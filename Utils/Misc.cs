@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using Discord;
 
 namespace RK800.Utils
 {
@@ -19,11 +20,11 @@ namespace RK800.Utils
             return string.Format("{0:0.#} {1}", size, units[unit]);
         }
 
-        public static string[] ConvertToDiscordSendable(this string s, int size=2000)
+        public static string[] ConvertToDiscordSendable(this string s, int size = 2000)
         {
-            if (s.Length <= size) return new string[]{s};
+            if (s.Length <= size) return new string[] { s };
             List<string> readable = new List<string>();
-            for (int i = 0; i < s.Length; i+= size)
+            for (int i = 0; i < s.Length; i += size)
             {
                 int length = Math.Min(s.Length - i, size);
                 readable.Add(s.Substring(i, length));

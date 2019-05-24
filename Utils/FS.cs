@@ -7,6 +7,7 @@ namespace RK800.Utils
     public static class FS
     {
         public static FileInfo GetFile(this DirectoryInfo obj, string filename) => new FileInfo($"{obj.FullName}{Path.DirectorySeparatorChar}{filename}");
+        
         public static long GetSize(this DirectoryInfo obj)
         {
             IEnumerable<FileInfo> files = obj.EnumerateFilesRecursively();

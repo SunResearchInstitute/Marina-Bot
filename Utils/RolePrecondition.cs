@@ -35,7 +35,7 @@ namespace RK800.Utils
             if (guildUser.Hierarchy < targetUser.Hierarchy)
                 return PreconditionResult.FromError("You cannot target anyone else whose roles are higher than yours.");
 
-            var currentUser = await context.Guild.GetCurrentUserAsync().ConfigureAwait(false) as SocketGuildUser;
+            SocketGuildUser currentUser = await context.Guild.GetCurrentUserAsync().ConfigureAwait(false) as SocketGuildUser;
             //maybe we should use <=?
             if (currentUser?.Hierarchy < targetUser.Hierarchy)
                 return PreconditionResult.FromError("The bot's role is lower than the targeted user.");
