@@ -65,7 +65,7 @@ namespace RK800
         {
             if (TrackerContext.Trackers.Keys.Contains(after.Id))
             {
-                TrackerContext.Trackers[after.Id] = DateTime.Now;
+                Tracker.Trackers[after.Id] = DateTime.Now;
             }
         }
 

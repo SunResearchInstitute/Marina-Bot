@@ -11,9 +11,11 @@ namespace RK800
 
         public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>();
 
-        private static readonly string[] PreDefinedSaves = { "DogMsgList.Ulong" };
+        private static readonly string[] PreDefinedSaves = { "DogMsgList.Ulong", "Trackers.Ulong" };
 
         public static UlongSaveFile DogMsgList => Saves["DogMsgList"] as UlongSaveFile;
+
+        public static UlongSaveFile Trackers => Saves["Trackers"] as UlongSaveFile;
 
         private static ISaveFile OpenSaveFile(FileInfo file)
         {
@@ -43,6 +45,12 @@ namespace RK800
 
             foreach (ISaveFile file in Saves.Values)
                 file.Read();
+        }
+
+        public static void SaveAll()
+        {
+            foreach (ISaveFile save in Saves.Values)
+                save.Write();
         }
     }
 }

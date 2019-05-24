@@ -12,25 +12,42 @@ namespace RK800.Commands
 {
     public class Tracker : ModuleBase<SocketCommandContext>
     {
+        public static Dictionary<ulong, DateTime> Trackers => TrackerContext.Trackers;
+
         [Command("TrackMe")]
         public async Task InitTracker()
         {
-            if (TrackerContext.Trackers.TryAdd(Context.User.Id, DateTime.Now))
+            if (Trackers.TryAdd(Context.User.Id, DateTime.Now))
             {
-                await ReplyAsync("Your online time is now being monitored!");
+                await ReplyAsync("You are now being monitored!");
+                SaveHandler.Trackers.SaveData.Add(Context.User.Id);
             }
             else
             {
-                await ReplyAsync("Your time is already being monitored!");
+                await ReplyAsync("You are already being monitored!");
+            }
+        }
+
+        [Command("UntrackMe")]
+        public async Task StopTracker()
+        {
+            if (Trackers.Remove(Context.User.Id))
+            {
+                await ReplyAsync("Your are no longer being monitored!");
+                SaveHandler.Trackers.SaveData.Remove(Context.User.Id);
+            }
+            else
+            {
+                await ReplyAsync("You are not being monitored!");
             }
         }
 
         [Command("Time")]
         public async Task GetTime()
         {
-            if (TrackerContext.Trackers.Keys.Contains(Context.User.Id))
+            if (Trackers.Keys.Contains(Context.User.Id))
             {
-                TimeSpan ts = DateTime.Now - TrackerContext.Trackers[Context.User.Id];
+                TimeSpan ts = DateTime.Now - Trackers[Context.User.Id];
                 string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
                 await ReplyAsync($"You spent {elapsedTime} in {Context.User.Status} ");
             }
@@ -39,7 +56,5 @@ namespace RK800.Commands
                 await Error.SendDiscordError(Context, Value: "You are not being monitored!");
             }
         }
-
-
     }
 }

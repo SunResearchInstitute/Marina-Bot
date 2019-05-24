@@ -34,7 +34,7 @@ namespace RK800.Commands
 
         private static void SendMessages()
         {
-            foreach (ulong id in SaveHandler.DogMsgList.Data)
+            foreach (ulong id in SaveHandler.DogMsgList.SaveData)
             {
                 WebClient wc = new WebClient();
                 Dictionary<string, string> jsondata = JsonConvert.DeserializeObject<Dictionary<string, string>>(wc.DownloadString("https://dog.ceo/api/breeds/image/random"));

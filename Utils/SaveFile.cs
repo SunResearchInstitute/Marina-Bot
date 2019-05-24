@@ -6,7 +6,7 @@ namespace RK800.Utils
 
     public abstract class SaveFile<T> : ISaveFile
     {
-        public T Data;
+        public T SaveData;
         public SaveFile(FileInfo file) : base(file) { }
     }
 
@@ -15,11 +15,11 @@ namespace RK800.Utils
 
         public override void Read()
         {
-            Data = new List<ulong>();
+            SaveData = new List<ulong>();
             using (StreamReader reader = new StreamReader(Open()))
             {
                 string s;
-                while ((s = reader.ReadLine()) != null) Data.Add(ulong.Parse(s));
+                while ((s = reader.ReadLine()) != null) SaveData.Add(ulong.Parse(s));
             }
         }
 
@@ -32,7 +32,7 @@ namespace RK800.Utils
             }
 
             using (StreamWriter writer = new StreamWriter(Open()))
-                foreach (ulong value in Data)
+                foreach (ulong value in SaveData)
                     writer.WriteLine($"{value}");
         }
 
@@ -43,14 +43,14 @@ namespace RK800.Utils
     {
         public override void Read()
         {
-            Data = new List<KeyValuePair<ulong, string>>();
+            SaveData = new List<KeyValuePair<ulong, string>>();
             using (StreamReader reader = new StreamReader(Open()))
             {
                 string s;
                 while ((s = reader.ReadLine()) != null)
                 {
                     string[] split = s.Split(": ");
-                    Data.Add(new KeyValuePair<ulong, string>(ulong.Parse(split[0]), split[1]));
+                    SaveData.Add(new KeyValuePair<ulong, string>(ulong.Parse(split[0]), split[1]));
                 }
             }
         }
@@ -64,7 +64,7 @@ namespace RK800.Utils
             }
             
             using (StreamWriter writer = new StreamWriter(Open()))
-                foreach (KeyValuePair<ulong, string> pair in Data)
+                foreach (KeyValuePair<ulong, string> pair in SaveData)
                     writer.WriteLine($"{pair.Key}: {pair.Value}");
         }
         public UlongStringSaveFile(FileInfo file) : base(file) { }
