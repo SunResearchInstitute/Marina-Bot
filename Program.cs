@@ -61,7 +61,9 @@ namespace RK800
             await Client.StartAsync();
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (TrackerContext.Trackers.Keys.Contains(after.Id))
             {
@@ -69,7 +71,9 @@ namespace RK800
             }
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async Task JoinedGuild(SocketGuild arg)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             throw new NotImplementedException();
             //TODO: Send our Init info for security stuff
