@@ -112,6 +112,9 @@ namespace RK800
             Console.WriteLine("Ready!");
 
             await Client.SetGameAsync("with Sumo");
+
+            //Workaround until we have a save that starts earlier
+            SaveHandler.Populate();
         }
 
         private static void LoadConfig()

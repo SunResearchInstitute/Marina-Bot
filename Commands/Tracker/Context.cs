@@ -13,9 +13,6 @@ namespace RK800.Commands.Tracker
             Enabled = true,
         };
 
-        static Context()
-        {
-            Timer.Elapsed += Tracker.TimeTracker.CheckTime;
-        }
+        static Context() => Timer.Elapsed += Tracker.TimeTracker.CheckTime;
     }
 }

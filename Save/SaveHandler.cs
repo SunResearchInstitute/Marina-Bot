@@ -30,7 +30,7 @@ namespace RK800.Save
             }
         }
 
-        static SaveHandler()
+        public static void Populate()
         {
             save.Create();
             foreach (string str in PreDefinedSaves)

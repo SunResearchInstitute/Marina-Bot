@@ -47,7 +47,7 @@ namespace RK800.Commands.Tracker
             if (TrackersSave.SaveData.Keys.Contains(Context.User.Id))
             {
                 TimeSpan ts = DateTime.Now - TrackersSave.SaveData[Context.User.Id];
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}", ts.Hours, ts.Minutes, ts.Seconds);
                 await ReplyAsync($"You spent {elapsedTime} in {Context.User.Status} ");
             }
             else
@@ -72,7 +72,7 @@ namespace RK800.Commands.Tracker
                 return;
             }
 
-            await ReplyAsync($"Your alert timer has been set to {time}");
+            await ReplyAsync($"Your alert timer has been set for {String.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}");
             if (AlertIntervals.SaveData.ContainsKey(Context.User.Id))
             {
                 AlertIntervals.SaveData[Context.User.Id] = time;
