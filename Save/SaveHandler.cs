@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace RK800
+namespace RK800.Save
 {
     class SaveHandler
     {
@@ -11,9 +11,7 @@ namespace RK800
 
         public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>();
 
-        private static readonly string[] PreDefinedSaves = { "DogMsgList.Ulong", "Trackers.Ulong" };
-
-        public static UlongSaveFile DogMsgList => Saves["DogMsgList"] as UlongSaveFile;
+        private static readonly string[] PreDefinedSaves = { "Trackers.Ulong" };
 
         public static UlongSaveFile Trackers => Saves["Trackers"] as UlongSaveFile;
 

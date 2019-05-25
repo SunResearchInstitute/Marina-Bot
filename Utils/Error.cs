@@ -1,6 +1,5 @@
 ﻿using Discord;
 using System.Threading.Tasks;
-using Discord.WebSocket;
 using System;
 using Discord.Commands;
 using Discord.Rest;

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System;
-using Discord;
 
 namespace RK800.Utils
 {

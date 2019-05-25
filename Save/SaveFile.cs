@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace RK800.Utils
+namespace RK800.Save
 {
 
     public abstract class SaveFile<T> : ISaveFile
