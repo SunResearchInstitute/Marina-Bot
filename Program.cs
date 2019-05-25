@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using RK800.Utils;
-using RK800.Commands;
+using RK800.Save;
+using RK800.Commands.Tracker;
 using Discord.Net;
 
 namespace RK800
@@ -65,9 +66,12 @@ namespace RK800
         private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            if (TrackerContext.Trackers.Keys.Contains(after.Id))
+            if (before.Status != after.Status)
             {
-                Tracker.Trackers[after.Id] = DateTime.Now;
+                if (TimeTracker.TrackersSave.SaveData.Keys.Contains(after.Id))
+                {
+                    TimeTracker.TrackersSave.SaveData[after.Id] = DateTime.Now;
+                }
             }
         }
 
