@@ -12,7 +12,7 @@ namespace RK800.Save
         public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>();
 
         private static readonly string[] PreDefinedSaves = { "Trackers.Tracker", "AlertIntervals.UlongTimeSpan" };
- 
+
         private static ISaveFile OpenSaveFile(FileInfo file)
         {
             switch (file.Extension.ToLower())
