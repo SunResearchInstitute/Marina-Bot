@@ -62,24 +62,24 @@ namespace RK800.Commands
         }
 
         [Command("SetAlertTime")]
-        public async Task SetTimeAlert(string s, params string[] msg)
+        public async Task SetTimeAlert(string Time_Span, params string[] Message)
         {
             if (TrackersSave.Data.ContainsKey(Context.User.Id))
             {
-                if (!TimeSpan.TryParse(s, out TimeSpan time))
+                if (!TimeSpan.TryParse(Time_Span, out TimeSpan time))
                 {
                     await Error.SendDiscordError(Context, Value: "Invald time interval!");
                     return;
                 }
-                /* 
+
                 if (time < new TimeSpan(0, 10, 0))
                 {
                     await Error.SendDiscordError(Context, Value: "Time can not be below ten minutes!");
                     return;
                 }
-                */
+
                 string reply = $"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}";
-                if (!string.IsNullOrWhiteSpace(string.Join(" ", msg))) reply += $" with message \"{string.Join(" ", msg)}\"";
+                if (!string.IsNullOrWhiteSpace(string.Join(" ", Message))) reply += $" with message \"{string.Join(" ", Message)}\"";
                 else reply += ".";
                 await ReplyAsync(reply);
                 TrackersSave.Data[Context.User.Id].IsAlertEnabled = true;

@@ -10,32 +10,32 @@ namespace RK800.Commands
     public class Help : ModuleBase<SocketCommandContext>
     {
         private static Dictionary<string, string> cmds = new Dictionary<string, string>();
+
         public static void Populate()
         {
             foreach (CommandInfo cmd in Program.Commands.Commands)
             {
-                if (string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs) cmds.Add(cmd.Name, "No info avaliable!");
-                else if (!string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs) cmds.Add(cmd.Name, cmd.Summary);
-                else if (string.IsNullOrWhiteSpace(cmd.Summary) && cmd.HasVarArgs)
+                string s = "";
+                if (string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs)
                 {
-                    string s = "args: ";
-                    foreach (ParameterInfo param in cmd.Parameters)
-                    {
-                        if (param.DefaultValue != null) s += $"[{param.Name} = {param.DefaultValue}] ";
-                        else s += $"<{param.Name}> ";
-                    }
-                    cmds.Add(cmd.Name, s);
+                    cmds.Add(cmd.Name, "No info avaliable!");
+                    continue;
                 }
-                else if (!string.IsNullOrWhiteSpace(cmd.Summary) && cmd.HasVarArgs)
+                else if (!string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs)
                 {
-                    string s = $"{cmd.Summary}\nargs: ";
-                    foreach (ParameterInfo param in cmd.Parameters)
-                    {
-                        if (param.DefaultValue != null) s += $"[{param.Name} = {param.DefaultValue}] ";
-                        else s += $"<{param.Name}> ";
-                    }
-                    cmds.Add(cmd.Name, s);
+                    cmds.Add(cmd.Name, cmd.Summary);
+                    continue;
                 }
+                else if (string.IsNullOrWhiteSpace(cmd.Summary) && cmd.HasVarArgs) s = "args: ";
+                else if (!string.IsNullOrWhiteSpace(cmd.Summary) && cmd.HasVarArgs) s = $"{cmd.Summary}\nargs: ";
+
+                foreach (ParameterInfo param in cmd.Parameters)
+                {
+                    if (param.DefaultValue != null) s += $"[{param.Name.Replace('_', ' ')} = {param.DefaultValue}] ";
+                    else s += $"<{param.Name.Replace('_', ' ')}> ";
+                }
+                cmds.Add(cmd.Name, s);
+
             }
         }
 
