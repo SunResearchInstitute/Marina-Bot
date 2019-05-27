@@ -20,7 +20,7 @@ namespace RK800
     {
         //API Stuff
         public static DiscordSocketClient Client;
-        private CommandService Commands;
+        public static CommandService Commands;
 
         //Config Stuff
         private static Dictionary<string, string> Config = new Dictionary<string, string>();
@@ -121,6 +121,8 @@ namespace RK800
 
             //Workaround until we have a save that starts earlier
             SaveHandler.Populate();
+            //a Static Method Starts too early
+            Help.Populate();
         }
 
         private static void LoadConfig()
