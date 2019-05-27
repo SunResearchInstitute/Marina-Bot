@@ -17,8 +17,7 @@ namespace RK800.Save
         public override void Read()
         {
             Data = new List<ulong>();
-            List<ulong> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<ulong>)) as List<ulong>;
-            if (FileData != null) Data = FileData;
+            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<ulong>)) is List<ulong> FileData) Data = FileData;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
@@ -30,8 +29,7 @@ namespace RK800.Save
         public override void Read()
         {
             Data = new List<UlongString>();
-            List<UlongString> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<UlongString>)) as List<UlongString>;
-            if (FileData != null) Data = FileData;
+            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<UlongString>)) is List<UlongString> FileData) Data = FileData;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));

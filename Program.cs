@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using RK800.Commands;
 using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,8 +11,8 @@ using System.IO;
 using System.Threading;
 using RK800.Utils;
 using RK800.Save;
-using RK800.Commands.Tracker;
 using Discord.Net;
+using System.Timers;
 
 namespace RK800
 {
@@ -25,11 +26,16 @@ namespace RK800
         private static Dictionary<string, string> Config = new Dictionary<string, string>();
         private static FileInfo ConfigFile = new FileInfo("Config.txt");
 
-        //private StreamWriter Log = File.AppendText(new FileInfo("Connor.log").FullName);
+        private static readonly System.Timers.Timer Timer = new System.Timers.Timer(60000)
+        {
+            AutoReset = true,
+            Enabled = true,
+        };
 
         static void Main()
         {
             LoadConfig();
+            Timer.Elapsed += Tracker.CheckTimeAsync;
             Program program = new Program();
             program.MainAsync().GetAwaiter().GetResult();
             Thread.Sleep(-1);
@@ -68,9 +74,9 @@ namespace RK800
         {
             if (before.Status != after.Status)
             {
-                if (TimeTracker.TrackersSave.Data.Keys.Contains(after.Id))
+                if (Tracker.TrackersSave.Data.Keys.Contains(after.Id) && Tracker.TrackersSave.Data[after.Id].IsTrackerEnabled)
                 {
-                    TimeTracker.TrackersSave.Data[after.Id].dt = DateTime.Now;
+                    Tracker.TrackersSave.Data[after.Id].dt = DateTime.Now;
                 }
             }
         }

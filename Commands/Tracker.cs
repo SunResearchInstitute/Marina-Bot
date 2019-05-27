@@ -1,16 +1,14 @@
 ﻿using Discord.Commands;
 using System;
 using Discord;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using RK800.Save;
 using System.Timers;
 using RK800.Utils;
 
-namespace RK800.Commands.Tracker
+namespace RK800.Commands
 {
-    public class TimeTracker : ModuleBase<SocketCommandContext>
+    public class Tracker : ModuleBase<SocketCommandContext>
     {
         public static TrackerSaveFile TrackersSave => SaveHandler.Saves["Trackers"] as TrackerSaveFile;
 
@@ -64,25 +62,27 @@ namespace RK800.Commands.Tracker
         }
 
         [Command("SetAlertTime")]
-        public async Task SetTimeAlert(string s)
+        public async Task SetTimeAlert(string s, params string[] msg)
         {
             if (TrackersSave.Data.ContainsKey(Context.User.Id))
             {
-                TimeSpan time;
-                if (!TimeSpan.TryParse(s, out time))
+                if (!TimeSpan.TryParse(s, out TimeSpan time))
                 {
                     await Error.SendDiscordError(Context, Value: "Invald time interval!");
                     return;
                 }
-
+                /* 
                 if (time < new TimeSpan(0, 10, 0))
                 {
                     await Error.SendDiscordError(Context, Value: "Time can not be below ten minutes!");
                     return;
                 }
-
-                await ReplyAsync($"Your alert timer has been set for {String.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}");
-                if (!TrackersSave.Data[Context.User.Id].IsAlertEnabled) TrackersSave.Data[Context.User.Id].IsAlertEnabled = true;
+                */
+                string reply = $"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}";
+                if (!string.IsNullOrWhiteSpace(string.Join(" ", msg))) reply += $" with message \"{string.Join(" ", msg)}\"";
+                else reply += ".";
+                await ReplyAsync(reply);
+                TrackersSave.Data[Context.User.Id].IsAlertEnabled = true;
                 TrackersSave.Data[Context.User.Id].ts = time;
             }
             else
@@ -91,13 +91,33 @@ namespace RK800.Commands.Tracker
             }
         }
 
-        public static void CheckTime(Object source, ElapsedEventArgs e)
+        [Command("GetAlertTime")]
+        public async Task GetTimeAlert()
+        {
+            if (TrackersSave.Data[Context.User.Id].IsAlertEnabled && TrackersSave.Data.ContainsKey(Context.User.Id))
+            {
+                string reply = $"You have set your alert timer to {string.Format("{0:00}:{1:00}", TrackersSave.Data[Context.User.Id].ts.Hours, TrackersSave.Data[Context.User.Id].ts.Minutes)}";
+                if (!string.IsNullOrWhiteSpace(TrackersSave.Data[Context.User.Id].str)) reply += $" with message \"{TrackersSave.Data[Context.User.Id].str}\"";
+                else reply += ".";
+                await ReplyAsync(reply);
+                return;
+            }
+
+            await Error.SendDiscordError(Context, Value: "You are not being monitored!");
+        }
+
+        public static async void CheckTimeAsync(Object source, ElapsedEventArgs e)
         {
             foreach (ulong id in TrackersSave.Data.Keys)
             {
-                if (TrackersSave.Data[id].ts == DateTime.Now - TrackersSave.Data[id].dt)
+                if (TrackersSave.Data[id].IsAlertEnabled && TrackersSave.Data[id].ts <= DateTime.Now - TrackersSave.Data[id].dt)
                 {
-                    Program.Client.GetUser(id).SendMessageAsync($"You have recieved this DM because your self set online time alert of {String.Format("{0:00}:{1:00}", TrackersSave.Data[id].ts.Hours, TrackersSave.Data[id].ts.Minutes)} has been reached!");
+                    string msg = $"You have recieved this DM because your self set online time alert of {string.Format("{0:00}:{1:00}", TrackersSave.Data[id].ts.Hours, TrackersSave.Data[id].ts.Minutes)} has been reached";
+                    if (!string.IsNullOrWhiteSpace(TrackersSave.Data[id].str)) msg += $" with message \"{TrackersSave.Data[id].str}\"";
+                    else msg += "!";
+                    await Program.Client.GetUser(id).SendMessageAsync(msg);
+                    await Program.Client.GetUser(id).SendMessageAsync("Your alert time has also been reset!");
+                    TrackersSave.Data[id].IsAlertEnabled = false;
                 }
             }
         }
