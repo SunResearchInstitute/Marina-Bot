@@ -17,8 +17,8 @@ namespace RK800.Save
         public override void Read()
         {
             Data = new List<ulong>();
-            List<ulong> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName)) as List<ulong>;
-            if (FileData != null) Data = FileData; 
+            List<ulong> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<ulong>)) as List<ulong>;
+            if (FileData != null) Data = FileData;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
@@ -30,8 +30,8 @@ namespace RK800.Save
         public override void Read()
         {
             Data = new List<UlongString>();
-            List<UlongString> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName)) as List<UlongString>;
-            if (FileData != null) Data = FileData; 
+            List<UlongString> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<UlongString>)) as List<UlongString>;
+            if (FileData != null) Data = FileData;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
@@ -44,8 +44,13 @@ namespace RK800.Save
         public override void Read()
         {
             Data = new Dictionary<ulong, TrackerData>();
-            Dictionary<ulong, TrackerData> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName)) as Dictionary<ulong, TrackerData>;
-            if (FileData != null) Data = FileData; 
+            Dictionary<ulong, TrackerData> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, TrackerData>)) as Dictionary<ulong, TrackerData>;
+            foreach (TrackerData data in FileData.Values)
+            {
+                //manually update time
+                data.dt = DateTime.Now;
+            }
+            if (FileData != null) Data = FileData;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
