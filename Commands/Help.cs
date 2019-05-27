@@ -18,7 +18,7 @@ namespace RK800.Commands
                 string s = "";
                 if (string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs)
                 {
-                    cmds.Add(cmd.Name, "No info avaliable!");
+                    cmds.Add(cmd.Name, "No info available!");
                     continue;
                 }
                 else if (!string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs)
