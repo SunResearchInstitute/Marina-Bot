@@ -68,9 +68,9 @@ namespace RK800
         {
             if (before.Status != after.Status)
             {
-                if (TimeTracker.TrackersSave.SaveData.Keys.Contains(after.Id))
+                if (TimeTracker.TrackersSave.Data.Keys.Contains(after.Id))
                 {
-                    TimeTracker.TrackersSave.SaveData[after.Id] = DateTime.Now;
+                    TimeTracker.TrackersSave.Data[after.Id].dt = DateTime.Now;
                 }
             }
         }

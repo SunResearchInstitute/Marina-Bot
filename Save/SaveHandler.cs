@@ -11,7 +11,7 @@ namespace RK800.Save
 
         public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>();
 
-        private static readonly string[] PreDefinedSaves = { "Trackers.Tracker", "AlertIntervals.UlongTimeSpan" };
+        private static readonly string[] PreDefinedSaves = { "Trackers.Tracker" };
 
         private static ISaveFile OpenSaveFile(FileInfo file)
         {
@@ -23,8 +23,6 @@ namespace RK800.Save
                     return new UlongStringSaveFile(file);
                 case ".tracker":
                     return new TrackerSaveFile(file);
-                case ".ulongtimespan":
-                    return new UlongTimeSpanSaveFile(file);
                 default:
                     throw new Exception("File not a save!");
             }

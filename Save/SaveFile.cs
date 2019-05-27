@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
+using Newtonsoft.Json;
 
 namespace RK800.Save
 {
 
     public abstract class SaveFile<T> : ISaveFile
     {
-        public T SaveData;
+        public T Data;
         public SaveFile(FileInfo file) : base(file) { }
     }
 
@@ -15,117 +16,71 @@ namespace RK800.Save
     {
         public override void Read()
         {
-            SaveData = new List<ulong>();
-            using (StreamReader reader = new StreamReader(Open()))
-            {
-                string s;
-                while ((s = reader.ReadLine()) != null) SaveData.Add(ulong.Parse(s));
-            }
+            Data = new List<ulong>();
+            List<ulong> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName)) as List<ulong>;
+            if (FileData != null) Data = FileData; 
         }
 
-        public override void Write()
-        {
-            if (File.Length > 0)
-            {
-                File.Delete();
-                File.Create().Close();
-            }
-
-            using (StreamWriter writer = new StreamWriter(Open()))
-                foreach (ulong value in SaveData)
-                    writer.WriteLine($"{value}");
-        }
+        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
         public UlongSaveFile(FileInfo file) : base(file) { }
     }
-    public class UlongStringSaveFile : SaveFile<List<KeyValuePair<ulong, string>>>
+    public class UlongStringSaveFile : SaveFile<List<UlongString>>
     {
         public override void Read()
         {
-            SaveData = new List<KeyValuePair<ulong, string>>();
-            using (StreamReader reader = new StreamReader(Open()))
-            {
-                string s;
-                while ((s = reader.ReadLine()) != null)
-                {
-                    string[] split = s.Split(": ");
-                    SaveData.Add(new KeyValuePair<ulong, string>(ulong.Parse(split[0]), split[1]));
-                }
-            }
+            Data = new List<UlongString>();
+            List<UlongString> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName)) as List<UlongString>;
+            if (FileData != null) Data = FileData; 
         }
 
-        public override void Write()
-        {
-            if (File.Length > 0)
-            {
-                File.Delete();
-                File.Create().Close();
-            }
+        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
-            using (StreamWriter writer = new StreamWriter(Open()))
-                foreach (KeyValuePair<ulong, string> pair in SaveData)
-                    writer.WriteLine($"{pair.Key}: {pair.Value}");
-        }
         public UlongStringSaveFile(FileInfo file) : base(file) { }
     }
 
-    public class UlongTimeSpanSaveFile : SaveFile<Dictionary<ulong, TimeSpan>>
+    public class TrackerSaveFile : SaveFile<Dictionary<ulong, TrackerData>>
     {
         public override void Read()
         {
-            SaveData = new Dictionary<ulong, TimeSpan>();
-            using (StreamReader reader = new StreamReader(Open()))
-            {
-                string s;
-                while ((s = reader.ReadLine()) != null)
-                {
-                    string[] split = s.Split(": ");
-                    SaveData.Add(ulong.Parse(split[0]), TimeSpan.Parse(split[1]));
-                }
-            }
+            Data = new Dictionary<ulong, TrackerData>();
+            Dictionary<ulong, TrackerData> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName)) as Dictionary<ulong, TrackerData>;
+            if (FileData != null) Data = FileData; 
         }
 
-        public override void Write()
-        {
-            if (File.Length > 0)
-            {
-                File.Delete();
-                File.Create().Close();
-            }
-
-            using (StreamWriter writer = new StreamWriter(Open()))
-                foreach (KeyValuePair<ulong, TimeSpan> pair in SaveData)
-                    writer.WriteLine($"{pair.Key}: {pair.Value}");
-        }
-        public UlongTimeSpanSaveFile(FileInfo file) : base(file) { }
-    }
-
-    public class TrackerSaveFile : SaveFile<Dictionary<ulong, DateTime>>
-    {
-        public override void Read()
-        {
-            SaveData = new Dictionary<ulong, DateTime>();
-            using (StreamReader reader = new StreamReader(Open()))
-            {
-                string s;
-                while ((s = reader.ReadLine()) != null) SaveData.Add(ulong.Parse(s), DateTime.Now);
-            }
-        }
-
-        public override void Write()
-        {
-            if (File.Length > 0)
-            {
-                File.Delete();
-                File.Create().Close();
-            }
-
-            using (StreamWriter writer = new StreamWriter(Open()))
-                foreach (ulong value in SaveData.Keys)
-                    writer.WriteLine($"{value}");
-        }
+        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
         public TrackerSaveFile(FileInfo file) : base(file) { }
     }
 
+    public class UlongString
+    {
+        public ulong ul;
+        public string str;
+
+
+        public UlongString(ulong u64, string s)
+        {
+            ul = u64;
+            str = s;
+        }
+    }
+
+    public class TrackerData
+    {
+        public DateTime dt;
+        public TimeSpan ts;
+        public string str;
+        public bool IsTrackerEnabled;
+        public bool IsAlertEnabled;
+
+        public TrackerData(DateTime date, TimeSpan time, string s = null, bool tracker = false, bool alert = false)
+        {
+            dt = date;
+            ts = time;
+            str = s;
+            IsTrackerEnabled = tracker;
+            IsAlertEnabled = alert;
+        }
+    }
 }
