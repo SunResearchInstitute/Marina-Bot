@@ -73,7 +73,7 @@ namespace RK800.Save
     {
         public DateTime dt;
         public TimeSpan ts;
-        public string str;
+        public string msg;
         public bool IsTrackerEnabled;
         public bool IsAlertEnabled;
 
@@ -81,7 +81,7 @@ namespace RK800.Save
         {
             dt = date;
             ts = time;
-            str = s;
+            msg = s;
             IsTrackerEnabled = tracker;
             IsAlertEnabled = alert;
         }

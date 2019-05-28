@@ -11,6 +11,7 @@ namespace RK800.Commands
     public class Animals : ModuleBase<SocketCommandContext>
     {
         [Command("Dog")]
+        [Summary("Gets a random dog picture.")]
         public async Task SendDog()
         {
             //This just downloads the json which should be fine
@@ -32,6 +33,7 @@ namespace RK800.Commands
         }
 
         [Command("Cat")]
+        [Summary("Gets a random cat picture.")]
         public async Task SendCat()
         {
             WebClient wc = new WebClient();

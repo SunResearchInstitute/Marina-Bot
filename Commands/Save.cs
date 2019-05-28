@@ -7,6 +7,7 @@ namespace RK800.Commands
     public class Save : ModuleBase<SocketCommandContext>
     {
         [Command("Save")]
+        [RequireOwner]
         public async Task ForceSaving()
         {
             SaveHandler.SaveAll();

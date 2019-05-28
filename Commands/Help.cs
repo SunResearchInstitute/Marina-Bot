@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using RK800;
 using Discord;
 using System.Collections.Generic;
+using System.Linq;
+using RK800.Utils;
 
 namespace RK800.Commands
 {
@@ -15,19 +17,23 @@ namespace RK800.Commands
         {
             foreach (CommandInfo cmd in Program.Commands.Commands)
             {
+                if (cmd.Preconditions.Any(p => p is RequireOwnerAttribute)) continue;
+
                 string s = "";
-                if (string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs)
+                bool isSummaryEmpty = string.IsNullOrWhiteSpace(cmd.Summary);
+                bool HasNoArgs = cmd.Parameters.Count == 0;
+                if (isSummaryEmpty && HasNoArgs)
                 {
                     cmds.Add(cmd.Name, "No info available!");
                     continue;
                 }
-                else if (!string.IsNullOrWhiteSpace(cmd.Summary) && !cmd.HasVarArgs)
+                else if (!isSummaryEmpty && HasNoArgs)
                 {
                     cmds.Add(cmd.Name, cmd.Summary);
                     continue;
                 }
-                else if (string.IsNullOrWhiteSpace(cmd.Summary) && cmd.HasVarArgs) s = "args: ";
-                else if (!string.IsNullOrWhiteSpace(cmd.Summary) && cmd.HasVarArgs) s = $"{cmd.Summary}\nargs: ";
+                else if (isSummaryEmpty && !HasNoArgs) s = "args: ";
+                else if (!isSummaryEmpty && !HasNoArgs) s = $"{cmd.Summary}\nargs: ";
 
                 foreach (ParameterInfo param in cmd.Parameters)
                 {
@@ -35,7 +41,6 @@ namespace RK800.Commands
                     else s += $"<{param.Name.Replace('_', ' ')}> ";
                 }
                 cmds.Add(cmd.Name, s);
-
             }
         }
 
@@ -47,11 +52,28 @@ namespace RK800.Commands
             builder.WithCurrentTimestamp();
             builder.WithFooter("All commands start with 'c.'");
             builder.WithTitle("Help Menu");
-            foreach (KeyValuePair<string, string> cmd in cmds)
+
+            if (Command != null)
             {
-                builder.AddField(cmd.Key, cmd.Value);
+                foreach (KeyValuePair<string, string> cmd in cmds)
+                {
+                    if (cmd.Key.Contains(Command))
+                    {
+                        builder.AddField(cmd.Key, cmd.Value);
+                        await ReplyAsync(embed: builder.Build());
+                        return;
+                    }
+                }
+                await Error.SendDiscordError(Context, Value: "Command does not exist!");
             }
-            await ReplyAsync(embed: builder.Build());
+            else
+            {
+                foreach (KeyValuePair<string, string> cmd in cmds)
+                {
+                    builder.AddField(cmd.Key, cmd.Value);
+                }
+                await Context.User.SendMessageAsync(embed: builder.Build());
+            }
         }
     }
 }
