@@ -25,7 +25,6 @@ namespace RK800.Commands
             {
                 TrackersSave.Data[Context.User.Id].IsTrackerEnabled = true;
                 await ReplyAsync("You are now being monitored!");
-
             }
             else
             {
