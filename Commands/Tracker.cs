@@ -33,7 +33,7 @@ namespace RK800.Commands
             }
         }
 
-        [Command("UntrackMe")]
+        [Command("UnTrackMe")]
         [Summary("Stops tracking your online time.")]
         public async Task StopTracker()
         {

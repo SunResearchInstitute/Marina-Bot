@@ -24,6 +24,7 @@ namespace RK800.Save
 
         public UlongSaveFile(FileInfo file) : base(file) { }
     }
+
     public class UlongStringSaveFile : SaveFile<List<UlongString>>
     {
         public override void Read()
@@ -35,6 +36,19 @@ namespace RK800.Save
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
         public UlongStringSaveFile(FileInfo file) : base(file) { }
+    }
+
+    public class UlongStringListSaveFile : SaveFile<Dictionary<ulong, List<string>>>
+    {
+        public override void Read()
+        {
+            Data = new Dictionary<ulong, List<string>>();
+            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, List<string>>)) is Dictionary<ulong, List<string>> FileData) Data = FileData;
+        }
+
+        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
+
+        public UlongStringListSaveFile(FileInfo file) : base(file) { }
     }
 
     public class TrackerSaveFile : SaveFile<Dictionary<ulong, TrackerData>>
