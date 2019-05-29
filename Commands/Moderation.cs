@@ -31,26 +31,41 @@ namespace RK800.Commands
         [Command("InitializeFilter"), Alias("InitFilter")]
         public async Task InitFilter(bool Use_Default_Filter_Values = true)
         {
-            if (!FilterSave.Data.ContainsKey(Context.Guild.Id))
+            if (FilterSave.Data.ContainsKey(Context.Guild.Id))
             {
-                List<string> List = new List<string>();
-                if (Use_Default_Filter_Values) List.AddRange(File.ReadAllLines(filterdefaults.FullName));
-                FilterSave.Data.Add(Context.Guild.Id, new FilterData(List));
-                await ReplyAsync("Filter Initialize!");
+                if (FilterSave.Data[Context.Guild.Id].IsEnabled)
+                {
+                    List<string> List = new List<string>();
+                    if (Use_Default_Filter_Values) List.AddRange(File.ReadAllLines(filterdefaults.FullName));
+                    FilterSave.Data.Add(Context.Guild.Id, new FilterData(List));
+                    await ReplyAsync("Filter Initialized!");
+                }
+                else await Error.SendDiscordError(Context, Value: "Filter has already been disabled!");
             }
-            else await Error.SendDiscordError(Context, Value: "Filter has already been initialize!");
+            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
+        }
+
+        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
+        [Command("RemoveFilterData")]
+        public async Task RemoveFilterData()
+        {
+            if (FilterSave.Data.Remove(Context.Guild.Id)) await ReplyAsync("Filter data removed!");
+            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
         }
 
         [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
         [Command("DisableFilter")]
         public async Task DisableFilter()
         {
-            if (!FilterSave.Data.ContainsKey(Context.Guild.Id))
+            if (FilterSave.Data.ContainsKey(Context.Guild.Id))
             {
-                FilterSave.Data[Context.Guild.Id].IsEnabled = false;
-                await ReplyAsync("Filter disabled!");
+                if (FilterSave.Data[Context.Guild.Id].IsEnabled)
+                {
+                    FilterSave.Data[Context.Guild.Id].IsEnabled = false;
+                    await ReplyAsync("Filter disabled!");
+                }
             }
-            else await Error.SendDiscordError(Context, Value: "Filter is already disabled!");
+            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
         }
 
         [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
@@ -63,7 +78,7 @@ namespace RK800.Commands
                 FilterSave.Data[Context.Guild.Id].Words.Add(Word);
                 await ReplyAsync("Word added!");
             }
-            else await Error.SendDiscordError(Context, Value: "Filter has not been initialize!");
+            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
         }
 
         [RequireUserPermission(GuildPermission.ManageMessages)]
@@ -83,7 +98,7 @@ namespace RK800.Commands
                 }
                 else await Error.SendDiscordError(Context, Value: "Filter contains no words!");
             }
-            else await Error.SendDiscordError(Context, Value: "Filiter has not been initialize!");
+            else await Error.SendDiscordError(Context, Value: "Filiter has not been initialized!");
         }
     }
 }
