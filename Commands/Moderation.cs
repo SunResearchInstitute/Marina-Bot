@@ -4,6 +4,7 @@ using RK800.Save;
 using System.Linq;
 using System.Collections.Generic;
 using RK800.Utils;
+using System;
 using Discord;
 using System.IO;
 
@@ -11,7 +12,7 @@ namespace RK800.Commands
 {
     public class Moderation : ModuleBase<SocketCommandContext>
     {
-        public static UlongStringListSaveFile FilterSave => SaveHandler.Saves["Filter"] as UlongStringListSaveFile;
+        public static FilterSaveFile FilterSave => SaveHandler.Saves["Filter"] as FilterSaveFile;
 
         public static FileInfo filterdefaults = new FileInfo("FilterDefaults.txt");
 
@@ -19,8 +20,9 @@ namespace RK800.Commands
         {
             if (FilterSave.Data.ContainsKey(server))
             {
-                foreach (string BadWord in FilterSave.Data[server])
-                    if (s.ToLower().Split(' ').Contains(BadWord)) return true;
+                foreach (string BadWord in FilterSave.Data[server].Words)
+                    if (s.Split(' ').Contains(BadWord, StringComparer.OrdinalIgnoreCase) || s.Contains(BadWord, StringComparison.OrdinalIgnoreCase)) return true;
+
             }
             return false;
         }
@@ -33,21 +35,32 @@ namespace RK800.Commands
             {
                 List<string> List = new List<string>();
                 if (Use_Default_Filter_Values) List.AddRange(File.ReadAllLines(filterdefaults.FullName));
-                FilterSave.Data.Add(Context.Guild.Id, List);
+                FilterSave.Data.Add(Context.Guild.Id, new FilterData(List));
                 await ReplyAsync("Filter Initialize!");
             }
             else await Error.SendDiscordError(Context, Value: "Filter has already been initialize!");
+        }
 
+        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
+        [Command("DisableFilter")]
+        public async Task DisableFilter()
+        {
+            if (!FilterSave.Data.ContainsKey(Context.Guild.Id))
+            {
+                FilterSave.Data[Context.Guild.Id].IsEnabled = false;
+                await ReplyAsync("Filter disabled!");
+            }
+            else await Error.SendDiscordError(Context, Value: "Filter is already disabled!");
         }
 
         [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
         [Command("AddFilteredWord")]
         public async Task AddBadWord(string Word)
         {
-            
+
             if (FilterSave.Data.ContainsKey(Context.Guild.Id))
             {
-                FilterSave.Data[Context.Guild.Id].Add(Word);
+                FilterSave.Data[Context.Guild.Id].Words.Add(Word);
                 await ReplyAsync("Word added!");
             }
             else await Error.SendDiscordError(Context, Value: "Filter has not been initialize!");

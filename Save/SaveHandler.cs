@@ -24,7 +24,7 @@ namespace RK800.Save
                 case ".tracker":
                     return new TrackerSaveFile(file);
                 case ".ulongstringlist":
-                    return new UlongStringListSaveFile(file);
+                    return new FilterSaveFile(file);
                 default:
                     throw new Exception("File not a save!");
             }

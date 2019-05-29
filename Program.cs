@@ -66,6 +66,10 @@ namespace RK800
             {
                 Error.SendApplicationError("Token is invalid!");
             }
+            //Workaround until we have a save that starts earlier
+            SaveHandler.Populate();
+            //a Static Method Starts too early
+            Help.Populate();
             await Client.StartAsync();
         }
 
@@ -87,14 +91,16 @@ namespace RK800
             SocketUserMessage Message = arg as SocketUserMessage;
             SocketCommandContext Context = new SocketCommandContext(Client, Message);
             int PrefixPos = 0;
-            
+
+            if (string.IsNullOrWhiteSpace(Context.Message.Content) || Context.User.IsBot) return;
+
             if (Context.Guild != null)
             {
                 if (Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
                 {
                     await Context.Channel.TriggerTypingAsync();
-                    await Context.Channel.SendMessageAsync($"{Context.User.Mention} This language is highly uncalled for...");
-                    await Task.Delay(300);
+                    await Context.Channel.SendMessageAsync($"{Context.User.Mention} Your language is highly uncalled for...");
+                    await Task.Delay(150);
                     await Context.Message.DeleteAsync();
                     await Context.Channel.TriggerTypingAsync();
                     await Task.Delay(500);
@@ -104,7 +110,7 @@ namespace RK800
                 if (!Message.HasStringPrefix("c.", ref PrefixPos)) return;
             }
 
-            if (string.IsNullOrWhiteSpace(Context.Message.Content) || Context.User.IsBot) return;
+
 
             //TODO: implement Banned Users
 
@@ -119,13 +125,7 @@ namespace RK800
         private async Task Client_Ready()
         {
             Console.WriteLine("Ready!");
-
             await Client.SetGameAsync("with Sumo");
-
-            //Workaround until we have a save that starts earlier
-            SaveHandler.Populate();
-            //a Static Method Starts too early
-            Help.Populate();
         }
 
         private static void LoadConfig()

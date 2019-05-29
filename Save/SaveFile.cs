@@ -38,17 +38,17 @@ namespace RK800.Save
         public UlongStringSaveFile(FileInfo file) : base(file) { }
     }
 
-    public class UlongStringListSaveFile : SaveFile<Dictionary<ulong, List<string>>>
+    public class FilterSaveFile : SaveFile<Dictionary<ulong, FilterData>>
     {
         public override void Read()
         {
-            Data = new Dictionary<ulong, List<string>>();
-            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, List<string>>)) is Dictionary<ulong, List<string>> FileData) Data = FileData;
+            Data = new Dictionary<ulong, FilterData>();
+            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, FilterData>)) is Dictionary<ulong, FilterData> FileData) Data = FileData;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
-        public UlongStringListSaveFile(FileInfo file) : base(file) { }
+        public FilterSaveFile(FileInfo file) : base(file) { }
     }
 
     public class TrackerSaveFile : SaveFile<Dictionary<ulong, TrackerData>>
@@ -79,6 +79,15 @@ namespace RK800.Save
             ul = u64;
             str = s;
         }
+    }
+
+    public class FilterData
+    {
+        public List<string> Words;
+
+        public bool IsEnabled = true;
+
+        public FilterData(List<string> list) => Words = list;
     }
 
     public class TrackerData
