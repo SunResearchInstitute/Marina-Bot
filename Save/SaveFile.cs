@@ -57,12 +57,10 @@ namespace RK800.Save
         {
             Data = new Dictionary<ulong, TrackerData>();
             Dictionary<ulong, TrackerData> FileData = JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, TrackerData>)) as Dictionary<ulong, TrackerData>;
-            foreach (TrackerData data in FileData.Values)
-            {
-                //manually update time
-                data.dt = DateTime.Now;
-            }
             if (FileData != null) Data = FileData;
+            //manually update time
+            foreach (TrackerData data in Data.Values)
+                data.dt = DateTime.Now;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
