@@ -48,12 +48,13 @@ namespace RK800
             Commands = new CommandService(new CommandServiceConfig
             {
                 CaseSensitiveCommands = false,
-                DefaultRunMode = RunMode.Async,
+                DefaultRunMode = RunMode.Async
             });
-            //What we should do when the client is ready and when the client gets a message
             Client.Ready += Client_Ready;
             Client.MessageReceived += MessageReceived;
-            Client.JoinedGuild += JoinedGuild;
+            //TODO: Moderation
+            //Client.MessageDeleted += MessageDeleted;
+            //Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
 
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
@@ -81,15 +82,6 @@ namespace RK800
             }
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private async Task JoinedGuild(SocketGuild arg)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        {
-            throw new NotImplementedException();
-            //TODO: Send our Init info for security stuff
-            //await arg.DefaultChannel.SendMessageAsync("");
-        }
-
         private async Task MessageReceived(SocketMessage arg)
         {
             SocketUserMessage Message = arg as SocketUserMessage;
@@ -97,11 +89,17 @@ namespace RK800
 
             int PrefixPos = 0;
 
-            if (Context.Guild != null)
-                if (!Message.HasStringPrefix("c.", ref PrefixPos))
-                    return;
+            if (Context.Guild != null && !Message.HasStringPrefix("c.", ref PrefixPos)) return;
 
             if (string.IsNullOrWhiteSpace(Context.Message.Content) || Context.User.IsBot) return;
+
+            if(Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content)) 
+            {
+                await Context.Channel.SendMessageAsync($"{Context.User.Mention} This language is highly uncalled for...");
+                await Context.Message.DeleteAsync();
+                await Context.Channel.SendMessageAsync("Thank you in advance for your cooperation.");
+                return;
+            }
 
             //TODO: implement Banned Users
 
