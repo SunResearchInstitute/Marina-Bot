@@ -25,6 +25,7 @@ namespace RK800.Commands
             return false;
         }
 
+        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
         [Command("InitializeFilter"), Alias("InitFilter")]
         public async Task InitFilter(bool Use_Default_Filter_Values = true)
         {
@@ -39,6 +40,7 @@ namespace RK800.Commands
 
         }
 
+        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
         [Command("AddFilteredWord")]
         public async Task AddBadWord(string Word)
         {
@@ -51,6 +53,7 @@ namespace RK800.Commands
             else await Error.SendDiscordError(Context, Value: "Filter has not been initialize!");
         }
 
+        [RequireUserPermission(GuildPermission.ManageMessages)]
         [Command("ListFilteredWords")]
         public async Task ListBadsWords()
         {
@@ -63,7 +66,7 @@ namespace RK800.Commands
                     builder.WithTitle("Filtered words");
                     builder.WithCurrentTimestamp();
                     builder.WithDescription(string.Join("\n", FilterSave.Data[Context.Guild.Id]));
-                    await ReplyAsync(embed: builder.Build());
+                    await Context.User.SendMessageAsync(embed: builder.Build());
                 }
                 else await Error.SendDiscordError(Context, Value: "Filter contains no words!");
             }
