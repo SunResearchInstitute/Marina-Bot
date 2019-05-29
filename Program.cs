@@ -87,19 +87,23 @@ namespace RK800
             SocketUserMessage Message = arg as SocketUserMessage;
             SocketCommandContext Context = new SocketCommandContext(Client, Message);
 
+            if (Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
+            {
+                await Context.Channel.TriggerTypingAsync();
+                await Context.Channel.SendMessageAsync($"{Context.User.Mention} This language is highly uncalled for...");
+                await Task.Delay(300);
+                await Context.Message.DeleteAsync();
+                await Context.Channel.TriggerTypingAsync();
+                await Task.Delay(500);
+                await Context.Channel.SendMessageAsync("Thank you in advance for your cooperation.");
+                return;
+            }
+
             int PrefixPos = 0;
 
             if (Context.Guild != null && !Message.HasStringPrefix("c.", ref PrefixPos)) return;
 
             if (string.IsNullOrWhiteSpace(Context.Message.Content) || Context.User.IsBot) return;
-
-            if(Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content)) 
-            {
-                await Context.Channel.SendMessageAsync($"{Context.User.Mention} This language is highly uncalled for...");
-                await Context.Message.DeleteAsync();
-                await Context.Channel.SendMessageAsync("Thank you in advance for your cooperation.");
-                return;
-            }
 
             //TODO: implement Banned Users
 
