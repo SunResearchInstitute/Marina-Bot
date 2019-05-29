@@ -20,20 +20,25 @@ namespace RK800.Commands
                 if (cmd.Preconditions.Any(p => p is RequireOwnerAttribute)) continue;
 
                 string s = "";
-                bool isSummaryEmpty = string.IsNullOrWhiteSpace(cmd.Summary);
                 bool HasNoArgs = cmd.Parameters.Count == 0;
-                if (isSummaryEmpty && HasNoArgs)
+                if (string.IsNullOrWhiteSpace(cmd.Summary))
                 {
-                    cmds.Add(cmd.Name, "No info available!");
-                    continue;
+                    if (HasNoArgs)
+                    {
+                        cmds.Add(cmd.Name, "No info available!");
+                        continue;
+                    }
+                    else s = "args: ";
                 }
-                else if (!isSummaryEmpty && HasNoArgs)
+                else
                 {
-                    cmds.Add(cmd.Name, cmd.Summary);
-                    continue;
+                    if (HasNoArgs)
+                    {
+                        cmds.Add(cmd.Name, cmd.Summary);
+                        continue;
+                    }
+                    else s = $"{cmd.Summary}\nargs: ";
                 }
-                else if (isSummaryEmpty && !HasNoArgs) s = "args: ";
-                else if (!isSummaryEmpty && !HasNoArgs) s = $"{cmd.Summary}\nargs: ";
 
                 foreach (ParameterInfo param in cmd.Parameters)
                 {
@@ -50,7 +55,7 @@ namespace RK800.Commands
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(Color.Blue);
             builder.WithCurrentTimestamp();
-            builder.WithFooter("All commands start with 'c.'");
+            builder.WithFooter("All commands start with 'c.' unless in DMs.");
             builder.WithTitle("Help Menu");
 
             if (Command != null)
