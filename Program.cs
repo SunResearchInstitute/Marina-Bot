@@ -96,7 +96,7 @@ namespace RK800
 
             if (Context.Guild != null)
             {
-                if (Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
+                if (Moderation.FilterSave.Data[Context.Guild.Id].IsEnabled && Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
                 {
                     await Context.Channel.TriggerTypingAsync();
                     await Context.Channel.SendMessageAsync($"{Context.User.Mention} Your language is highly uncalled for...");
@@ -110,16 +110,8 @@ namespace RK800
                 if (!Message.HasStringPrefix("c.", ref PrefixPos)) return;
             }
 
-
-
-            //TODO: implement Banned Users
-
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
-            if (!Result.IsSuccess)
-            {
-                await Error.SendDiscordError(Context, Key: Result.ErrorReason);
-                //Should we log items?
-            }
+            if (!Result.IsSuccess) await Error.SendDiscordError(Context, Key: Result.ErrorReason);
         }
 
         private async Task Client_Ready()
@@ -146,7 +138,7 @@ namespace RK800
                     "Token={token}"
                 };
                 File.WriteAllLines(ConfigFile.FullName, configtemplate);
-                Error.SendApplicationError("Config Does not exist, it has been created for you!");
+                Error.SendApplicationError("Config does not exist, it has been created for you!");
             }
         }
     }
