@@ -18,7 +18,7 @@ namespace RK800.Commands
         {
             if (!TrackersSave.Data.ContainsKey(Context.User.Id))
             {
-                TrackersSave.Data.Add(Context.User.Id, new TrackerData(DateTime.Now, TimeSpan.MaxValue, tracker: true));
+                TrackersSave.Data.Add(Context.User.Id, new TrackerData(DateTime.Now, TimeSpan.MaxValue, true));
                 await ReplyAsync("You are now being monitored!");
             }
             else if (!TrackersSave.Data[Context.User.Id].IsTrackerEnabled)
@@ -84,7 +84,7 @@ namespace RK800.Commands
                 string reply = $"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}";
                 if (!string.IsNullOrWhiteSpace(string.Join(" ", Message))) reply += $" with message \"{string.Join(" ", Message)}\"";
                 else reply += ".";
-                TrackersSave.Data[Context.User.Id].msg = string.Join(" ", Message);
+                TrackersSave.Data[Context.User.Id].DmReason = string.Join(" ", Message);
                 TrackersSave.Data[Context.User.Id].IsAlertEnabled = true;
                 TrackersSave.Data[Context.User.Id].ts = time;
                 await ReplyAsync(reply);
@@ -108,7 +108,7 @@ namespace RK800.Commands
                 }
 
                 string reply = $"You have set your alert timer to {string.Format("{0:00}:{1:00}", TrackersSave.Data[Context.User.Id].ts.Hours, TrackersSave.Data[Context.User.Id].ts.Minutes)}";
-                if (!string.IsNullOrWhiteSpace(TrackersSave.Data[Context.User.Id].msg)) reply += $" with message \"{TrackersSave.Data[Context.User.Id].msg}\"";
+                if (!string.IsNullOrWhiteSpace(TrackersSave.Data[Context.User.Id].DmReason)) reply += $" with message \"{TrackersSave.Data[Context.User.Id].DmReason}\"";
                 else reply += ".";
                 await ReplyAsync(reply);
                 return;
@@ -155,7 +155,7 @@ namespace RK800.Commands
                 if (TrackersSave.Data[id].IsTrackerEnabled && TrackersSave.Data[id].IsAlertEnabled && TrackersSave.Data[id].ts <= DateTime.Now - TrackersSave.Data[id].dt)
                 {
                     string msg = $"You have recieved this DM because your self set online time alert of {string.Format("{0:00}:{1:00}", TrackersSave.Data[id].ts.Hours, TrackersSave.Data[id].ts.Minutes)} has been reached";
-                    if (!string.IsNullOrWhiteSpace(TrackersSave.Data[id].msg)) msg += $" with message \"{TrackersSave.Data[id].msg}\"";
+                    if (!string.IsNullOrWhiteSpace(TrackersSave.Data[id].DmReason)) msg += $" with message \"{TrackersSave.Data[id].DmReason}\"";
                     else msg += "!";
                     await Program.Client.GetUser(id).SendMessageAsync(msg);
                     await Program.Client.GetUser(id).SendMessageAsync("Your alert time has also been reset!");

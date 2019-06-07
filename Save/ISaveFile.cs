@@ -7,13 +7,9 @@ namespace RK800.Save
         public abstract void Read();
         public abstract void Write();
         protected FileInfo File;
-        protected Stream Open()
-        {
-            return File.Open(FileMode.Open, FileAccess.ReadWrite);
-        }
-        public ISaveFile(FileInfo file)
-        {
-            File = file;
-        }
+        protected Stream Open() => File.Open(FileMode.Open, FileAccess.ReadWrite);
+        
+        public ISaveFile(FileInfo file) => File = file;
+        
     }
 }

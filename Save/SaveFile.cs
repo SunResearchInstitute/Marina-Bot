@@ -67,6 +67,19 @@ namespace RK800.Save
         public TrackerSaveFile(FileInfo file) : base(file) { }
     }
 
+    public class WarnSaveFile : SaveFile<Dictionary<ulong, Dictionary<ulong, WarnData>>>
+    {
+        public override void Read()
+        {
+            Data = new Dictionary<ulong, Dictionary<ulong, WarnData>>();
+            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, Dictionary<ulong, WarnData>>)) is Dictionary<ulong, Dictionary<ulong, WarnData>> FileData) Data = FileData;
+        }
+
+        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
+
+        public WarnSaveFile(FileInfo file) : base(file) { }
+    }
+
     public class UlongString
     {
         public ulong ul;
@@ -83,7 +96,6 @@ namespace RK800.Save
     public class FilterData
     {
         public List<string> Words;
-
         public bool IsEnabled = true;
 
         public FilterData(List<string> list) => Words = list;
@@ -93,17 +105,28 @@ namespace RK800.Save
     {
         public DateTime dt;
         public TimeSpan ts;
-        public string msg;
+        public string DmReason = null;
         public bool IsTrackerEnabled;
         public bool IsAlertEnabled;
 
-        public TrackerData(DateTime date, TimeSpan time, string s = null, bool tracker = false, bool alert = false)
+        public TrackerData(DateTime date, TimeSpan time, bool tracker)
         {
             dt = date;
             ts = time;
-            msg = s;
             IsTrackerEnabled = tracker;
-            IsAlertEnabled = alert;
+            IsAlertEnabled = false;
+        }
+    }
+
+    public class WarnData
+    {
+        public DateTime time;
+        public string Reason;
+
+        public WarnData( string reasoning)
+        {
+            time = DateTime.Now;
+            Reason = reasoning;
         }
     }
 }
