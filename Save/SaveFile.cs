@@ -67,12 +67,13 @@ namespace RK800.Save
         public TrackerSaveFile(FileInfo file) : base(file) { }
     }
 
-    public class WarnSaveFile : SaveFile<Dictionary<ulong, Dictionary<ulong, WarnData>>>
+    //Server: User to Warns
+    public class WarnSaveFile : SaveFile<Dictionary<ulong, Dictionary<ulong, List<WarnData>>>>
     {
         public override void Read()
         {
-            Data = new Dictionary<ulong, Dictionary<ulong, WarnData>>();
-            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, Dictionary<ulong, WarnData>>)) is Dictionary<ulong, Dictionary<ulong, WarnData>> FileData) Data = FileData;
+            Data = new Dictionary<ulong, Dictionary<ulong, List<WarnData>>>();
+            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, Dictionary<ulong, List<WarnData>>>)) is Dictionary<ulong, Dictionary<ulong, List<WarnData>>> FileData) Data = FileData;
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
@@ -123,9 +124,9 @@ namespace RK800.Save
         public DateTime time;
         public string Reason;
 
-        public WarnData( string reasoning)
+        public WarnData(DateTime dt, string reasoning)
         {
-            time = DateTime.Now;
+            time = dt;
             Reason = reasoning;
         }
     }

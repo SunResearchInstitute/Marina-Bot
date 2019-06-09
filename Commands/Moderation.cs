@@ -1,5 +1,4 @@
 using Discord.Commands;
-using Discord.WebSocket;
 using System.Threading.Tasks;
 using RK800.Save;
 using System.Linq;
@@ -8,6 +7,7 @@ using RK800.Utils;
 using System;
 using Discord;
 using System.IO;
+using Discord.WebSocket;
 
 namespace RK800.Commands
 {
@@ -19,48 +19,77 @@ namespace RK800.Commands
 
         public static FileInfo FilterDefaults = new FileInfo("FilterDefaults.txt");
 
-        [RequireBotPermission(GuildPermission.BanMembers), RequireBotPermission(GuildPermission.KickMembers), RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireBotPermission(GuildPermission.BanMembers), RequireBotPermission(GuildPermission.KickMembers), RequireUserPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.KickMembers)]
         [Command("Warn")]
-        public async Task Warn(IGuildUser User, params string[] Reason)
+        public async Task Warn(SocketGuildUser User, params string[] Reason)
         {
+            if (User == Context.User as IGuildUser)
+            {
+                await Error.SendDiscordError(Context, Value: "You can't do mod actions on yourself.");
+                return;
+            }
+            SocketGuildUser socketmod = Context.User as SocketGuildUser;
+            if (User.Hierarchy >= socketmod.Hierarchy)
+            {
+                await Error.SendDiscordError(Context, Value: "You cannot target anyone else whose roles are higher or the same as yours.");
+                return;
+            }
             string joined;
             if (Reason.Length != 0) joined = string.Join(' ', Reason);
             else joined = null;
 
-            if (!WarnsSave.Data.ContainsKey(Context.Guild.Id))
+            if (WarnsSave.Data.ContainsKey(Context.Guild.Id))
             {
-                WarnsSave.Data.Add(Context.Guild.Id, new Dictionary<ulong, WarnData>() { { User.Id, new WarnData(string.Join(' ', joined)) } });
+                if (WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id))
+                {
+                    WarnsSave.Data[Context.Guild.Id][User.Id].Add(new WarnData(DateTime.Now, joined));
+                }
+                else
+                {
+                    WarnsSave.Data[Context.Guild.Id].Add(User.Id, new List<WarnData>() { new WarnData(DateTime.Now, joined) });
+                }
             }
             else
             {
-                WarnsSave.Data[Context.Guild.Id].Add(User.Id, new WarnData(string.Join(' ', joined)));
+                WarnsSave.Data.Add(Context.Guild.Id, new Dictionary<ulong, List<WarnData>>() { { User.Id, new List<WarnData>() { new WarnData(DateTime.Now, joined) } } });
             }
-            switch (WarnsSave.Data[Context.Guild.Id].Count)
+
+            string dmmsg = $"You were warned on {Context.Guild.Name} ";
+            switch (WarnsSave.Data[Context.Guild.Id][User.Id].Count)
             {
                 //Based off of Komet
                 case 1:
-                    await User.SendMessageAsync($"You were warned on {Context.Guild.Name} and now have a warning!");
+                    dmmsg += "and now have a warning!";
+                    await User.SendMessageAsync(dmmsg);
                     break;
                 case 2:
-                    await User.SendMessageAsync($"You were warned on {Context.Guild.Name} and now have 2 warnings! The next warn will automatically kick!");
+                    dmmsg += "and now have 2 warnings! The next warn will automatically kick!";
+                    await User.SendMessageAsync(dmmsg);
                     break;
                 case 3:
-                    await User.SendMessageAsync($"You were warned on {Context.Guild.Name} and now have 3 warnings! For having 3 warnings you have been kicked, the next warning will result in a kick!");
+                    dmmsg += "and now have 3 warnings! For having 3 warnings you have been kicked, the next warning will also result in a kick!";
+                    await User.SendMessageAsync(dmmsg);
                     await User.KickAsync();
                     break;
                 case 4:
-                    await User.SendMessageAsync($"You were warned on {Context.Guild.Name} and now have 4 warnings! For having 4 warnings you have been kicked again, the next warning will result in a ban from the server!");
+                    dmmsg += "and now have 4 warnings! For having 4 warnings you have been kicked again, the next warning will result in a ban from the server!";
+                    await User.SendMessageAsync(dmmsg);
                     await User.KickAsync();
                     break;
                 case 5:
-                    await User.SendMessageAsync($"You were warned on {Context.Guild.Name} and now have 5 warnings! For having 5 warnings you have been banned from the server!");
+                    dmmsg += "and now have 5 warnings! For having 5 warnings you have been banned from the server!";
+                    await User.SendMessageAsync(dmmsg);
                     await User.BanAsync();
                     break;
-                    //over 5
+                //over 5
                 default:
                     await User.BanAsync();
                     break;
             }
+            string warningmsg = $"{User.Mention} warned. User has {WarnsSave.Data[Context.Guild.Id][User.Id].Count} warning";
+            if (WarnsSave.Data[Context.Guild.Id].Count > 1) warningmsg += "s.";
+            else warningmsg += ".";
+            await ReplyAsync(warningmsg);
         }
 
         public static bool MessageContainsFilteredWord(ulong server, string s)
@@ -136,6 +165,7 @@ namespace RK800.Commands
             {
                 if (FilterSave.Data.Count > 0)
                 {
+                    //TODO: Adjust for max msg size
                     EmbedBuilder builder = new EmbedBuilder();
                     builder.WithColor(Color.Blue);
                     builder.WithTitle("Filtered words");

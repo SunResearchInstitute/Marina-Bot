@@ -89,6 +89,8 @@ namespace RK800
         private async Task MessageReceived(SocketMessage arg)
         {
             SocketUserMessage Message = arg as SocketUserMessage;
+            //Welcomes are considered a msg and are null
+            if (Message == null) return;
             SocketCommandContext Context = new SocketCommandContext(Client, Message);
             int PrefixPos = 0;
 
@@ -96,7 +98,7 @@ namespace RK800
 
             if (Context.Guild != null)
             {
-                if (Moderation.FilterSave.Data[Context.Guild.Id].IsEnabled && Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
+                if (Moderation.FilterSave.Data.ContainsKey(Context.Guild.Id) && Moderation.FilterSave.Data[Context.Guild.Id].IsEnabled && Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
                 {
                     await Context.Channel.TriggerTypingAsync();
                     await Context.Channel.SendMessageAsync($"{Context.User.Mention} Your language is highly uncalled for...");

@@ -52,6 +52,7 @@ namespace RK800.Commands
         [Command("Help")]
         public async Task GetHelp(string Command = null)
         {
+            //TODO: Adjust for max msg size
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(Color.Blue);
             builder.WithCurrentTimestamp();
