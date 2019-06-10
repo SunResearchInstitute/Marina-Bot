@@ -1,7 +1,7 @@
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System;
-using Newtonsoft.Json;
 
 namespace RK800.Save
 {
@@ -16,8 +16,9 @@ namespace RK800.Save
     {
         public override void Read()
         {
-            Data = new List<ulong>();
-            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<ulong>)) is List<ulong> FileData) Data = FileData;
+            List<ulong> FileData = JsonConvert.DeserializeObject<List<ulong>>(System.IO.File.ReadAllText(File.FullName));
+            if (FileData != null) Data = FileData;
+            else Data = new List<ulong>();
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
@@ -29,10 +30,10 @@ namespace RK800.Save
     {
         public override void Read()
         {
-            Data = new List<UlongString>();
-            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(List<UlongString>)) is List<UlongString> FileData) Data = FileData;
+            List<UlongString> FileData = JsonConvert.DeserializeObject<List<UlongString>>(System.IO.File.ReadAllText(File.FullName));
+            if (FileData != null) Data = FileData;
+            else Data = new List<UlongString>();
         }
-
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
         public UlongStringSaveFile(FileInfo file) : base(file) { }
@@ -42,8 +43,9 @@ namespace RK800.Save
     {
         public override void Read()
         {
-            Data = new Dictionary<ulong, FilterData>();
-            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, FilterData>)) is Dictionary<ulong, FilterData> FileData) Data = FileData;
+            Dictionary<ulong, FilterData> FileData = JsonConvert.DeserializeObject<Dictionary<ulong, FilterData>>(System.IO.File.ReadAllText(File.FullName));
+            if (FileData != null) Data = FileData;
+            else Data = new Dictionary<ulong, FilterData>();
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
@@ -55,8 +57,9 @@ namespace RK800.Save
     {
         public override void Read()
         {
-            Data = new Dictionary<ulong, TrackerData>();
-            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, TrackerData>)) is Dictionary<ulong, TrackerData> FileData) Data = FileData;
+            Dictionary<ulong, TrackerData> FileData = JsonConvert.DeserializeObject<Dictionary<ulong, TrackerData>>(System.IO.File.ReadAllText(File.FullName));
+            if (FileData != null) Data = FileData;
+            else Data = new Dictionary<ulong, TrackerData>();
             //manually update time
             foreach (TrackerData data in Data.Values)
                 data.dt = DateTime.Now;
@@ -72,8 +75,9 @@ namespace RK800.Save
     {
         public override void Read()
         {
-            Data = new Dictionary<ulong, Dictionary<ulong, List<WarnData>>>();
-            if (JsonConvert.DeserializeObject(System.IO.File.ReadAllText(File.FullName), typeof(Dictionary<ulong, Dictionary<ulong, List<WarnData>>>)) is Dictionary<ulong, Dictionary<ulong, List<WarnData>>> FileData) Data = FileData;
+            Dictionary<ulong, Dictionary<ulong, List<WarnData>>> FileData = JsonConvert.DeserializeObject<Dictionary<ulong, Dictionary<ulong, List<WarnData>>>>(System.IO.File.ReadAllText(File.FullName));
+            if (FileData != null) Data = FileData;
+            else Data = new Dictionary<ulong, Dictionary<ulong, List<WarnData>>>();
         }
 
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
@@ -121,13 +125,15 @@ namespace RK800.Save
 
     public class WarnData
     {
-        public DateTime time;
+        public ulong Issuer;
+        public DateTime Time;
         public string Reason;
 
-        public WarnData(DateTime dt, string reasoning)
+        public WarnData(DateTime dt, string reasoning, ulong user)
         {
-            time = dt;
+            Time = dt;
             Reason = reasoning;
+            Issuer = user;
         }
     }
 }

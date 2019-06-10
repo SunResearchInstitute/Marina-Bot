@@ -1,11 +1,10 @@
-using Discord.Commands;
-using System;
-using System.Threading.Tasks;
-using RK800;
 using Discord;
+using Discord.Commands;
+using RK800.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using RK800.Utils;
+using System;
+using System.Threading.Tasks;
 
 namespace RK800.Commands
 {
@@ -52,33 +51,49 @@ namespace RK800.Commands
         [Command("Help")]
         public async Task GetHelp(string Command = null)
         {
-            //TODO: Adjust for max msg size
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(Color.Blue);
-            builder.WithCurrentTimestamp();
+            
             builder.WithFooter("All commands start with 'c.' unless in DMs.");
             builder.WithTitle("Help Menu");
 
-            if (Command != null)
+            if (Command == null)
             {
-                foreach (KeyValuePair<string, string> cmd in cmds)
+                foreach(KeyValuePair<string, string> cmd in cmds)
                 {
-                    if (cmd.Key.Contains(Command))
+                    builder.AddField(cmd.Key, cmd.Value);
+                    //future proofing
+                    if (builder.Fields.Count == EmbedBuilder.MaxFieldCount)
                     {
-                        builder.AddField(cmd.Key, cmd.Value);
-                        await ReplyAsync(embed: builder.Build());
-                        return;
+                        if (builder.Fields.Count == cmds.Count) 
+                        {
+                            builder.WithCurrentTimestamp();
+                            await Context.User.SendMessageAsync(embed: builder.Build());
+                            return;
+                        }
+                        await Context.User.SendMessageAsync(embed: builder.Build());
+                        //clear fields
+                        builder.Fields = new List<EmbedFieldBuilder>();
+                        builder.Title = null;
                     }
                 }
-                await Error.SendDiscordError(Context, Value: "Command does not exist!");
+                builder.WithCurrentTimestamp();
+                await Context.User.SendMessageAsync(embed: builder.Build());
             }
             else
             {
-                foreach (KeyValuePair<string, string> cmd in cmds)
+                KeyValuePair<string, string> cmd;
+                try
                 {
-                    builder.AddField(cmd.Key, cmd.Value);
+                    cmd = cmds.First(c => c.Key.Contains(Command, StringComparison.CurrentCultureIgnoreCase));
                 }
-                await Context.User.SendMessageAsync(embed: builder.Build());
+                catch (InvalidOperationException)
+                {
+                    await Error.SendDiscordError(Context, Value: "Command does not exist!");
+                    return;
+                }
+                builder.AddField(cmd.Key, cmd.Value);
+                await ReplyAsync(embed: builder.Build());
             }
         }
     }

@@ -1,10 +1,10 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.Rest;
-using System.Threading.Tasks;
-using Discord;
-using System.Net;
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace RK800.Commands
 {
@@ -42,7 +42,6 @@ namespace RK800.Commands
 
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(Color.Blue);
-            //Dictionary<string, object> yeet = ;
             builder.WithImageUrl(jsondata[0]["url"].ToString());
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");

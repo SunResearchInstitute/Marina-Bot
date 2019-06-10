@@ -1,17 +1,17 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Discord.WebSocket;
-using System;
 using RK800.Commands;
-using System.Reflection;
-using System.Linq;
-using System.Threading.Tasks;
+using RK800.Save;
+using RK800.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
-using RK800.Utils;
-using RK800.Save;
-using Discord.Net;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace RK800
@@ -88,9 +88,8 @@ namespace RK800
 
         private async Task MessageReceived(SocketMessage arg)
         {
-            SocketUserMessage Message = arg as SocketUserMessage;
             //Welcomes are considered a msg and are null
-            if (Message == null) return;
+            if (!(arg is SocketUserMessage Message)) return;
             SocketCommandContext Context = new SocketCommandContext(Client, Message);
             int PrefixPos = 0;
 
@@ -101,11 +100,11 @@ namespace RK800
                 if (Moderation.FilterSave.Data.ContainsKey(Context.Guild.Id) && Moderation.FilterSave.Data[Context.Guild.Id].IsEnabled && Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
                 {
                     await Context.Channel.TriggerTypingAsync();
+                    await Task.Delay(80);
                     await Context.Channel.SendMessageAsync($"{Context.User.Mention} Your language is highly uncalled for...");
-                    await Task.Delay(150);
                     await Context.Message.DeleteAsync();
                     await Context.Channel.TriggerTypingAsync();
-                    await Task.Delay(500);
+                    await Task.Delay(200);
                     await Context.Channel.SendMessageAsync("Thank you in advance for your cooperation.");
                     return;
                 }

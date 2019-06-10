@@ -1,13 +1,13 @@
+using Discord;
 using Discord.Commands;
-using System.Threading.Tasks;
+using Discord.WebSocket;
 using RK800.Save;
-using System.Linq;
-using System.Collections.Generic;
 using RK800.Utils;
 using System;
-using Discord;
+using System.Collections.Generic;
 using System.IO;
-using Discord.WebSocket;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RK800.Commands
 {
@@ -19,6 +19,27 @@ namespace RK800.Commands
 
         public static FileInfo FilterDefaults = new FileInfo("FilterDefaults.txt");
 
+        [Command("Warns")]
+        public async Task GetWarns(SocketGuildUser User = null)
+        {
+            if (User == null)
+            {
+                User = Context.User as SocketGuildUser;
+            }
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.WithTitle($"Warnings for {User.Username}");
+            builder.WithColor(Color.Blue);
+
+            for (int i = 0; i < WarnsSave.Data[Context.Guild.Id][User.Id].Count; i++)
+            {
+                WarnData warn = WarnsSave.Data[Context.Guild.Id][User.Id][i];
+                string value = $"Issuer: {Context.Guild.GetUser(warn.Issuer).Mention} ({warn.Issuer})\n";
+                if (warn.Reason != null) value += $"Reason: {warn.Reason}";
+                else value += "No reason given";
+                builder.AddField($"Warn {i + 1}: {warn.Time.ToUniversalTime()}", value);
+            }
+            await ReplyAsync(embed: builder.Build());
+        }
         [RequireBotPermission(GuildPermission.BanMembers), RequireBotPermission(GuildPermission.KickMembers), RequireUserPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.KickMembers)]
         [Command("Warn")]
         public async Task Warn(SocketGuildUser User, params string[] Reason)
@@ -42,16 +63,16 @@ namespace RK800.Commands
             {
                 if (WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id))
                 {
-                    WarnsSave.Data[Context.Guild.Id][User.Id].Add(new WarnData(DateTime.Now, joined));
+                    WarnsSave.Data[Context.Guild.Id][User.Id].Add(new WarnData(DateTime.Now, joined, Context.User.Id));
                 }
                 else
                 {
-                    WarnsSave.Data[Context.Guild.Id].Add(User.Id, new List<WarnData>() { new WarnData(DateTime.Now, joined) });
+                    WarnsSave.Data[Context.Guild.Id].Add(User.Id, new List<WarnData>() { new WarnData(DateTime.Now, joined, Context.User.Id) });
                 }
             }
             else
             {
-                WarnsSave.Data.Add(Context.Guild.Id, new Dictionary<ulong, List<WarnData>>() { { User.Id, new List<WarnData>() { new WarnData(DateTime.Now, joined) } } });
+                WarnsSave.Data.Add(Context.Guild.Id, new Dictionary<ulong, List<WarnData>>() { { User.Id, new List<WarnData>() { new WarnData(DateTime.Now, joined, Context.User.Id) } } });
             }
 
             string dmmsg = $"You were warned on {Context.Guild.Name} ";
@@ -60,24 +81,29 @@ namespace RK800.Commands
                 //Based off of Komet
                 case 1:
                     dmmsg += "and now have a warning!";
+                    if (WarnsSave.Data[Context.Guild.Id][User.Id][0].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][0].Reason}";
                     await User.SendMessageAsync(dmmsg);
                     break;
                 case 2:
                     dmmsg += "and now have 2 warnings! The next warn will automatically kick!";
+                    if (WarnsSave.Data[Context.Guild.Id][User.Id][1].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][1].Reason}";
                     await User.SendMessageAsync(dmmsg);
                     break;
                 case 3:
                     dmmsg += "and now have 3 warnings! For having 3 warnings you have been kicked, the next warning will also result in a kick!";
+                    if (WarnsSave.Data[Context.Guild.Id][User.Id][2].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][2].Reason}";
                     await User.SendMessageAsync(dmmsg);
                     await User.KickAsync();
                     break;
                 case 4:
                     dmmsg += "and now have 4 warnings! For having 4 warnings you have been kicked again, the next warning will result in a ban from the server!";
+                    if (WarnsSave.Data[Context.Guild.Id][User.Id][3].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][3].Reason}";
                     await User.SendMessageAsync(dmmsg);
                     await User.KickAsync();
                     break;
                 case 5:
                     dmmsg += "and now have 5 warnings! For having 5 warnings you have been banned from the server!";
+                    if (WarnsSave.Data[Context.Guild.Id][User.Id][4].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][4].Reason}";
                     await User.SendMessageAsync(dmmsg);
                     await User.BanAsync();
                     break;
@@ -104,25 +130,21 @@ namespace RK800.Commands
         }
 
         [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("InitializeFilter"), Alias("InitFilter")]
+        [Command("InitializeFilter"), Alias("InitFilter"), Summary("Starts a word filter.")]
         public async Task InitFilter(bool Use_Default_Filter_Values = true)
         {
-            if (FilterSave.Data.ContainsKey(Context.Guild.Id))
+            if (!FilterSave.Data.ContainsKey(Context.Guild.Id))
             {
-                if (FilterSave.Data[Context.Guild.Id].IsEnabled)
-                {
-                    List<string> List = new List<string>();
-                    if (Use_Default_Filter_Values) List.AddRange(File.ReadAllLines(FilterDefaults.FullName));
-                    FilterSave.Data.Add(Context.Guild.Id, new FilterData(List));
-                    await ReplyAsync("Filter Initialized!");
-                }
-                else await Error.SendDiscordError(Context, Value: "Filter has already been disabled!");
+                List<string> List = new List<string>();
+                if (Use_Default_Filter_Values) List.AddRange(File.ReadAllLines(FilterDefaults.FullName));
+                FilterSave.Data.Add(Context.Guild.Id, new FilterData(List));
+                await ReplyAsync("Filter Initialized!");
             }
-            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
+            else await Error.SendDiscordError(Context, Value: "Filter has been initialized already!");
         }
 
         [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("RemoveFilterData")]
+        [Command("RemoveFilterData"), Summary("Removes all filter data.")]
         public async Task RemoveFilterData()
         {
             if (FilterSave.Data.Remove(Context.Guild.Id)) await ReplyAsync("Filter data removed!");
@@ -130,7 +152,23 @@ namespace RK800.Commands
         }
 
         [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("DisableFilter")]
+        [Command("EnableFilter"), Summary("Enables word filtering.")]
+        public async Task EnableFilter()
+        {
+            if (FilterSave.Data.ContainsKey(Context.Guild.Id))
+            {
+                if (!FilterSave.Data[Context.Guild.Id].IsEnabled)
+                {
+                    FilterSave.Data[Context.Guild.Id].IsEnabled = true;
+                    await ReplyAsync("Filter disabled!");
+                }
+                else await Error.SendDiscordError(Context, Value: "Filter is already enabled!");
+            }
+            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
+        }
+
+        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
+        [Command("DisableFilter"), Summary("Disables word filtering.")]
         public async Task DisableFilter()
         {
             if (FilterSave.Data.ContainsKey(Context.Guild.Id))
@@ -140,12 +178,13 @@ namespace RK800.Commands
                     FilterSave.Data[Context.Guild.Id].IsEnabled = false;
                     await ReplyAsync("Filter disabled!");
                 }
+                else await Error.SendDiscordError(Context, Value: "Filter is already disabled!");
             }
             else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
         }
 
         [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("AddFilteredWord")]
+        [Command("AddFilteredWord"), Summary("Adds a word to the filter.")]
         public async Task AddBadWord(string Word)
         {
 
@@ -158,19 +197,32 @@ namespace RK800.Commands
         }
 
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("ListFilteredWords")]
+        [Command("ListFilteredWords"), Summary("Sends a DM of all filtered words.")]
         public async Task ListBadsWords()
         {
             if (FilterSave.Data.ContainsKey(Context.Guild.Id))
             {
                 if (FilterSave.Data.Count > 0)
                 {
-                    //TODO: Adjust for max msg size
                     EmbedBuilder builder = new EmbedBuilder();
                     builder.WithColor(Color.Blue);
                     builder.WithTitle("Filtered words");
-                    builder.WithCurrentTimestamp();
-                    builder.WithDescription(string.Join("\n", FilterSave.Data[Context.Guild.Id]));
+                    string words = string.Join("\n", FilterSave.Data[Context.Guild.Id]);
+                    if (EmbedBuilder.MaxDescriptionLength < words.Length)
+                    {
+                        string[] msgs = Misc.ConvertToDiscordSendable(words, EmbedBuilder.MaxDescriptionLength);
+                        for (int i = 0; i < msgs.Length; i++)
+                        {
+                            string msg = msgs[i];
+                            builder.WithDescription(msg);
+                            if (i == msgs.Length) builder.WithCurrentTimestamp();
+                            await Context.User.SendMessageAsync(embed: builder.Build());
+                            if (i == 0) builder.Title = null;
+                        }
+                        return;
+                    }
+                    else builder.WithCurrentTimestamp();
+                    builder.WithDescription(words);
                     await Context.User.SendMessageAsync(embed: builder.Build());
                 }
                 else await Error.SendDiscordError(Context, Value: "Filter contains no words!");
