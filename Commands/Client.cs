@@ -11,6 +11,7 @@ namespace RK800.Commands
         [RequireOwner]
         public async Task Shutdown()
         {
+            await Context.Channel.TriggerTypingAsync();
             await ReplyAsync("Shutting down!");
             await Context.Client.LogoutAsync();
             SaveHandler.SaveAll();

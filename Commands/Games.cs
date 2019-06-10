@@ -15,6 +15,7 @@ namespace RK800.Commands
         [Summary("Display information of an Overwatch player.")]
         public async Task GetOverwatchStats(string Username, string Platform)
         {
+            await Context.Channel.TriggerTypingAsync();
             Platform = Platform.ToLower();
 
             if (Platform != "xbl" && Platform != "psn" && Platform != "pc")

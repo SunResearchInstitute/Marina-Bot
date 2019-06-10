@@ -10,6 +10,7 @@ namespace RK800.Commands
         [RequireOwner]
         public async Task ForceSaving()
         {
+            await Context.Channel.TriggerTypingAsync();
             SaveHandler.SaveAll();
             await ReplyAsync("Saved all data!");
         }

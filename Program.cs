@@ -81,7 +81,7 @@ namespace RK800
 
         private async Task UserLeft(SocketGuildUser User)
         {
-            SocketGuildChannel GuildChannel = User.Guild.GetChannel(Moderation.LogChannelsSave.Data[User.Guild.Id]);
+            SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
             if (GuildChannel != null)
             {
                 EmbedBuilder builder = new EmbedBuilder();
@@ -91,12 +91,12 @@ namespace RK800
                 ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
                 await LogChannel.SendMessageAsync(embed: builder.Build());
             }
-            else Moderation.LogChannelsSave.Data.Remove(User.Guild.Id);
+            else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
         }
 
         private async Task UserJoined(SocketGuildUser User)
         {
-            SocketGuildChannel GuildChannel = User.Guild.GetChannel(Moderation.LogChannelsSave.Data[User.Guild.Id]);
+            SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
             if (GuildChannel != null)
             {
                 EmbedBuilder builder = new EmbedBuilder();
@@ -106,7 +106,7 @@ namespace RK800
                 ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
                 await LogChannel.SendMessageAsync(embed: builder.Build());
             }
-            else Moderation.LogChannelsSave.Data.Remove(User.Guild.Id);
+            else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
         }
 
         private async Task MessageUpdated(Cacheable<IMessage, ulong> Message, SocketMessage NewMessage, ISocketMessageChannel Channel)
@@ -114,9 +114,9 @@ namespace RK800
             if (Message.HasValue)
             {
                 SocketCommandContext Context = new SocketCommandContext(Client, Message.Value as SocketUserMessage);
-                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && Moderation.LogChannelsSave.Data.ContainsKey(Context.Guild.Id))
+                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
                 {
-                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(Moderation.LogChannelsSave.Data[Context.Guild.Id]);
+                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Context.Guild.Id]);
                     if (GuildChannel != null)
                     {
                         ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
@@ -126,19 +126,19 @@ namespace RK800
                         builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content} -> {NewMessage.Content}");
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
-                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description , EmbedBuilder.MaxDescriptionLength);
+                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
                             for (int i = 0; i < Msgs.Length; i++)
                             {
                                 string msg = Msgs[i];
                                 builder.WithDescription(msg);
                                 await LogChannel.SendMessageAsync(embed: builder.Build());
                                 if (i == 0) builder.Title = null;
-                                
+
                             }
                         }
                         else await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
-                    else Moderation.LogChannelsSave.Data.Remove(Context.Guild.Id);
+                    else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
                 }
             }
         }
@@ -148,9 +148,9 @@ namespace RK800
             if (Message.HasValue)
             {
                 SocketCommandContext Context = new SocketCommandContext(Client, Message.Value as SocketUserMessage);
-                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && Moderation.LogChannelsSave.Data.ContainsKey(Context.Guild.Id))
+                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
                 {
-                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(Moderation.LogChannelsSave.Data[Context.Guild.Id]);
+                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Context.Guild.Id]);
                     if (GuildChannel != null)
                     {
                         ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
@@ -160,7 +160,7 @@ namespace RK800
                         builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Name}>:\n{Message.Value.Content}");
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
-                    else Moderation.LogChannelsSave.Data.Remove(Context.Guild.Id);
+                    else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
                 }
             }
         }
@@ -171,9 +171,9 @@ namespace RK800
         {
             if (before.Status != after.Status)
             {
-                if (Tracker.TrackersSave.Data.Keys.Contains(after.Id) && Tracker.TrackersSave.Data[after.Id].IsTrackerEnabled)
+                if (SaveHandler.TrackersSave.Data.Keys.Contains(after.Id) && SaveHandler.TrackersSave.Data[after.Id].IsTrackerEnabled)
                 {
-                    Tracker.TrackersSave.Data[after.Id].dt = DateTime.Now;
+                    SaveHandler.TrackersSave.Data[after.Id].dt = DateTime.Now;
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace RK800
 
             if (Context.Guild != null)
             {
-                if (Moderation.FilterSave.Data.ContainsKey(Context.Guild.Id) && Moderation.FilterSave.Data[Context.Guild.Id].IsEnabled && Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
+                if (SaveHandler.FilterSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.FilterSave.Data[Context.Guild.Id].IsEnabled && Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
                 {
                     await Context.Channel.TriggerTypingAsync();
                     await Task.Delay(80);
@@ -202,9 +202,10 @@ namespace RK800
                 }
                 if (!Message.HasStringPrefix("c.", ref PrefixPos)) return;
             }
-
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
             if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
+            
+
         }
 
         private async Task Client_Ready()
