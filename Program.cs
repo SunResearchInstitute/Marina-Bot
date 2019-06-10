@@ -58,6 +58,8 @@ namespace RK800
             Client.Ready += Client_Ready;
             Client.MessageReceived += MessageReceived;
             Client.MessageDeleted += MessageDeleted;
+            Client.UserJoined += UserJoined;
+            Client.UserLeft += UserLeft;
             Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
 
@@ -77,6 +79,36 @@ namespace RK800
             await Client.StartAsync();
         }
 
+        private async Task UserLeft(SocketGuildUser User)
+        {
+            SocketGuildChannel GuildChannel = User.Guild.GetChannel(Moderation.LogChannelsSave.Data[User.Guild.Id]);
+            if (GuildChannel != null)
+            {
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.WithColor(Color.Blue);
+                builder.WithTitle("User Left");
+                builder.WithDescription(User.Mention);
+                ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                await LogChannel.SendMessageAsync(embed: builder.Build());
+            }
+            else Moderation.LogChannelsSave.Data.Remove(User.Guild.Id);
+        }
+
+        private async Task UserJoined(SocketGuildUser User)
+        {
+            SocketGuildChannel GuildChannel = User.Guild.GetChannel(Moderation.LogChannelsSave.Data[User.Guild.Id]);
+            if (GuildChannel != null)
+            {
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.WithColor(Color.Blue);
+                builder.WithTitle("User Joined");
+                builder.WithDescription(User.Mention);
+                ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                await LogChannel.SendMessageAsync(embed: builder.Build());
+            }
+            else Moderation.LogChannelsSave.Data.Remove(User.Guild.Id);
+        }
+
         private async Task MessageUpdated(Cacheable<IMessage, ulong> Message, SocketMessage NewMessage, ISocketMessageChannel Channel)
         {
             if (Message.HasValue)
@@ -91,7 +123,7 @@ namespace RK800
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Edited");
-                        builder.WithDescription($"From {Message.Value.Author} in {Channel.Name}:\n{Message.Value.Content} -> {NewMessage.Content}");
+                        builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content} -> {NewMessage.Content}");
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
                             string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description , EmbedBuilder.MaxDescriptionLength);
@@ -125,7 +157,7 @@ namespace RK800
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Deleted");
-                        builder.WithDescription($"From {Message.Value.Author} in {Channel.Name}:\n{Message.Value.Content}");
+                        builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Name}>:\n{Message.Value.Content}");
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                     else Moderation.LogChannelsSave.Data.Remove(Context.Guild.Id);
