@@ -17,7 +17,9 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Connor.csproj"
+                "${workspaceFolder}/Connor.csproj",
+                "-c",
+                "release"
             ],
             "problemMatcher": "$tsc"
         },
