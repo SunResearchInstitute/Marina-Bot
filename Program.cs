@@ -91,8 +91,20 @@ namespace RK800
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Edited");
-                        builder.AddField($"From {Message.Value.Author} in {Channel.Name}:", $"`{Message.Value.Content}` -> `{NewMessage.Content}`");
-                        await LogChannel.SendMessageAsync(embed: builder.Build());
+                        builder.WithDescription($"From {Message.Value.Author} in {Channel.Name}:\n{Message.Value.Content} -> {NewMessage.Content}");
+                        if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                        {
+                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description , EmbedBuilder.MaxDescriptionLength);
+                            for (int i = 0; i < Msgs.Length; i++)
+                            {
+                                string msg = Msgs[i];
+                                builder.WithDescription(msg);
+                                await LogChannel.SendMessageAsync(embed: builder.Build());
+                                if (i == 0) builder.Title = null;
+                                
+                            }
+                        }
+                        else await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                     else Moderation.LogChannelsSave.Data.Remove(Context.Guild.Id);
                 }
@@ -113,7 +125,7 @@ namespace RK800
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Deleted");
-                        builder.AddField($"From {Message.Value.Author} in {Channel.Name}:", $"`{Message.Value.Content}`");
+                        builder.WithDescription($"From {Message.Value.Author} in {Channel.Name}:\n{Message.Value.Content}");
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                     else Moderation.LogChannelsSave.Data.Remove(Context.Guild.Id);
