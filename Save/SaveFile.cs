@@ -12,33 +12,6 @@ namespace RK800.Save
         public SaveFile(FileInfo file) : base(file) { }
     }
 
-    public class UlongSaveFile : SaveFile<List<ulong>>
-    {
-        public override void Read()
-        {
-            List<ulong> FileData = JsonConvert.DeserializeObject<List<ulong>>(System.IO.File.ReadAllText(File.FullName));
-            if (FileData != null) Data = FileData;
-            else Data = new List<ulong>();
-        }
-
-        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
-
-        public UlongSaveFile(FileInfo file) : base(file) { }
-    }
-
-    public class UlongStringSaveFile : SaveFile<List<UlongString>>
-    {
-        public override void Read()
-        {
-            List<UlongString> FileData = JsonConvert.DeserializeObject<List<UlongString>>(System.IO.File.ReadAllText(File.FullName));
-            if (FileData != null) Data = FileData;
-            else Data = new List<UlongString>();
-        }
-        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
-
-        public UlongStringSaveFile(FileInfo file) : base(file) { }
-    }
-
     public class FilterSaveFile : SaveFile<Dictionary<ulong, FilterData>>
     {
         public override void Read()
@@ -51,6 +24,20 @@ namespace RK800.Save
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
         public FilterSaveFile(FileInfo file) : base(file) { }
+    }
+
+    public class UlongUlongSaveFile : SaveFile<Dictionary<ulong, ulong>>
+    {
+        public override void Read()
+        {
+            Dictionary<ulong, ulong> FileData = JsonConvert.DeserializeObject<Dictionary<ulong, ulong>>(System.IO.File.ReadAllText(File.FullName));
+            if (FileData != null) Data = FileData;
+            else Data = new Dictionary<ulong, ulong>();
+        }
+
+        public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
+
+        public UlongUlongSaveFile(FileInfo file) : base(file) { }
     }
 
     public class TrackerSaveFile : SaveFile<Dictionary<ulong, TrackerData>>
@@ -83,19 +70,6 @@ namespace RK800.Save
         public override void Write() => System.IO.File.WriteAllText(File.FullName, JsonConvert.SerializeObject(Data));
 
         public WarnSaveFile(FileInfo file) : base(file) { }
-    }
-
-    public class UlongString
-    {
-        public ulong ul;
-        public string str;
-
-
-        public UlongString(ulong u64, string s)
-        {
-            ul = u64;
-            str = s;
-        }
     }
 
     public class FilterData

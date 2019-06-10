@@ -14,11 +14,43 @@ namespace RK800.Commands
     public class Moderation : ModuleBase<SocketCommandContext>
     {
         public static FilterSaveFile FilterSave => SaveHandler.Saves["Filter"] as FilterSaveFile;
-
         public static WarnSaveFile WarnsSave => SaveHandler.Saves["Warns"] as WarnSaveFile;
+        public static UlongUlongSaveFile LogChannelsSave => SaveHandler.Saves["LogChannels"] as UlongUlongSaveFile;
 
         //Should we convert this file to a Readonly Array?
         public static FileInfo FilterDefaults = new FileInfo("FilterDefaults.txt");
+
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [Command("SetLogs")]
+        [Summary("Sets the logging channel for deleted and modified messages.")]
+        public async Task SetLogChannel(SocketGuildChannel channel)
+        {
+            if (!LogChannelsSave.Data.ContainsKey(Context.Guild.Id))
+            {
+                LogChannelsSave.Data.Add(Context.Guild.Id, channel.Id);
+                await ReplyAsync("Log Channel has been set!");
+            }
+            else
+            {
+                LogChannelsSave.Data[Context.Guild.Id] = channel.Id;
+                await ReplyAsync("Log Channel has been changed!");
+            }
+        }
+
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [Command("RemoveLogs")]
+        [Summary("Remvoes the logging channel for deleted and modified messages.")]
+        public async Task RemoveLogChannel()
+        {
+            if (LogChannelsSave.Data.Remove(Context.Guild.Id))
+            {
+                await ReplyAsync("Log Channel has been removed!");
+            }
+            else
+            {
+                await ReplyAsync("Log Channel has not been set!");
+            }
+        }
 
         [RequireUserPermission(GuildPermission.BanMembers)]
         [Command("Ban")]
@@ -117,35 +149,57 @@ namespace RK800.Commands
             }
 
             string dmmsg = $"You were warned on {Context.Guild.Name} ";
+
             switch (WarnsSave.Data[Context.Guild.Id][User.Id].Count)
             {
+
                 //Based off of Komet
                 case 1:
                     dmmsg += "and now have a warning!";
                     if (WarnsSave.Data[Context.Guild.Id][User.Id][0].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][0].Reason}";
-                    await User.SendMessageAsync(dmmsg);
+                    try
+                    {
+                        await User.SendMessageAsync(dmmsg);
+                    }
+                    catch { }
                     break;
                 case 2:
                     dmmsg += "and now have 2 warnings! The next warn will automatically kick!";
                     if (WarnsSave.Data[Context.Guild.Id][User.Id][1].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][1].Reason}";
-                    await User.SendMessageAsync(dmmsg);
+                    try
+                    {
+                        await User.SendMessageAsync(dmmsg);
+                    }
+                    catch { }
                     break;
                 case 3:
                     dmmsg += "and now have 3 warnings! For having 3 warnings you have been kicked, the next warning will also result in a kick!";
                     if (WarnsSave.Data[Context.Guild.Id][User.Id][2].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][2].Reason}";
-                    await User.SendMessageAsync(dmmsg);
+                    try
+                    {
+                        await User.SendMessageAsync(dmmsg);
+                    }
+                    catch { }
                     await User.KickAsync();
                     break;
                 case 4:
                     dmmsg += "and now have 4 warnings! For having 4 warnings you have been kicked again, the next warning will result in a ban from the server!";
                     if (WarnsSave.Data[Context.Guild.Id][User.Id][3].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][3].Reason}";
-                    await User.SendMessageAsync(dmmsg);
+                    try
+                    {
+                        await User.SendMessageAsync(dmmsg);
+                    }
+                    catch { }
                     await User.KickAsync();
                     break;
                 case 5:
                     dmmsg += "and now have 5 warnings! For having 5 warnings you have been banned from the server!";
                     if (WarnsSave.Data[Context.Guild.Id][User.Id][4].Reason != null) dmmsg += $"The given reason is: {WarnsSave.Data[Context.Guild.Id][User.Id][4].Reason}";
-                    await User.SendMessageAsync(dmmsg);
+                    try
+                    {
+                        await User.SendMessageAsync(dmmsg);
+                    }
+                    catch { }
                     await User.BanAsync();
                     break;
                 //over 5
@@ -153,8 +207,9 @@ namespace RK800.Commands
                     await User.BanAsync();
                     break;
             }
+
             string warningmsg = $"{User.Mention} warned. User has {WarnsSave.Data[Context.Guild.Id][User.Id].Count} warning";
-            if (WarnsSave.Data[Context.Guild.Id].Count > 1) warningmsg += "s.";
+            if (WarnsSave.Data[Context.Guild.Id][User.Id].Count > 1) warningmsg += "s.";
             else warningmsg += ".";
             await ReplyAsync(warningmsg);
         }

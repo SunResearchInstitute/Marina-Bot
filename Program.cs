@@ -44,7 +44,12 @@ namespace RK800
         private async Task MainAsync()
         {
             //This just configures how we want to handle our client and commands
-            Client = new DiscordSocketClient(new DiscordSocketConfig());
+            Client = new DiscordSocketClient(new DiscordSocketConfig()
+            {
+                //Chaching for Moderation
+                MessageCacheSize = 100,
+            });
+
             Commands = new CommandService(new CommandServiceConfig
             {
                 CaseSensitiveCommands = false,
@@ -52,9 +57,8 @@ namespace RK800
             });
             Client.Ready += Client_Ready;
             Client.MessageReceived += MessageReceived;
-            //TODO: Moderation
-            //Client.MessageDeleted += MessageDeleted;
-            //Client.MessageUpdated += MessageUpdated;
+            Client.MessageDeleted += MessageDeleted;
+            Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
 
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
@@ -64,13 +68,57 @@ namespace RK800
             }
             catch (HttpException)
             {
-                Error.SendApplicationError("Token is invalid!");
+                Error.SendApplicationError("Token is invalid!", -1);
             }
             //Workaround until we have a save that starts earlier
             SaveHandler.Populate();
             //a Static Method Starts too early
             Help.Populate();
             await Client.StartAsync();
+        }
+
+        private async Task MessageUpdated(Cacheable<IMessage, ulong> Message, SocketMessage NewMessage, ISocketMessageChannel Channel)
+        {
+            if (Message.HasValue)
+            {
+                SocketCommandContext Context = new SocketCommandContext(Client, Message.Value as SocketUserMessage);
+                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && Moderation.LogChannelsSave.Data.ContainsKey(Context.Guild.Id))
+                {
+                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(Moderation.LogChannelsSave.Data[Context.Guild.Id]);
+                    if (GuildChannel != null)
+                    {
+                        ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                        EmbedBuilder builder = new EmbedBuilder();
+                        builder.WithColor(Color.Blue);
+                        builder.WithTitle("Message Edited");
+                        builder.AddField($"From {Message.Value.Author} in {Channel.Name}:", $"`{Message.Value.Content}` -> `{NewMessage.Content}`");
+                        await LogChannel.SendMessageAsync(embed: builder.Build());
+                    }
+                    else Moderation.LogChannelsSave.Data.Remove(Context.Guild.Id);
+                }
+            }
+        }
+
+        private async Task MessageDeleted(Cacheable<IMessage, ulong> Message, ISocketMessageChannel Channel)
+        {
+            if (Message.HasValue)
+            {
+                SocketCommandContext Context = new SocketCommandContext(Client, Message.Value as SocketUserMessage);
+                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && Moderation.LogChannelsSave.Data.ContainsKey(Context.Guild.Id))
+                {
+                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(Moderation.LogChannelsSave.Data[Context.Guild.Id]);
+                    if (GuildChannel != null)
+                    {
+                        ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                        EmbedBuilder builder = new EmbedBuilder();
+                        builder.WithColor(Color.Blue);
+                        builder.WithTitle("Message Deleted");
+                        builder.AddField($"From {Message.Value.Author} in {Channel.Name}:", $"`{Message.Value.Content}`");
+                        await LogChannel.SendMessageAsync(embed: builder.Build());
+                    }
+                    else Moderation.LogChannelsSave.Data.Remove(Context.Guild.Id);
+                }
+            }
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -112,7 +160,7 @@ namespace RK800
             }
 
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
-            if (!Result.IsSuccess) await Error.SendDiscordError(Context, Key: Result.ErrorReason);
+            if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
         }
 
         private async Task Client_Ready()
