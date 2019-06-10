@@ -17,9 +17,49 @@ namespace RK800.Commands
 
         public static WarnSaveFile WarnsSave => SaveHandler.Saves["Warns"] as WarnSaveFile;
 
+        //Should we convert this file to a Readonly Array?
         public static FileInfo FilterDefaults = new FileInfo("FilterDefaults.txt");
 
-        //TODO: Clear Warns CMD and remove specfic warns 
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        [Command("Ban")]
+        public async Task Banuser([RequireHierarchyAttribute]SocketGuildUser User, params string[] Reason)
+        {
+            string joined;
+            if (Reason.Length != 0) joined = string.Join(' ', Reason);
+            else joined = null;
+            string msg = $"You were banned from {Context.Guild.Name}\n";
+            if (joined != null) msg += $"Reason: {joined}";
+            await User.SendMessageAsync(msg);
+            await User.BanAsync(reason: joined);
+            await ReplyAsync($"{User} is now b& :thumbsup:");
+        }
+
+        [RequireUserPermission(GuildPermission.KickMembers)]
+        [Command("Kick")]
+        public async Task Kickuser([RequireHierarchyAttribute]SocketGuildUser User, params string[] Reason)
+        {
+            string joined;
+            if (Reason.Length != 0) joined = string.Join(' ', Reason);
+            else joined = null;
+            string msg = $"You were kicked from {Context.Guild.Name}\n";
+            if (joined != null) msg += $"Reason: {joined}";
+            await User.SendMessageAsync(msg);
+            await User.KickAsync(joined);
+            await ReplyAsync($"kicked {User} :thumbsup:");
+        }
+
+
+        [RequireUserPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.KickMembers)]
+        [Command("ClearWarns")]
+        public async Task ClearWarns(SocketGuildUser User)
+        {
+            if (WarnsSave.Data.ContainsKey(Context.Guild.Id) && WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id) && WarnsSave.Data[Context.Guild.Id][User.Id].Count != 0)
+            {
+                WarnsSave.Data[Context.Guild.Id][User.Id] = new List<WarnData>();
+                await ReplyAsync($"Warns have been cleared for {User.Mention}");
+            }
+            else await Error.SendDiscordError(Context, Value: "There are no warns for that user!");
+        }
         [Command("Warns")]
         public async Task GetWarns(SocketGuildUser User = null)
         {
@@ -30,7 +70,7 @@ namespace RK800.Commands
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithTitle($"Warnings for {User.Username}");
             builder.WithColor(Color.Blue);
-            if (!WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id) ||WarnsSave.Data[Context.Guild.Id][User.Id].Count == 0)
+            if (!WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id) || WarnsSave.Data[Context.Guild.Id][User.Id].Count == 0)
             {
                 builder.WithDescription("There are none! Good for you!");
                 await ReplyAsync(embed: builder.Build());
@@ -49,17 +89,11 @@ namespace RK800.Commands
         }
         [RequireBotPermission(GuildPermission.BanMembers), RequireBotPermission(GuildPermission.KickMembers), RequireUserPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.KickMembers)]
         [Command("Warn")]
-        public async Task Warn(SocketGuildUser User, params string[] Reason)
+        public async Task Warn([RequireHierarchyAttribute]SocketGuildUser User, params string[] Reason)
         {
             if (User == Context.User as IGuildUser)
             {
                 await Error.SendDiscordError(Context, Value: "You can't do mod actions on yourself.");
-                return;
-            }
-            SocketGuildUser socketmod = Context.User as SocketGuildUser;
-            if (User.Hierarchy >= socketmod.Hierarchy)
-            {
-                await Error.SendDiscordError(Context, Value: "You cannot target anyone else whose roles are higher or the same as yours.");
                 return;
             }
             string joined;

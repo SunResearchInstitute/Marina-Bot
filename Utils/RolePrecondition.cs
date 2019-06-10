@@ -31,13 +31,11 @@ namespace RK800.Utils
             if (targetUser == null)
                 return PreconditionResult.FromError("Target user not found.");
 
-            //maybe we should use <=?
-            if (guildUser.Hierarchy < targetUser.Hierarchy)
+            if (guildUser.Hierarchy <= targetUser.Hierarchy)
                 return PreconditionResult.FromError("You cannot target anyone else whose roles are higher than yours.");
 
             SocketGuildUser currentUser = await context.Guild.GetCurrentUserAsync().ConfigureAwait(false) as SocketGuildUser;
-            //maybe we should use <=?
-            if (currentUser?.Hierarchy < targetUser.Hierarchy)
+            if (currentUser?.Hierarchy <= targetUser.Hierarchy)
                 return PreconditionResult.FromError("The bot's role is lower than the targeted user.");
 
             return PreconditionResult.FromSuccess();
