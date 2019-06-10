@@ -19,6 +19,7 @@ namespace RK800.Commands
 
         public static FileInfo FilterDefaults = new FileInfo("FilterDefaults.txt");
 
+        //TODO: Clear Warns CMD and remove specfic warns 
         [Command("Warns")]
         public async Task GetWarns(SocketGuildUser User = null)
         {
@@ -29,6 +30,12 @@ namespace RK800.Commands
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithTitle($"Warnings for {User.Username}");
             builder.WithColor(Color.Blue);
+            if (!WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id) ||WarnsSave.Data[Context.Guild.Id][User.Id].Count == 0)
+            {
+                builder.WithDescription("There are none! Good for you!");
+                await ReplyAsync(embed: builder.Build());
+                return;
+            }
 
             for (int i = 0; i < WarnsSave.Data[Context.Guild.Id][User.Id].Count; i++)
             {
