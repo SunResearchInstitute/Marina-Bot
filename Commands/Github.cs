@@ -105,10 +105,7 @@ namespace RK800.Commands
                     }
                     else
                     {
-                        if (o.AllowPrerelease)
-                        {
-                            tag = releases.First();
-                        }
+                        if (o.AllowPrerelease) tag = releases.First();
                         else
                         {
                             try
