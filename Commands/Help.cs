@@ -4,6 +4,7 @@ using RK800.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Discord.Net;
 using System.Threading.Tasks;
 
 namespace RK800.Commands
@@ -53,22 +54,30 @@ namespace RK800.Commands
         {
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(Color.Blue);
-            
+
             builder.WithFooter("All commands start with 'c.' unless in DMs.");
             builder.WithTitle("Help Menu");
 
             if (Command == null)
             {
-                foreach(KeyValuePair<string, string> cmd in cmds)
+                foreach (KeyValuePair<string, string> cmd in cmds)
                 {
                     builder.AddField(cmd.Key, cmd.Value);
                     //future proofing
                     if (builder.Fields.Count == EmbedBuilder.MaxFieldCount)
                     {
-                        if (builder.Fields.Count == cmds.Count) 
+                        if (builder.Fields.Count == cmds.Count)
                         {
                             builder.WithCurrentTimestamp();
-                            await Context.User.SendMessageAsync(embed: builder.Build());
+                            try
+                            {
+                                await Context.User.SendMessageAsync(embed: builder.Build());
+                            }
+                            catch (HttpException)
+                            {
+                                await ReplyAsync("Unable to send DM!");
+                                return;
+                            }
                             return;
                         }
                         await Context.User.SendMessageAsync(embed: builder.Build());
@@ -78,7 +87,15 @@ namespace RK800.Commands
                     }
                 }
                 builder.WithCurrentTimestamp();
-                await Context.User.SendMessageAsync(embed: builder.Build());
+                try
+                {
+                    await Context.User.SendMessageAsync(embed: builder.Build());
+                }
+                catch (HttpException)
+                {
+                    await ReplyAsync("Unable to send DM!");
+                    return;
+                }
             }
             else
             {

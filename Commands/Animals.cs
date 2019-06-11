@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Discord.Net;
 
 namespace RK800.Commands
 {
@@ -29,7 +30,15 @@ namespace RK800.Commands
             builder.WithImageUrl(jsondata["message"]);
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://dog.ceo/dog-api/");
-            await Context.User.SendMessageAsync(embed: builder.Build());
+            try
+            {
+                await Context.User.SendMessageAsync(embed: builder.Build());
+            }
+            catch (HttpException)
+            {
+                await ReplyAsync("Unable to send DM!");
+                return;
+            }
         }
 
         [Command("Cat")]
@@ -45,7 +54,15 @@ namespace RK800.Commands
             builder.WithImageUrl(jsondata[0]["url"].ToString());
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");
-            await Context.User.SendMessageAsync(embed: builder.Build());
+            try
+            {
+                await Context.User.SendMessageAsync(embed: builder.Build());
+            }
+            catch (HttpException)
+            {
+                await ReplyAsync("Unable to send DM!");
+                return;
+            }
         }
     }
 }
