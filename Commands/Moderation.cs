@@ -52,7 +52,7 @@ namespace RK800.Commands
             }
         }
 
-        [RequireUserPermission(GuildPermission.BanMembers)]
+        [RequireUserPermission(GuildPermission.BanMembers), RequireBotPermission(GuildPermission.BanMembers)]
         [Command("Ban")]
         public async Task Banuser([RequireHierarchyAttribute]SocketGuildUser User, params string[] Reason)
         {
@@ -67,7 +67,7 @@ namespace RK800.Commands
             await ReplyAsync($"{User} is now b& :thumbsup:");
         }
 
-        [RequireUserPermission(GuildPermission.KickMembers)]
+        [RequireUserPermission(GuildPermission.KickMembers), RequireBotPermission(GuildPermission.KickMembers)]
         [Command("Kick")]
         public async Task Kickuser([RequireHierarchyAttribute]SocketGuildUser User, params string[] Reason)
         {

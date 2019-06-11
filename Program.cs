@@ -164,9 +164,7 @@ namespace RK800
             }
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async Task GuildMemberUpdated(SocketGuildUser Before, SocketGuildUser After)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (SaveHandler.TrackersSave.Data.Keys.Contains(After.Id) && SaveHandler.TrackersSave.Data[After.Id].IsTrackerEnabled)
             {
@@ -186,14 +184,23 @@ namespace RK800
                         ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
-                        
-                        string NickB;
-                        string NickA;
-                        if (string.IsNullOrWhiteSpace(Before.Nickname)) 
+
+                        if (string.IsNullOrWhiteSpace(After.Nickname))
                         {
-                            builder.WithTitle("Nickname Change");
+                            builder.WithTitle("Nickname Removal");
+                            builder.WithDescription($"{After.Mention}:\n`{Before.Nickname}` -> ``");
                         }
-                        builder.WithDescription($"{After.Mention}\n`{NickB}` -> `{NickA}`");   
+                        else if (string.IsNullOrWhiteSpace(Before.Nickname))
+                        {
+                            builder.WithTitle("Nickname Changed");
+                            builder.WithDescription($"{After.Mention}:\n`None` -> `{After.Nickname}`");
+                        }
+                        else
+                        {
+                            builder.WithTitle("Nickname Changed");
+                            builder.WithDescription($"{After.Mention}:\n`{Before.Nickname}` -> `{After.Nickname}`");
+                        }
+
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                 }
@@ -223,7 +230,11 @@ namespace RK800
                     await Context.Channel.SendMessageAsync("Thank you in advance for your cooperation.");
                     return;
                 }
+#if DEBUG
                 if (!Message.HasStringPrefix("d.", ref PrefixPos)) return;
+#else
+                if (!Message.HasStringPrefix("c.", ref PrefixPos)) return;
+#endif
             }
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
             if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
