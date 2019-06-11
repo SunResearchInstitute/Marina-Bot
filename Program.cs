@@ -58,7 +58,6 @@ namespace RK800
             Client.Ready += Client_Ready;
             Client.MessageReceived += MessageReceived;
             Client.MessageDeleted += MessageDeleted;
-            Client.UserJoined += UserJoined;
             Client.UserLeft += UserLeft;
             Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
