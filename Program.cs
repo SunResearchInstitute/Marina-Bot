@@ -163,7 +163,7 @@ namespace RK800
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Deleted");
-                        builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Name}>:\n{Message.Value.Content}");
+                        builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}");
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                     else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
