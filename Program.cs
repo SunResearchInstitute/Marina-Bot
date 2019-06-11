@@ -145,7 +145,19 @@ namespace RK800
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Deleted");
                         builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}");
-                        await LogChannel.SendMessageAsync(embed: builder.Build());
+                        if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                        {
+                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
+                            for (int i = 0; i < Msgs.Length; i++)
+                            {
+                                string msg = Msgs[i];
+                                builder.WithDescription(msg);
+                                await LogChannel.SendMessageAsync(embed: builder.Build());
+                                if (i == 0) builder.Title = null;
+
+                            }
+                        }
+                        else await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                     else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
                 }
@@ -153,15 +165,39 @@ namespace RK800
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
+        private async Task GuildMemberUpdated(SocketGuildUser Before, SocketGuildUser After)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            if (SaveHandler.TrackersSave.Data.Keys.Contains(after.Id) && SaveHandler.TrackersSave.Data[after.Id].IsTrackerEnabled)
+            if (SaveHandler.TrackersSave.Data.Keys.Contains(After.Id) && SaveHandler.TrackersSave.Data[After.Id].IsTrackerEnabled)
             {
-                if (before.Status != after.Status)
+                if (Before.Status != After.Status)
                 {
-                    SaveHandler.TrackersSave.Data[after.Id].dt = DateTime.Now;
+                    SaveHandler.TrackersSave.Data[After.Id].dt = DateTime.Now;
                 }
+            }
+
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(After.Guild.Id))
+            {
+                SocketGuildChannel GuildChannel = After.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[After.Guild.Id]);
+                if (GuildChannel != null)
+                {
+                    if (Before.Nickname != After.Nickname)
+                    {
+                        ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                        EmbedBuilder builder = new EmbedBuilder();
+                        builder.WithColor(Color.Blue);
+                        
+                        string NickB;
+                        string NickA;
+                        if (string.IsNullOrWhiteSpace(Before.Nickname)) 
+                        {
+                            builder.WithTitle("Nickname Change");
+                        }
+                        builder.WithDescription($"{After.Mention}\n`{NickB}` -> `{NickA}`");   
+                        await LogChannel.SendMessageAsync(embed: builder.Build());
+                    }
+                }
+                else SaveHandler.LogChannelsSave.Data.Remove(After.Guild.Id);
             }
         }
 
@@ -187,7 +223,7 @@ namespace RK800
                     await Context.Channel.SendMessageAsync("Thank you in advance for your cooperation.");
                     return;
                 }
-                if (!Message.HasStringPrefix("c.", ref PrefixPos)) return;
+                if (!Message.HasStringPrefix("d.", ref PrefixPos)) return;
             }
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
             if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
@@ -200,9 +236,9 @@ namespace RK800
             Console.WriteLine("Ready!");
             while (true)
             {
-               if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | c.help");
-               else await Client.SetGameAsync($"on {Client.Guilds.Count} server | c.help");  
-               await Task.Delay(600000);
+                if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | c.help");
+                else await Client.SetGameAsync($"on {Client.Guilds.Count} server | c.help");
+                await Task.Delay(600000);
             }
         }
 

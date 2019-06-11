@@ -15,6 +15,7 @@ namespace RK800.Commands
             await ReplyAsync("Shutting down!");
             await Context.Client.LogoutAsync();
             SaveHandler.SaveAll();
+            Console.WriteLine("Shutdown via Commmand!");
             Environment.Exit(0);
         }
 
