@@ -17,5 +17,8 @@ namespace RK800.Commands
             SaveHandler.SaveAll();
             Environment.Exit(0);
         }
+
+        [Command("Source")]
+        public async Task GetSource() => await ReplyAsync("I was written in C# using Discord.Net: https://github.com/SunTheCourier/Connor");
     }
 }

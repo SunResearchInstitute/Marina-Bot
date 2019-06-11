@@ -73,7 +73,7 @@ namespace RK800.Commands
             {
                 if (!TimeSpan.TryParse(Time_Span, out TimeSpan time))
                 {
-                    await Error.SendDiscordError(Context, Value: "Invald time interval!");
+                    await Error.SendDiscordError(Context, Value: "Invalid time interval!");
                     return;
                 }
 
@@ -83,13 +83,25 @@ namespace RK800.Commands
                     return;
                 }
 
+                if (time > new TimeSpan(23, 59, 0))
+                {
+                    await Error.SendDiscordError(Context, Value: "Time can not be above 23:59");
+                    return;
+                }
+
                 string reply = $"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}";
-                if (!string.IsNullOrWhiteSpace(string.Join(" ", Message))) reply += $" with message \"{string.Join(" ", Message)}\"";
+                if (!string.IsNullOrWhiteSpace(string.Join(" ", Message))) reply += $" with message \"{string.Join(" ", Message)}\".";
                 else reply += ".";
                 SaveHandler.TrackersSave.Data[Context.User.Id].DmReason = string.Join(" ", Message);
                 SaveHandler.TrackersSave.Data[Context.User.Id].IsAlertEnabled = true;
                 SaveHandler.TrackersSave.Data[Context.User.Id].ts = time;
-                await ReplyAsync(reply);
+                if (reply.Length > 2000)
+                {
+                    string[] msgs = Misc.ConvertToDiscordSendable(reply);
+                    foreach (string msg in msgs)
+                    await ReplyAsync(msg);
+                }
+                else await ReplyAsync(reply);
             }
             else
             {
@@ -113,8 +125,13 @@ namespace RK800.Commands
                 string reply = $"You have set your alert timer to {string.Format("{0:00}:{1:00}", SaveHandler.TrackersSave.Data[Context.User.Id].ts.Hours, SaveHandler.TrackersSave.Data[Context.User.Id].ts.Minutes)}";
                 if (!string.IsNullOrWhiteSpace(SaveHandler.TrackersSave.Data[Context.User.Id].DmReason)) reply += $" with message \"{SaveHandler.TrackersSave.Data[Context.User.Id].DmReason}\"";
                 else reply += ".";
-                await ReplyAsync(reply);
-                return;
+                if (reply.Length > 2000)
+                {
+                    string[] msgs = Misc.ConvertToDiscordSendable(reply);
+                    foreach (string msg in msgs)
+                    await ReplyAsync(msg);
+                }
+                else await ReplyAsync(reply);
             }
             else await Error.SendDiscordError(Context, Value: "You are not being monitored!");
         }

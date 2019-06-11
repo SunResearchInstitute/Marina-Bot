@@ -81,32 +81,38 @@ namespace RK800
 
         private async Task UserLeft(SocketGuildUser User)
         {
-            SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
-            if (GuildChannel != null)
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
             {
-                EmbedBuilder builder = new EmbedBuilder();
-                builder.WithColor(Color.Blue);
-                builder.WithTitle("User Left");
-                builder.WithDescription(User.Mention);
-                ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                await LogChannel.SendMessageAsync(embed: builder.Build());
+                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
+                if (GuildChannel != null)
+                {
+                    EmbedBuilder builder = new EmbedBuilder();
+                    builder.WithColor(Color.Blue);
+                    builder.WithTitle("User Left");
+                    builder.WithDescription(User.Mention);
+                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                    await LogChannel.SendMessageAsync(embed: builder.Build());
+                }
+                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
             }
-            else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
         }
 
         private async Task UserJoined(SocketGuildUser User)
         {
-            SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
-            if (GuildChannel != null)
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
             {
-                EmbedBuilder builder = new EmbedBuilder();
-                builder.WithColor(Color.Blue);
-                builder.WithTitle("User Joined");
-                builder.WithDescription(User.Mention);
-                ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                await LogChannel.SendMessageAsync(embed: builder.Build());
+                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
+                if (GuildChannel != null)
+                {
+                    EmbedBuilder builder = new EmbedBuilder();
+                    builder.WithColor(Color.Blue);
+                    builder.WithTitle("User Joined");
+                    builder.WithDescription(User.Mention);
+                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                    await LogChannel.SendMessageAsync(embed: builder.Build());
+                }
+                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
             }
-            else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
         }
 
         private async Task MessageUpdated(Cacheable<IMessage, ulong> Message, SocketMessage NewMessage, ISocketMessageChannel Channel)
