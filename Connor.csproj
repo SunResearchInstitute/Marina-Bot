@@ -9,6 +9,7 @@
     <Product />
     <Company />
     <Description>The android sent by CyberLife</Description>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
