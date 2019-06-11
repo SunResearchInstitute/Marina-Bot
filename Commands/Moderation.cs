@@ -326,7 +326,7 @@ namespace RK800.Commands
                         }
                         return;
                     }
-                    else builder.WithCurrentTimestamp();
+                    builder.WithCurrentTimestamp();
                     builder.WithDescription(words);
                     await Context.User.SendMessageAsync(embed: builder.Build());
                 }

@@ -102,7 +102,7 @@ namespace RK800.Commands
                 {
                     string[] msgs = Misc.ConvertToDiscordSendable(reply);
                     foreach (string msg in msgs)
-                    await ReplyAsync(msg);
+                        await ReplyAsync(msg);
                 }
                 else await ReplyAsync(reply);
             }
@@ -132,7 +132,7 @@ namespace RK800.Commands
                 {
                     string[] msgs = Misc.ConvertToDiscordSendable(reply);
                     foreach (string msg in msgs)
-                    await ReplyAsync(msg);
+                        await ReplyAsync(msg);
                 }
                 else await ReplyAsync(reply);
             }
@@ -173,7 +173,7 @@ namespace RK800.Commands
             }
         }
 
-        public static async void CheckTimeAsync(Object source, ElapsedEventArgs e)
+        public static async void CheckTimeAsync(object source, ElapsedEventArgs e)
         {
             foreach (ulong id in SaveHandler.TrackersSave.Data.Keys)
             {
@@ -187,11 +187,26 @@ namespace RK800.Commands
                         string[] msgs = Misc.ConvertToDiscordSendable(msg);
                         foreach (string reply in msgs)
                         {
-                            await Program.Client.GetUser(id).SendMessageAsync(reply);
+                            try
+                            {
+                                await Program.Client.GetUser(id).SendMessageAsync(reply);
+                            }
+                            catch { }
                         }
                     }
-                    else await Program.Client.GetUser(id).SendMessageAsync(msg);
-                    await Program.Client.GetUser(id).SendMessageAsync("Your alert time has also been reset!");
+                    else
+                    {
+                        try
+                        {
+                            await Program.Client.GetUser(id).SendMessageAsync(msg);
+                        }
+                        catch { }
+                    }
+                    try
+                    {
+                        await Program.Client.GetUser(id).SendMessageAsync("Your alert time has also been reset!");
+                    }
+                    catch { }
                     SaveHandler.TrackersSave.Data[id].IsAlertEnabled = false;
                     SaveHandler.TrackersSave.Data[id].DmReason = null;
                 }
