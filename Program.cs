@@ -169,9 +169,9 @@ namespace RK800
         private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            if (before.Status != after.Status)
+            if (SaveHandler.TrackersSave.Data.Keys.Contains(after.Id) && SaveHandler.TrackersSave.Data[after.Id].IsTrackerEnabled)
             {
-                if (SaveHandler.TrackersSave.Data.Keys.Contains(after.Id) && SaveHandler.TrackersSave.Data[after.Id].IsTrackerEnabled)
+                if (before.Status != after.Status)
                 {
                     SaveHandler.TrackersSave.Data[after.Id].dt = DateTime.Now;
                 }
@@ -204,14 +204,19 @@ namespace RK800
             }
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
             if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
-            
+
 
         }
 
         private async Task Client_Ready()
         {
             Console.WriteLine("Ready!");
-            await Client.SetGameAsync("with Sumo");
+            while (true)
+            {
+               if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | c.help");
+               else await Client.SetGameAsync($"on {Client.Guilds.Count} server | c.help");  
+               await Task.Delay(600000);
+            }
         }
 
         private static void LoadConfig()

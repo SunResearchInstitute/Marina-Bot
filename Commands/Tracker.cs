@@ -138,7 +138,7 @@ namespace RK800.Commands
         }
 
         [Command("RemoveAllTrackerData")]
-        [Summary("Removes all Tracker and Alarm Data")]
+        [Summary("Removes all Tracker and Alarm Data.")]
         public async Task RemoveAllData()
         {
             await Context.Channel.TriggerTypingAsync();

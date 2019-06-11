@@ -13,7 +13,7 @@ namespace RK800.Save
 
         private static readonly string[] PreDefinedSaves = { "Trackers.Tracker", "Filters.UlongStringList", "Warns.Warn", "LogChannels.UlongUlong" };
 
-        public static FilterSaveFile FilterSave => SaveHandler.Saves["Filter"] as FilterSaveFile;
+        public static FilterSaveFile FilterSave => SaveHandler.Saves["Filters"] as FilterSaveFile;
         public static WarnSaveFile WarnsSave => SaveHandler.Saves["Warns"] as WarnSaveFile;
         public static UlongUlongSaveFile LogChannelsSave => SaveHandler.Saves["LogChannels"] as UlongUlongSaveFile;
         public static TrackerSaveFile TrackersSave => SaveHandler.Saves["Trackers"] as TrackerSaveFile;
