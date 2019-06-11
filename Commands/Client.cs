@@ -20,6 +20,7 @@ namespace RK800.Commands
         }
 
         [Command("Source")]
+        [Summary("Source Code!")]
         public async Task GetSource() => await ReplyAsync("I was written in C# using Discord.Net: https://github.com/SunTheCourier/Connor");
     }
 }

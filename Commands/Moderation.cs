@@ -13,14 +13,29 @@ namespace RK800.Commands
 {
     public class Moderation : ModuleBase<SocketCommandContext>
     {
-
-
         //Should we convert this file to a Readonly Array?
         public static FileInfo FilterDefaults = new FileInfo("FilterDefaults.txt");
 
         [RequireUserPermission(GuildPermission.Administrator)]
+        [Command("Logs")]
+        [Summary("Gets the logging channel.")]
+        public async Task GetLogChannel(SocketGuildChannel channel)
+        {
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id))
+            {
+                SocketGuildChannel LogChannel = Context.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Context.Guild.Id]);
+                if (LogChannel != null)
+                {
+                    await ReplyAsync($"The Current logging channel is set to <#{LogChannel.Id}>");
+                    return;
+                }
+            }
+            await ReplyAsync("Logging channel is not set.");
+        }
+
+        [RequireUserPermission(GuildPermission.Administrator)]
         [Command("SetLogs")]
-        [Summary("Sets the logging channel for deleted and modified messages.")]
+        [Summary("Sets the logging channel.")]
         public async Task SetLogChannel(SocketGuildChannel channel)
         {
             await Context.Channel.TriggerTypingAsync();
@@ -38,7 +53,7 @@ namespace RK800.Commands
 
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("RemoveLogs")]
-        [Summary("Remvoes the logging channel for deleted and modified messages.")]
+        [Summary("Remvoes the logging channel.")]
         public async Task RemoveLogChannel()
         {
             await Context.Channel.TriggerTypingAsync();
