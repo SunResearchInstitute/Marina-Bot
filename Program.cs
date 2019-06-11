@@ -48,7 +48,8 @@ namespace RK800
             Client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 //Chaching for Moderation
-                MessageCacheSize = 100
+                MessageCacheSize = 100,
+                LogLevel = LogSeverity.Error
             });
 
             Commands = new CommandService(new CommandServiceConfig
@@ -57,13 +58,15 @@ namespace RK800
                 DefaultRunMode = RunMode.Async,
                 LogLevel = LogSeverity.Error
             });
+
             Client.Ready += Client_Ready;
             Client.MessageReceived += MessageReceived;
             Client.MessageDeleted += MessageDeleted;
             Client.UserLeft += UserLeft;
             Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
-            Client.Log += Client_Log;
+            Client.Log += Log;
+            Commands.Log += Log;
 
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
             try
@@ -81,12 +84,13 @@ namespace RK800
             await Client.StartAsync();
         }
 
-        private Task Client_Log(LogMessage log)
+        private Task Log(LogMessage log)
         {
             using (StreamWriter writer = File.AppendText(LogFile.FullName))
             {
-                writer.WriteLine($"{log.Message} {log.Source}: {log.Exception.Message} {log.Exception.StackTrace}");
+                writer.WriteLine($"{log.Source} {log.Message} {log.Source}: {log.Exception.Message} {log.Exception.StackTrace}");
             }
+
             return Task.CompletedTask;
         }
 
