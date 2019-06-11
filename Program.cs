@@ -97,24 +97,6 @@ namespace RK800
             }
         }
 
-        private async Task UserJoined(SocketGuildUser User)
-        {
-            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
-            {
-                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
-                if (GuildChannel != null)
-                {
-                    EmbedBuilder builder = new EmbedBuilder();
-                    builder.WithColor(Color.Blue);
-                    builder.WithTitle("User Joined");
-                    builder.WithDescription(User.Mention);
-                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                    await LogChannel.SendMessageAsync(embed: builder.Build());
-                }
-                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
-            }
-        }
-
         private async Task MessageUpdated(Cacheable<IMessage, ulong> Message, SocketMessage NewMessage, ISocketMessageChannel Channel)
         {
             if (Message.HasValue)
