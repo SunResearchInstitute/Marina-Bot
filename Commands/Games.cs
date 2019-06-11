@@ -31,10 +31,10 @@ namespace RK800.Commands
             }
             WebClient wc = new WebClient();
             //region is auto-detected but 'us' is in there because of compatibility
-            OverwatchProfile data;
+            OverwatchProfile Data;
             try
             {
-                data = JsonConvert.DeserializeObject<OverwatchProfile>(wc.DownloadString($"https://ow-api.com/v1/stats/{Platform}/us/{Username}/profile"));
+                Data = JsonConvert.DeserializeObject<OverwatchProfile>(wc.DownloadString($"https://ow-api.com/v1/stats/{Platform.ToLower()}/us/{Username}/profile"));
             }
             catch (WebException e)
             {
@@ -50,24 +50,23 @@ namespace RK800.Commands
                 return;
             }
 
-            //we cant access the `private` bool so we will check like this
-            if (data.gamesWon == 0 && data.rating == 0)
+            if (Data.Private)
             {
-                await Error.SendDiscordError(Context, Value: "Profile is private/No Data!");
+                await Error.SendDiscordError(Context, Value: "Profile is private!");
                 return;
             }
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(Color.Orange);
-            builder.WithTitle($"{data.name}'s Stats");
-            builder.WithThumbnailUrl(data.icon.AbsoluteUri);
-            if (data.rating != 0) builder.AddField($"Competitive:", $"{data.rating} SR, Rank: {GetOverwatchRankName(data.rating)}");
+            builder.WithTitle($"{Data.Name}'s Stats");
+            builder.WithThumbnailUrl(Data.Icon.AbsoluteUri);
+            if (Data.Rating != 0) builder.AddField($"Competitive:", $"{Data.Rating} SR, Rank: {GetOverwatchRankName(Data.Rating)}");
             else builder.AddField("Competetive Rank:", "Not placed!");
-            builder.AddField("Endorsment Level:", data.endorsement);
-            builder.AddField("Level", (data.prestige * 100) + data.level);
-            builder.AddField("Games Won:", data.gamesWon);
-            builder.AddField("Games Played in Quick Play and Competitive Play:", data.competitiveStats.games.played + data.quickPlayStats.games.played);
-            builder.AddField("Total Amount of Cards Recieved in Quick Play and Competitive Play:", data.competitiveStats.awards.cards + data.quickPlayStats.awards.cards);
-            builder.AddField("Total Amount of Medals Accquired in Quick Play and Competitive Play:", data.competitiveStats.awards.medals + data.quickPlayStats.awards.medals);
+            builder.AddField("Endorsment Level:", Data.Endorsement);
+            builder.AddField("Level", (Data.Prestige * 100) + Data.Level);
+            builder.AddField("Games Won:", Data.GamesWon);
+            builder.AddField("Games Played in Quick Play and Competitive Play:", Data.CompetitiveStats.Games.Played + Data.QuickPlayStats.Games.Played);
+            builder.AddField("Total Amount of Cards Recieved in Quick Play and Competitive Play:", Data.CompetitiveStats.Awards.Cards + Data.QuickPlayStats.Awards.Cards);
+            builder.AddField("Total Amount of Medals Accquired in Quick Play and Competitive Play:", Data.CompetitiveStats.Awards.Medals + Data.QuickPlayStats.Awards.Medals);
             builder.WithCurrentTimestamp();
             await ReplyAsync(embed: builder.Build());
         }
@@ -104,39 +103,40 @@ namespace RK800.Commands
 
     public class GameTotal
     {
-        public uint played;
-        public uint won;
+        public uint Played;
+        public uint Won;
     }
 
     public class Awards
     {
-        public ulong cards;
-        public ulong medals;
-        public ulong medalsBronze;
-        public ulong medalsSilver;
-        public ulong medalsGold;
+        public ulong Cards;
+        public ulong Medals;
+        public ulong MedalsBronze;
+        public ulong MedalsSilver;
+        public ulong MedalsGold;
     }
 
     public class OverwatchStats
     {
-        public GameTotal games;
-        public Awards awards;
+        public GameTotal Games;
+        public Awards Awards;
     }
 
     public class OverwatchProfile
     {
-        public ushort endorsement;
-        public Uri endorsementIcon;
-        public Uri icon;
-        public string name;
-        public byte level;
+        public ushort Endorsement;
+        public Uri EndorsementIcon;
+        public Uri Icon;
+        public string Name;
+        public byte Level;
         public Uri LevelIcon;
-        public ushort prestige;
-        public Uri prestigeIcon;
-        public ushort rating;
-        public Uri ratingIcon;
-        public ulong gamesWon;
-        public OverwatchStats quickPlayStats;
-        public OverwatchStats competitiveStats;
+        public ushort Prestige;
+        public Uri PrestigeIcon;
+        public ushort Rating;
+        public Uri RatingIcon;
+        public ulong GamesWon;
+        public OverwatchStats QuickPlayStats;
+        public OverwatchStats CompetitiveStats;
+        public bool Private;
     }
 }
