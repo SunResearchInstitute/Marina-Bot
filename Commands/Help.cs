@@ -54,8 +54,6 @@ namespace RK800.Commands
         {
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(Color.Blue);
-
-            builder.WithFooter("All commands start with 'c.' unless in DMs.");
             builder.WithTitle("Help Menu");
 
             if (Command == null)
@@ -69,6 +67,7 @@ namespace RK800.Commands
                         if (builder.Fields.Count == cmds.Count)
                         {
                             builder.WithCurrentTimestamp();
+                            builder.WithFooter("All commands start with 'c.' unless in DMs.");
                             try
                             {
                                 await Context.User.SendMessageAsync(embed: builder.Build());
@@ -87,6 +86,7 @@ namespace RK800.Commands
                     }
                 }
                 builder.WithCurrentTimestamp();
+                builder.WithFooter("All commands start with 'c.' unless in DMs.");
                 try
                 {
                     await Context.User.SendMessageAsync(embed: builder.Build());
