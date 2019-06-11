@@ -63,7 +63,7 @@ namespace RK800
             Client.UserLeft += UserLeft;
             Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
-            Client.Log += Log;
+            Client.Log += Client_Log;
 
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
             try
@@ -81,7 +81,7 @@ namespace RK800
             await Client.StartAsync();
         }
 
-        private Task Log(LogMessage log)
+        private Task Client_Log(LogMessage log)
         {
             using (StreamWriter writer = File.AppendText(LogFile.FullName))
             {
@@ -108,12 +108,12 @@ namespace RK800
             }
         }
 
-        private async Task MessageUpdated(Cacheable<IMessage, ulong> Message, SocketMessage NewMessage, ISocketMessageChannel Channel)
+        private async Task MessageUpdated(Cacheable<IMessage, ulong> OldMessage, SocketMessage NewMessage, ISocketMessageChannel Channel)
         {
-            if (Message.HasValue)
+            if (OldMessage.HasValue && OldMessage.Value.Content != NewMessage.Content)
             {
-                SocketCommandContext Context = new SocketCommandContext(Client, Message.Value as SocketUserMessage);
-                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
+                SocketCommandContext Context = new SocketCommandContext(Client, OldMessage.Value as SocketUserMessage);
+                if (!string.IsNullOrWhiteSpace(OldMessage.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
                 {
                     SocketGuildChannel GuildChannel = Context.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Context.Guild.Id]);
                     if (GuildChannel != null)
@@ -122,7 +122,7 @@ namespace RK800
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Edited");
-                        builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content} -> {NewMessage.Content}");
+                        builder.WithDescription($"From {OldMessage.Value.Author.Mention} in <#{Channel.Id}>:\n{OldMessage.Value.Content} -> {NewMessage.Content}");
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
                             string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
@@ -250,10 +250,7 @@ namespace RK800
             }
 
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
-
             if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
-
-
         }
 
         private async Task Client_Ready()
