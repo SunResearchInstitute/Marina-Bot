@@ -25,6 +25,7 @@ namespace RK800
         //Config Stuff
         private static Dictionary<string, string> Config = new Dictionary<string, string>();
         private static FileInfo ConfigFile = new FileInfo("Config.txt");
+        private static FileInfo LogFile = new FileInfo("Connor.log");
 
         private static readonly System.Timers.Timer Timer = new System.Timers.Timer(60000)
         {
@@ -53,7 +54,8 @@ namespace RK800
             Commands = new CommandService(new CommandServiceConfig
             {
                 CaseSensitiveCommands = false,
-                DefaultRunMode = RunMode.Async
+                DefaultRunMode = RunMode.Async,
+                LogLevel = LogSeverity.Error
             });
             Client.Ready += Client_Ready;
             Client.MessageReceived += MessageReceived;
@@ -61,6 +63,7 @@ namespace RK800
             Client.UserLeft += UserLeft;
             Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
+            Client.Log += Log;
 
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
             try
@@ -76,6 +79,15 @@ namespace RK800
             //a Static Method Starts too early
             Help.Populate();
             await Client.StartAsync();
+        }
+
+        private Task Log(LogMessage log)
+        {
+            using (StreamWriter writer = File.AppendText(LogFile.FullName))
+            {
+                writer.WriteLine($"{log.Message} {log.Source}: {log.Exception.Message} {log.Exception.StackTrace}");
+            }
+            return Task.CompletedTask;
         }
 
         private async Task UserLeft(SocketGuildUser User)
@@ -236,7 +248,9 @@ namespace RK800
                 if (!Message.HasStringPrefix("c.", ref PrefixPos)) return;
 #endif
             }
+
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
+
             if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
 
 
