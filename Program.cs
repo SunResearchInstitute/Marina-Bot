@@ -47,7 +47,7 @@ namespace RK800
             Client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 //Chaching for Moderation
-                MessageCacheSize = 100,
+                MessageCacheSize = 100
             });
 
             Commands = new CommandService(new CommandServiceConfig
