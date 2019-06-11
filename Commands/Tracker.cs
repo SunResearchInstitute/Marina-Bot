@@ -89,10 +89,13 @@ namespace RK800.Commands
                     return;
                 }
 
+                string joined;
+                if (Message.Length != 0) joined = string.Join(" ", Message);
+                else joined = null;
                 string reply = $"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}";
-                if (!string.IsNullOrWhiteSpace(string.Join(" ", Message))) reply += $" with message \"{string.Join(" ", Message)}\".";
+                if (!string.IsNullOrWhiteSpace(joined)) reply += $" with message \"{string.Join(" ", Message)}\".";
                 else reply += ".";
-                SaveHandler.TrackersSave.Data[Context.User.Id].DmReason = string.Join(" ", Message);
+                SaveHandler.TrackersSave.Data[Context.User.Id].DmReason = joined;
                 SaveHandler.TrackersSave.Data[Context.User.Id].IsAlertEnabled = true;
                 SaveHandler.TrackersSave.Data[Context.User.Id].ts = time;
                 if (reply.Length > 2000)
@@ -179,9 +182,18 @@ namespace RK800.Commands
                     string msg = $"You have recieved this DM because your self set online time alert of {string.Format("{0:00}:{1:00}", SaveHandler.TrackersSave.Data[id].ts.Hours, SaveHandler.TrackersSave.Data[id].ts.Minutes)} has been reached";
                     if (!string.IsNullOrWhiteSpace(SaveHandler.TrackersSave.Data[id].DmReason)) msg += $" with message \"{SaveHandler.TrackersSave.Data[id].DmReason}\"";
                     else msg += "!";
-                    await Program.Client.GetUser(id).SendMessageAsync(msg);
+                    if (msg.Length > 2000)
+                    {
+                        string[] msgs = Misc.ConvertToDiscordSendable(msg);
+                        foreach (string reply in msgs)
+                        {
+                            await Program.Client.GetUser(id).SendMessageAsync(reply);
+                        }
+                    }
+                    else await Program.Client.GetUser(id).SendMessageAsync(msg);
                     await Program.Client.GetUser(id).SendMessageAsync("Your alert time has also been reset!");
                     SaveHandler.TrackersSave.Data[id].IsAlertEnabled = false;
+                    SaveHandler.TrackersSave.Data[id].DmReason = null;
                 }
             }
         }
