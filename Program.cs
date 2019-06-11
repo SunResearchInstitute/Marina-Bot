@@ -204,7 +204,7 @@ namespace RK800
                         if (string.IsNullOrWhiteSpace(After.Nickname))
                         {
                             builder.WithTitle("Nickname Removal");
-                            builder.WithDescription($"{After.Mention}:\n`{Before.Nickname}` -> ``");
+                            builder.WithDescription($"{After.Mention}:\n`{Before.Nickname}` -> `None`");
                         }
                         else if (string.IsNullOrWhiteSpace(Before.Nickname))
                         {
