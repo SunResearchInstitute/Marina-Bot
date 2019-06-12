@@ -126,7 +126,7 @@ namespace RK800
                         EmbedBuilder builder = new EmbedBuilder();
                         builder.WithColor(Color.Blue);
                         builder.WithTitle("Message Edited");
-                        builder.WithDescription($"From {OldMessage.Value.Author.Mention} in <#{Channel.Id}>:\n{OldMessage.Value.Content} -> {NewMessage.Content}");
+                        builder.WithDescription($"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}");
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
                             string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
@@ -136,7 +136,6 @@ namespace RK800
                                 builder.WithDescription(msg);
                                 await LogChannel.SendMessageAsync(embed: builder.Build());
                                 if (i == 0) builder.Title = null;
-
                             }
                         }
                         else await LogChannel.SendMessageAsync(embed: builder.Build());
