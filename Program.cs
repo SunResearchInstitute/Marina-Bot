@@ -104,7 +104,7 @@ namespace RK800
                     EmbedBuilder builder = new EmbedBuilder();
                     builder.WithColor(Color.Blue);
                     builder.WithTitle("User Left");
-                    builder.WithDescription(User.Mention);
+                    builder.WithDescription($"{User.Mention} ({User.Username})");
                     ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
