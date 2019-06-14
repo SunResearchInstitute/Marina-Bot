@@ -19,7 +19,7 @@ namespace RK800.Commands
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Logs")]
         [Summary("Gets the logging channel.")]
-        public async Task GetLogChannel(SocketGuildChannel channel)
+        public async Task GetLogChannel()
         {
             if (SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id))
             {
@@ -80,6 +80,23 @@ namespace RK800.Commands
             await User.SendMessageAsync(msg);
             await User.BanAsync(reason: joined);
             await ReplyAsync($"{User} is now b& :thumbsup:");
+
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
+            {
+                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
+                if (GuildChannel != null)
+                {
+                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                    EmbedBuilder builder = new EmbedBuilder();
+
+                    builder.WithColor(Color.Blue);
+                    builder.WithTitle("**Banned**");
+                    builder.WithDescription($"{Context.User.Mention} banned {User.Mention} | {User}");
+                    if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
+                    await LogChannel.SendMessageAsync(embed: builder.Build());
+                }
+                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
+            }
         }
 
         [RequireUserPermission(GuildPermission.KickMembers), RequireBotPermission(GuildPermission.KickMembers)]
@@ -94,7 +111,24 @@ namespace RK800.Commands
             if (joined != null) msg += $"Reason: {joined}";
             await User.SendMessageAsync(msg);
             await User.KickAsync(joined);
-            await ReplyAsync($"kicked {User} :thumbsup:");
+            await ReplyAsync($"kicked {User} :boot:");
+
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
+            {
+                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
+                if (GuildChannel != null)
+                {
+                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                    EmbedBuilder builder = new EmbedBuilder();
+
+                    builder.WithColor(Color.Blue);
+                    builder.WithTitle("**Kicked**");
+                    builder.WithDescription($"{Context.User.Mention} kicked {User.Mention} | {User}");
+                    if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
+                    await LogChannel.SendMessageAsync(embed: builder.Build());
+                }
+                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
+            }
         }
 
 
@@ -168,14 +202,15 @@ namespace RK800.Commands
                 SaveHandler.WarnsSave.Data.Add(Context.Guild.Id, new Dictionary<ulong, List<WarnData>>() { { User.Id, new List<WarnData>() { new WarnData(DateTime.Now, joined, Context.User.Id) } } });
             }
 
-            string dmmsg = $"You were warned on {Context.Guild.Name} ";
+            string reason = SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Last().Reason;
 
+            string dmmsg = $"You were warned on {Context.Guild.Name} ";
             switch (SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count)
             {
                 //Based off of Komet
                 case 1:
                     dmmsg += "and now have a warning!";
-                    if (SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][0].Reason != null) dmmsg += $"The given reason is: {SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][0].Reason}";
+                    if (reason != null) dmmsg += $"\nThe given reason is: {reason}";
                     try
                     {
                         await User.SendMessageAsync(dmmsg);
@@ -184,7 +219,7 @@ namespace RK800.Commands
                     break;
                 case 2:
                     dmmsg += "and now have 2 warnings! The next warn will automatically kick!";
-                    if (SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][1].Reason != null) dmmsg += $"The given reason is: {SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][1].Reason}";
+                    if (reason != null) dmmsg += $"\nThe given reason is: {reason}";
                     try
                     {
                         await User.SendMessageAsync(dmmsg);
@@ -193,7 +228,7 @@ namespace RK800.Commands
                     break;
                 case 3:
                     dmmsg += "and now have 3 warnings! For having 3 warnings you have been kicked, the next warning will also result in a kick!";
-                    if (SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][2].Reason != null) dmmsg += $"The given reason is: {SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][2].Reason}";
+                    if (reason != null) dmmsg += $"\nThe given reason is: {reason}";
                     try
                     {
                         await User.SendMessageAsync(dmmsg);
@@ -203,7 +238,7 @@ namespace RK800.Commands
                     break;
                 case 4:
                     dmmsg += "and now have 4 warnings! For having 4 warnings you have been kicked again, the next warning will result in a ban from the server!";
-                    if (SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][3].Reason != null) dmmsg += $"The given reason is: {SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][3].Reason}";
+                    if (reason != null) dmmsg += $"\nThe given reason is: {reason}";
                     try
                     {
                         await User.SendMessageAsync(dmmsg);
@@ -213,7 +248,7 @@ namespace RK800.Commands
                     break;
                 case 5:
                     dmmsg += "and now have 5 warnings! For having 5 warnings you have been banned from the server!";
-                    if (SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][4].Reason != null) dmmsg += $"The given reason is: {SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id][4].Reason}";
+                    if (reason != null) dmmsg += $"\nThe given reason is: {reason}";
                     try
                     {
                         await User.SendMessageAsync(dmmsg);
@@ -225,6 +260,23 @@ namespace RK800.Commands
                 default:
                     await User.BanAsync();
                     break;
+            }
+
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
+            {
+                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
+                if (GuildChannel != null)
+                {
+                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
+                    EmbedBuilder builder = new EmbedBuilder();
+
+                    builder.WithColor(Color.Blue);
+                    builder.WithTitle("**Warned**");
+                    builder.WithDescription($"{Context.User.Mention} warned {User.Mention} (warn #{SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count}) | {User}");
+                    if (reason != null) builder.Description += $"\n__Reason__: \"{reason}\"";
+                    await LogChannel.SendMessageAsync(embed: builder.Build());
+                }
+                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
             }
 
             string warningmsg = $"{User.Mention} warned. User has {SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count} warning";

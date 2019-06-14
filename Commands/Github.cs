@@ -40,14 +40,12 @@ namespace RK800.Commands
             public bool Desc { get; set; }
         }
 
-
-        [Command("GetRelease")]
-        [Summary("Gets a release from the specificed Github repository.\nAvaliable options:\n--repo, -r=string\n--user, -u=string\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
-        public async Task GetRelease(params string[] Options)
+        [Command("GitRelease")]
+        [Summary("Gets a release from the specificed Github repository.\nUser and Repository must be included anywhere in the command in that order.\nAvaliable options:\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
+        public async Task GetRelease(params string[] Arguments)
         {
-
             await Context.Channel.TriggerTypingAsync();
-            Parser.Default.ParseArguments<Options>(Options)
+            Parser.Default.ParseArguments<Options>(Arguments)
             //Should prevent any exceptions from breaking the bot
             .WithParsed(o => _ = GetReleaseTask(o))
             .WithNotParsed(e => _ = Error.SendDiscordError(Context, Value: "Invalid arguments"));
