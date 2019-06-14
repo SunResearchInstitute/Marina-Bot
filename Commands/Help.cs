@@ -102,7 +102,7 @@ namespace RK800.Commands
                 KeyValuePair<string, string> cmd;
                 try
                 {
-                    cmd = cmds.First(c => c.Key.Contains(Command, StringComparison.CurrentCultureIgnoreCase));
+                    cmd = cmds.First(c => c.Key.Contains(Command, StringComparison.OrdinalIgnoreCase));
                 }
                 catch (InvalidOperationException)
                 {
