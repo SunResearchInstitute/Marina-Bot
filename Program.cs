@@ -114,7 +114,8 @@ namespace RK800
 
         private async Task MessageUpdated(Cacheable<IMessage, ulong> OldMessage, SocketMessage NewMessage, ISocketMessageChannel Channel)
         {
-            if (OldMessage.HasValue && OldMessage.Value.Content != NewMessage.Content)
+
+            if (OldMessage.HasValue && OldMessage.Value.Content != NewMessage.Content && !NewMessage.Author.IsBot)
             {
                 SocketCommandContext Context = new SocketCommandContext(Client, OldMessage.Value as SocketUserMessage);
                 if (!string.IsNullOrWhiteSpace(OldMessage.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
@@ -147,7 +148,7 @@ namespace RK800
 
         private async Task MessageDeleted(Cacheable<IMessage, ulong> Message, ISocketMessageChannel Channel)
         {
-            if (Message.HasValue)
+            if (Message.HasValue && !Message.Value.Author.IsBot)
             {
                 SocketCommandContext Context = new SocketCommandContext(Client, Message.Value as SocketUserMessage);
                 if (!string.IsNullOrWhiteSpace(Message.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
@@ -181,12 +182,11 @@ namespace RK800
 
         private async Task GuildMemberUpdated(SocketGuildUser Before, SocketGuildUser After)
         {
-            if (SaveHandler.TrackersSave.Data.Keys.Contains(After.Id) && SaveHandler.TrackersSave.Data[After.Id].IsTrackerEnabled)
+            if (Before.IsBot) return;
+
+            if (SaveHandler.TrackersSave.Data.Keys.Contains(After.Id) && SaveHandler.TrackersSave.Data[After.Id].IsTrackerEnabled && Before.Status != After.Status)
             {
-                if (Before.Status != After.Status)
-                {
-                    SaveHandler.TrackersSave.Data[After.Id].dt = DateTime.Now;
-                }
+                SaveHandler.TrackersSave.Data[After.Id].dt = DateTime.Now;
             }
 
             if (SaveHandler.LogChannelsSave.Data.ContainsKey(After.Guild.Id))
@@ -215,7 +215,6 @@ namespace RK800
                             builder.WithTitle("Nickname Changed");
                             builder.WithDescription($"{After.Mention}:\n`{Before.Nickname}` -> `{After.Nickname}`");
                         }
-
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                 }
