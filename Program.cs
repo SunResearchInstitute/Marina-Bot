@@ -36,7 +36,7 @@ namespace RK800
         static void Main()
         {
             LoadConfig();
-            Timer.Elapsed += Tracker.CheckTimeAsync;
+            Timer.Elapsed += Tracker.CheckTime;
             Program program = new Program();
             program.MainAsync().GetAwaiter().GetResult();
             Thread.Sleep(-1);
@@ -114,7 +114,6 @@ namespace RK800
 
         private async Task MessageUpdated(Cacheable<IMessage, ulong> OldMessage, SocketMessage NewMessage, ISocketMessageChannel Channel)
         {
-
             if (OldMessage.HasValue && OldMessage.Value.Content != NewMessage.Content && !NewMessage.Author.IsBot)
             {
                 SocketCommandContext Context = new SocketCommandContext(Client, OldMessage.Value as SocketUserMessage);

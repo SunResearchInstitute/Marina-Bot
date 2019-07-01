@@ -93,7 +93,7 @@ namespace RK800.Commands
                 if (Message.Length != 0) joined = string.Join(" ", Message);
                 else joined = null;
                 string reply = $"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}";
-                if (!string.IsNullOrWhiteSpace(joined)) reply += $" with message \"{string.Join(" ", Message)}\".";
+                if (!string.IsNullOrWhiteSpace(joined)) reply += $" with message `{string.Join(" ", Message)}`.";
                 else reply += ".";
                 reply += " Please make sure I can send you DMs.";
                 SaveHandler.TrackersSave.Data[Context.User.Id].DmReason = joined;
@@ -174,9 +174,10 @@ namespace RK800.Commands
             }
         }
 
-        public static void CheckTimeAsync(object source, ElapsedEventArgs e) => _ = SendMessages();
+        //This will not cause the program to crash if it fails
+        public static void CheckTime(object source, ElapsedEventArgs e) => _ = SendMessagesAsync();
 
-        private static async Task SendMessages()
+        private static async Task SendMessagesAsync()
         {
             foreach (ulong id in SaveHandler.TrackersSave.Data.Keys)
             {
