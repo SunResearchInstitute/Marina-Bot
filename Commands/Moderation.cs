@@ -80,23 +80,6 @@ namespace RK800.Commands
             await User.SendMessageAsync(msg);
             await User.BanAsync(reason: joined);
             await ReplyAsync($"{User} is now b& :thumbsup:");
-
-            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
-            {
-                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
-                if (GuildChannel != null)
-                {
-                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                    EmbedBuilder builder = new EmbedBuilder();
-
-                    builder.WithColor(Color.Blue);
-                    builder.WithTitle("**Banned**");
-                    builder.WithDescription($"{Context.User.Mention} banned {User.Mention} | {User}");
-                    if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
-                    await LogChannel.SendMessageAsync(embed: builder.Build());
-                }
-                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
-            }
         }
 
         [RequireUserPermission(GuildPermission.KickMembers), RequireBotPermission(GuildPermission.KickMembers)]

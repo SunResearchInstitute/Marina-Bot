@@ -8,7 +8,7 @@ namespace RK800.Commands
 {
     public class Network : ModuleBase<SocketCommandContext>
     {
-        [Command("Ping"), Summary("Pings an IP.")]
+        [Command("Ping"), Summary("Pings an IP."), Alias("ddos")]
         public async Task Ping(string Ip)
         {
             Ping pinger = new Ping();

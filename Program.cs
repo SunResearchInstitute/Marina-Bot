@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Net;
+using Discord.Rest;
 using Discord.WebSocket;
 using RK800.Commands;
 using RK800.Save;
@@ -25,7 +26,7 @@ namespace RK800
         //Config Stuff
         private static Dictionary<string, string> Config = new Dictionary<string, string>();
         private static FileInfo ConfigFile = new FileInfo("Config.txt");
-        private static FileInfo LogFile = new FileInfo("Connor.log");
+        private static readonly FileInfo LogFile = new FileInfo("Connor.log");
 
         private static readonly System.Timers.Timer Timer = new System.Timers.Timer(60000)
         {
@@ -63,6 +64,7 @@ namespace RK800
             Client.MessageReceived += MessageReceived;
             Client.MessageDeleted += MessageDeleted;
             Client.UserLeft += UserLeft;
+            Client.UserBanned += UserBanned;
             Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
             Client.Log += Log;
@@ -94,6 +96,25 @@ namespace RK800
             return Task.CompletedTask;
         }
 
+        private async Task UserBanned(SocketUser User, SocketGuild Guild)
+        {
+            if (SaveHandler.LogChannelsSave.Data.ContainsKey(Guild.Id))
+            {
+                if (Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Guild.Id]) is ISocketMessageChannel LogChannel)
+                {
+                    EmbedBuilder builder = new EmbedBuilder();
+                    IEnumerable<RestAuditLogEntry> Logs = await Guild.GetAuditLogsAsync(5).FlattenAsync();
+                    RestAuditLogEntry LastBan = Logs.First(l => l.Action == ActionType.Ban);
+
+                    builder.WithColor(Color.Blue);
+                    builder.WithTitle("**Banned**");
+                    builder.WithDescription($"{LastBan.User.Mention} banned {User.Mention} | {User}");
+                    if (!string.IsNullOrWhiteSpace(LastBan.Reason)) builder.Description += $"\n__Reason__: \"{LastBan.Reason}\"";
+                    await LogChannel.SendMessageAsync(embed: builder.Build());
+                }
+                else SaveHandler.LogChannelsSave.Data.Remove(Guild.Id);
+            }
+        }
         private async Task UserLeft(SocketGuildUser User)
         {
             if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
@@ -104,7 +125,7 @@ namespace RK800
                     EmbedBuilder builder = new EmbedBuilder();
                     builder.WithColor(Color.Blue);
                     builder.WithTitle("User Left");
-                    builder.WithDescription($"{User.Mention} ({User.Username})");
+                    builder.WithDescription($"{User.Mention} | {User.Username}");
                     ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }

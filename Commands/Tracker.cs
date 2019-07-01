@@ -31,7 +31,7 @@ namespace RK800.Commands
             }
         }
 
-        [Command("UnTrackMe")]
+        [Command("UntrackMe")]
         [Summary("Stops tracking your online time.")]
         public async Task StopTracker()
         {
@@ -64,7 +64,7 @@ namespace RK800.Commands
 
         }
 
-        [Command("SetAlertTime")]
+        [Command("SetAlert")]
         [Summary("Sets the time you want to be alerted at.")]
         public async Task SetTimeAlert(string Time_Span, params string[] Message)
         {
@@ -113,7 +113,7 @@ namespace RK800.Commands
             }
         }
 
-        [Command("GetAlertTime")]
+        [Command("GetAlert")]
         [Summary("Gets the time you want to be alerted at.")]
         public async Task GetTimeAlert()
         {
@@ -140,7 +140,7 @@ namespace RK800.Commands
             else await Error.SendDiscordError(Context, Value: "You are not being monitored!");
         }
 
-        [Command("StopAlertTimer")]
+        [Command("StopAlert")]
         [Summary("Removes the time you want to be alerted at.")]
         public async Task RemoveTimeAlert()
         {
