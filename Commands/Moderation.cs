@@ -138,8 +138,8 @@ namespace RK800.Commands
             }
             EmbedBuilder builder = new EmbedBuilder
             {
-                Title = ($"Warnings for {User.Username}"),
-                Color = (Color.Blue)
+                Title = $"Warnings for {User.Username}",
+                Color = Color.Blue
             };
             if (!SaveHandler.WarnsSave.Data.ContainsKey(Context.Guild.Id) || !SaveHandler.WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id) || SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count == 0)
             {

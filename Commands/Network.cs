@@ -20,8 +20,7 @@ namespace RK800.Commands
                     EmbedBuilder builder = new EmbedBuilder
                     {
                         Color = Color.Green
-                    }
-                    ;
+                    };
                     builder.WithCurrentTimestamp();
                     string s;
                     if (reply.Address.ToString() != Ip) s = $"{reply.Address.ToString()} ({Ip})";

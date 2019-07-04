@@ -102,13 +102,14 @@ namespace RK800
             {
                 if (Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Guild.Id]) is ISocketMessageChannel LogChannel)
                 {
-                    EmbedBuilder builder = new EmbedBuilder();
                     IEnumerable<RestAuditLogEntry> Logs = await Guild.GetAuditLogsAsync(5).FlattenAsync();
                     RestAuditLogEntry LastBan = Logs.First(l => l.Action == ActionType.Ban);
-
-                    builder.Color = Color.Blue;
-                    builder.Title = "**Banned**";
-                    builder.Description =  $"{LastBan.User.Mention} banned {User.Mention} | {User}";
+                    EmbedBuilder builder = new EmbedBuilder
+                    {
+                        Color = Color.Blue,
+                        Title = "**Banned**",
+                        Description = $"{LastBan.User.Mention} banned {User.Mention} | {User}"
+                    };
                     if (!string.IsNullOrWhiteSpace(LastBan.Reason)) builder.Description += $"\n__Reason__: \"{LastBan.Reason}\"";
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
@@ -150,7 +151,7 @@ namespace RK800
                         {
                             Color = Color.Blue,
                             Title = "Message Edited",
-                            Description = ($"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}")
+                            Description = $"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}"
                         };
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
