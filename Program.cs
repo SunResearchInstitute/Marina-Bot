@@ -13,7 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace RK800
 {
@@ -28,7 +28,7 @@ namespace RK800
         private static FileInfo ConfigFile = new FileInfo("Config.txt");
         private static readonly FileInfo LogFile = new FileInfo("Connor.log");
 
-        private static readonly System.Timers.Timer Timer = new System.Timers.Timer(60000)
+        private static readonly Timer Timer = new Timer(60000)
         {
             AutoReset = true,
             Enabled = true,
@@ -110,6 +110,7 @@ namespace RK800
                         Title = "**Banned**",
                         Description = $"{LastBan.User.Mention} banned {User.Mention} | {User}"
                     };
+                    builder.WithCurrentTimestamp();
                     if (!string.IsNullOrWhiteSpace(LastBan.Reason)) builder.Description += $"\n__Reason__: \"{LastBan.Reason}\"";
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
@@ -129,6 +130,7 @@ namespace RK800
                         Title = "User Left",
                         Description = $"{User.Mention} | {User.Username}"
                     };
+                    builder.WithCurrentTimestamp();
                     ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
@@ -160,11 +162,19 @@ namespace RK800
                             {
                                 string msg = Msgs[i];
                                 builder.Description = msg;
+                                if (Msgs.Length - 1 == i)
+                                {
+                                    builder.WithCurrentTimestamp();
+                                }
                                 await LogChannel.SendMessageAsync(embed: builder.Build());
                                 if (i == 0) builder.Title = null;
                             }
                         }
-                        else await LogChannel.SendMessageAsync(embed: builder.Build());
+                        else
+                        {
+                            builder.WithCurrentTimestamp();
+                            await LogChannel.SendMessageAsync(embed: builder.Build());
+                        }
                     }
                     else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
                 }
@@ -188,6 +198,7 @@ namespace RK800
                             Title = "Message Deleted",
                             Description = $"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}"
                         };
+
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
                             string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
@@ -195,12 +206,19 @@ namespace RK800
                             {
                                 string msg = Msgs[i];
                                 builder.Description = msg;
+                                if (Msgs.Length - 1 == i)
+                                {
+                                    builder.WithCurrentTimestamp();
+                                }
                                 await LogChannel.SendMessageAsync(embed: builder.Build());
                                 if (i == 0) builder.Title = null;
-
                             }
                         }
-                        else await LogChannel.SendMessageAsync(embed: builder.Build());
+                        else
+                        {
+                            builder.WithCurrentTimestamp();
+                            await LogChannel.SendMessageAsync(embed: builder.Build());
+                        }
                     }
                     else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
                 }
@@ -228,7 +246,7 @@ namespace RK800
                         {
                             Color = Color.Blue
                         };
-
+                        builder.WithCurrentTimestamp();
                         if (string.IsNullOrWhiteSpace(After.Nickname))
                         {
                             builder.Title = "Nickname Removal";

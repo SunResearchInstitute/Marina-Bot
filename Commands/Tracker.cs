@@ -92,20 +92,19 @@ namespace RK800.Commands
                 string joined;
                 if (Message.Length != 0) joined = string.Join(" ", Message);
                 else joined = null;
-                string reply = $"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}";
-                if (!string.IsNullOrWhiteSpace(joined)) reply += $" with message `{string.Join(" ", Message)}`.";
-                else reply += ".";
-                reply += " Please make sure I can send you DMs.";
+                EmbedBuilder builder = new EmbedBuilder
+                {
+                    Color = Color.Blue,
+                    Title = "Alert Timer"
+                };
+                builder.WithCurrentTimestamp();
+                string value = joined != null ? $"With message: \"{joined}\"" : "No Message was attached!";
+                builder.AddField($"Your alert timer has been set for {string.Format("{0:00}:{1:00}", time.Hours, time.Minutes)}", value);
+                builder.WithFooter("Please make sure I can send you DMs.");
                 SaveHandler.TrackersSave.Data[Context.User.Id].DmReason = joined;
                 SaveHandler.TrackersSave.Data[Context.User.Id].IsAlertEnabled = true;
                 SaveHandler.TrackersSave.Data[Context.User.Id].ts = time;
-                if (reply.Length > 2000)
-                {
-                    string[] msgs = Misc.ConvertToDiscordSendable(reply);
-                    foreach (string msg in msgs)
-                        await ReplyAsync(msg);
-                }
-                else await ReplyAsync(reply);
+                await ReplyAsync(embed: builder.Build());
             }
             else
             {
