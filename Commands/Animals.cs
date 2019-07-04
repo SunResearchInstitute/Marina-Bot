@@ -25,9 +25,11 @@ namespace RK800.Commands
                 await application.Owner.SendMessageAsync($"Dog API failed!\nStatus: `{jsondata["status"]}`");
                 return;
             }
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.WithColor(Color.Blue);
-            builder.WithImageUrl(jsondata["message"]);
+            EmbedBuilder builder = new EmbedBuilder
+            {
+                Color = Color.Blue,
+                ImageUrl = jsondata["message"]
+            };
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://dog.ceo/dog-api/");
             try
@@ -49,9 +51,11 @@ namespace RK800.Commands
             List<Dictionary<string, object>> jsondata = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(wc.DownloadString("https://api.thecatapi.com/v1/images/search?format=json"));
             wc.Dispose();
 
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.WithColor(Color.Blue);
-            builder.WithImageUrl(jsondata[0]["url"].ToString());
+            EmbedBuilder builder = new EmbedBuilder
+            {
+                Color = Color.Blue,
+                ImageUrl = jsondata[0]["url"].ToString()
+            };
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");
             try

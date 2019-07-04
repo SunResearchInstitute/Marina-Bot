@@ -102,11 +102,12 @@ namespace RK800.Commands
                 if (GuildChannel != null)
                 {
                     ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                    EmbedBuilder builder = new EmbedBuilder();
-
-                    builder.WithColor(Color.Blue);
-                    builder.WithTitle("**Kicked**");
-                    builder.WithDescription($"{Context.User.Mention} kicked {User.Mention} | {User}");
+                    EmbedBuilder builder = new EmbedBuilder
+                    {
+                        Color = Color.Blue,
+                        Title = "**Kicked**",
+                        Description = $"{Context.User.Mention} kicked {User.Mention} | {User}"
+                };
                     if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
@@ -135,12 +136,14 @@ namespace RK800.Commands
             {
                 User = Context.User as SocketGuildUser;
             }
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.WithTitle($"Warnings for {User.Username}");
-            builder.WithColor(Color.Blue);
+            EmbedBuilder builder = new EmbedBuilder
+            {
+                Title = ($"Warnings for {User.Username}"),
+                Color = (Color.Blue)
+            };
             if (!SaveHandler.WarnsSave.Data.ContainsKey(Context.Guild.Id) || !SaveHandler.WarnsSave.Data[Context.Guild.Id].ContainsKey(User.Id) || SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count == 0)
             {
-                builder.WithDescription("There are none! Good for you!");
+                builder.Description = "There are none! Good for you!";
                 await ReplyAsync(embed: builder.Build());
                 return;
             }
@@ -251,11 +254,12 @@ namespace RK800.Commands
                 if (GuildChannel != null)
                 {
                     ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                    EmbedBuilder builder = new EmbedBuilder();
-
-                    builder.WithColor(Color.Blue);
-                    builder.WithTitle("**Warned**");
-                    builder.WithDescription($"{Context.User.Mention} warned {User.Mention} (warn #{SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count}) | {User}");
+                    EmbedBuilder builder = new EmbedBuilder
+                    {
+                        Color = Color.Blue,
+                        Title = "**Warned**",
+                        Description = $"{Context.User.Mention} warned {User.Mention} (warn #{SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count}) | {User}"
+                    };
                     if (reason != null) builder.Description += $"\n__Reason__: \"{reason}\"";
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
@@ -359,9 +363,11 @@ namespace RK800.Commands
             {
                 if (SaveHandler.FilterSave.Data.Count > 0)
                 {
-                    EmbedBuilder builder = new EmbedBuilder();
-                    builder.WithColor(Color.Blue);
-                    builder.WithTitle("Filtered words");
+                    EmbedBuilder builder = new EmbedBuilder
+                    {
+                        Color = Color.Blue,
+                        Title = "Filtered words"
+                    };
                     string words = string.Join("\n", SaveHandler.FilterSave.Data[Context.Guild.Id]);
                     if (EmbedBuilder.MaxDescriptionLength < words.Length)
                     {
@@ -369,7 +375,7 @@ namespace RK800.Commands
                         for (int i = 0; i < msgs.Length; i++)
                         {
                             string msg = msgs[i];
-                            builder.WithDescription(msg);
+                            builder.Description = msg;
                             if (i == msgs.Length - 1) builder.WithCurrentTimestamp();
                             await Context.User.SendMessageAsync(embed: builder.Build());
                             if (i == 0) builder.Title = null;
@@ -377,7 +383,7 @@ namespace RK800.Commands
                         return;
                     }
                     builder.WithCurrentTimestamp();
-                    builder.WithDescription(words);
+                    builder.Description = words;
                     await Context.User.SendMessageAsync(embed: builder.Build());
                 }
                 else await Error.SendDiscordError(Context, Value: "Filter contains no words!");

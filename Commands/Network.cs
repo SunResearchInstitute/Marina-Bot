@@ -17,8 +17,11 @@ namespace RK800.Commands
                 PingReply reply = pinger.Send(Ip);
                 if (reply.Status == IPStatus.Success)
                 {
-                    EmbedBuilder builder = new EmbedBuilder();
-                    builder.WithColor(Color.Green);
+                    EmbedBuilder builder = new EmbedBuilder
+                    {
+                        Color = Color.Green
+                    }
+                    ;
                     builder.WithCurrentTimestamp();
                     string s;
                     if (reply.Address.ToString() != Ip) s = $"{reply.Address.ToString()} ({Ip})";

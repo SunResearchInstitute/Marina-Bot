@@ -1,11 +1,9 @@
 using CommandLine;
+using CommandLine.Text;
 using Discord;
 using Discord.Commands;
-using Newtonsoft.Json;
 using Octokit;
 using RK800.Utils;
-using System;
-using RK800;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,7 +19,7 @@ namespace RK800.Commands
             [Option('t', "tag", Required = false)]
             public string Tag { get; set; }
 
-            [Option('l', "listags", Required = false, Default = false)]
+            [Option('l', "tags", Required = false, Default = false)]
             public bool ListTags { get; set; }
 
             [Option('m', "maxtagdisplaylength", Required = false, Default = 12)]
@@ -41,11 +39,16 @@ namespace RK800.Commands
         }
 
         [Command("GitRelease")]
-        [Summary("Gets a release from the specificed Github repository.\nUser and Repository must be included anywhere in the command in that order.\nAvaliable options:\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
+        [Summary("Gets a release from the specificed Github repository.\nUser and Repository must be included anywhere in the command in that order.\nAvaliable options:\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--tags, -l=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
         public async Task GetRelease(params string[] Arguments)
         {
             await Context.Channel.TriggerTypingAsync();
-            Parser.Default.ParseArguments<Options>(Arguments)
+            Parser parser = new Parser(config =>
+            {
+                config.HelpWriter = null;
+                config.AutoHelp = false;
+            });
+            parser.ParseArguments<Options>(Arguments)
             //Should prevent any exceptions from breaking the bot
             .WithParsed(o => _ = GetReleaseTask(o))
             .WithNotParsed(e => _ = Error.SendDiscordError(Context, Value: "Invalid arguments"));
@@ -76,10 +79,11 @@ namespace RK800.Commands
 
             if (o.ListTags)
             {
-                EmbedBuilder embed = new EmbedBuilder();
-                embed.WithColor(Color.Blue);
-                embed.WithTitle("Tags");
-                embed.Description = string.Empty;
+                EmbedBuilder embed = new EmbedBuilder
+                {
+                    Color = Color.Blue,
+                    Title = "Tags",
+                };
                 for (int i = 0; i < releases.Count; i++)
                 {
                     Release release = releases[i];
@@ -124,10 +128,12 @@ namespace RK800.Commands
                 }
             }
 
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.WithTitle(tag.Name);
-            builder.WithColor(Color.Blue);
-            builder.WithUrl(tag.HtmlUrl);
+            EmbedBuilder builder = new EmbedBuilder
+            {
+                Title = tag.Name,
+                Color = Color.Blue,
+                Url = tag.HtmlUrl
+            };
             if (o.Desc)
             {
                 if (tag.Body.Length > EmbedBuilder.MaxDescriptionLength)
@@ -155,7 +161,7 @@ namespace RK800.Commands
                     }
                     return;
                 }
-                builder.WithDescription(tag.Body);
+                builder.Description = tag.Body;
             }
 
             foreach (ReleaseAsset asset in tag.Assets)

@@ -38,8 +38,8 @@ namespace RK800.Commands
             }
             catch (WebException e)
             {
-                //ehhhhh
-                if (e.Message.Contains("404"))
+                HttpWebResponse response = (HttpWebResponse)e.Response;
+                if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     await Error.SendDiscordError(Context, Value: "User not found!");
                 }
@@ -55,10 +55,12 @@ namespace RK800.Commands
                 await Error.SendDiscordError(Context, Value: "Profile is private!");
                 return;
             }
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.WithColor(Color.Orange);
-            builder.WithTitle($"{Data.Name}'s Stats");
-            builder.WithThumbnailUrl(Data.Icon.AbsoluteUri);
+            EmbedBuilder builder = new EmbedBuilder
+            {
+                Color = Color.Orange,
+                Title = $"{Data.Name}'s Stats",
+                ThumbnailUrl = Data.Icon.AbsoluteUri
+            };
             if (Data.Rating != 0) builder.AddField($"Competitive:", $"{Data.Rating} SR, Rank: {GetOverwatchRankName(Data.Rating)}");
             else builder.AddField("Competetive Rank:", "Not placed!");
             builder.AddField("Endorsment Level:", Data.Endorsement);

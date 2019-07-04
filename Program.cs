@@ -90,7 +90,7 @@ namespace RK800
         {
             using (StreamWriter writer = File.AppendText(LogFile.FullName))
             {
-                writer.WriteLine($"{log.Source} {log.Message} {log.Source}: {log.Exception.Message} {log.Exception.StackTrace}");
+                writer.WriteLine($"{log.Source} {log.Exception.Message}: {log.Exception.Message} {log.Exception.StackTrace}");
             }
 
             return Task.CompletedTask;
@@ -106,9 +106,9 @@ namespace RK800
                     IEnumerable<RestAuditLogEntry> Logs = await Guild.GetAuditLogsAsync(5).FlattenAsync();
                     RestAuditLogEntry LastBan = Logs.First(l => l.Action == ActionType.Ban);
 
-                    builder.WithColor(Color.Blue);
-                    builder.WithTitle("**Banned**");
-                    builder.WithDescription($"{LastBan.User.Mention} banned {User.Mention} | {User}");
+                    builder.Color = Color.Blue;
+                    builder.Title = "**Banned**";
+                    builder.Description =  $"{LastBan.User.Mention} banned {User.Mention} | {User}";
                     if (!string.IsNullOrWhiteSpace(LastBan.Reason)) builder.Description += $"\n__Reason__: \"{LastBan.Reason}\"";
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
@@ -122,10 +122,12 @@ namespace RK800
                 SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
                 if (GuildChannel != null)
                 {
-                    EmbedBuilder builder = new EmbedBuilder();
-                    builder.WithColor(Color.Blue);
-                    builder.WithTitle("User Left");
-                    builder.WithDescription($"{User.Mention} | {User.Username}");
+                    EmbedBuilder builder = new EmbedBuilder
+                    {
+                        Color = Color.Blue,
+                        Title = "User Left",
+                        Description = $"{User.Mention} | {User.Username}"
+                    };
                     ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
@@ -144,17 +146,19 @@ namespace RK800
                     if (GuildChannel != null)
                     {
                         ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                        EmbedBuilder builder = new EmbedBuilder();
-                        builder.WithColor(Color.Blue);
-                        builder.WithTitle("Message Edited");
-                        builder.WithDescription($"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}");
+                        EmbedBuilder builder = new EmbedBuilder
+                        {
+                            Color = Color.Blue,
+                            Title = "Message Edited",
+                            Description = ($"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}")
+                        };
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
                             string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
                             for (int i = 0; i < Msgs.Length; i++)
                             {
                                 string msg = Msgs[i];
-                                builder.WithDescription(msg);
+                                builder.Description = msg;
                                 await LogChannel.SendMessageAsync(embed: builder.Build());
                                 if (i == 0) builder.Title = null;
                             }
@@ -177,17 +181,19 @@ namespace RK800
                     if (GuildChannel != null)
                     {
                         ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                        EmbedBuilder builder = new EmbedBuilder();
-                        builder.WithColor(Color.Blue);
-                        builder.WithTitle("Message Deleted");
-                        builder.WithDescription($"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}");
+                        EmbedBuilder builder = new EmbedBuilder
+                        {
+                            Color = Color.Blue,
+                            Title = "Message Deleted",
+                            Description = $"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}"
+                        };
                         if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                         {
                             string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
                             for (int i = 0; i < Msgs.Length; i++)
                             {
                                 string msg = Msgs[i];
-                                builder.WithDescription(msg);
+                                builder.Description = msg;
                                 await LogChannel.SendMessageAsync(embed: builder.Build());
                                 if (i == 0) builder.Title = null;
 
@@ -217,23 +223,25 @@ namespace RK800
                     if (Before.Nickname != After.Nickname)
                     {
                         ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                        EmbedBuilder builder = new EmbedBuilder();
-                        builder.WithColor(Color.Blue);
+                        EmbedBuilder builder = new EmbedBuilder
+                        {
+                            Color = Color.Blue
+                        };
 
                         if (string.IsNullOrWhiteSpace(After.Nickname))
                         {
-                            builder.WithTitle("Nickname Removal");
-                            builder.WithDescription($"{After.Mention}:\n`{Before.Nickname}` -> `None`");
+                            builder.Title = "Nickname Removal";
+                            builder.Description = $"{After.Mention}:\n`{Before.Nickname}` -> `None`";
                         }
                         else if (string.IsNullOrWhiteSpace(Before.Nickname))
                         {
-                            builder.WithTitle("Nickname Changed");
-                            builder.WithDescription($"{After.Mention}:\n`None` -> `{After.Nickname}`");
+                            builder.Title = "Nickname Changed";
+                            builder.Description = $"{After.Mention}:\n`None` -> `{After.Nickname}`";
                         }
                         else
                         {
-                            builder.WithTitle("Nickname Changed");
-                            builder.WithDescription($"{After.Mention}:\n`{Before.Nickname}` -> `{After.Nickname}`");
+                            builder.Title = "Nickname Changed";
+                            builder.Description = $"{After.Mention}:\n`{Before.Nickname}` -> `{After.Nickname}`";
                         }
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }

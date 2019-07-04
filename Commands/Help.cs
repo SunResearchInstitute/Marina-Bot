@@ -52,9 +52,11 @@ namespace RK800.Commands
         [Command("Help")]
         public async Task GetHelp(string Command = null)
         {
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.WithColor(Color.Blue);
-            builder.WithTitle("Help Menu");
+            EmbedBuilder builder = new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = "Help Menu"
+            };
 
             if (Command == null)
             {
