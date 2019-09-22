@@ -1,8 +1,8 @@
 using Discord.Commands;
-using RK800.Save;
+using Marina.Save;
 using System.Threading.Tasks;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Save : ModuleBase<SocketCommandContext>
     {

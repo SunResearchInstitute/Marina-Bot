@@ -1,21 +1,17 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RK800.Save;
-using RK800.Utils;
+using Marina.Save;
+using Marina.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Moderation : ModuleBase<SocketCommandContext>
     {
-        //Should we convert this file to a Readonly Array?
-        public static FileInfo FilterDefaults = new FileInfo("FilterDefaults.txt");
-
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Logs")]
         [Summary("Gets the logging channel.")]
@@ -270,125 +266,6 @@ namespace RK800.Commands
             if (SaveHandler.WarnsSave.Data[Context.Guild.Id][User.Id].Count > 1) warningmsg += "s.";
             else warningmsg += ".";
             await ReplyAsync(warningmsg);
-        }
-
-        public static bool MessageContainsFilteredWord(ulong server, string s)
-        {
-            if (SaveHandler.FilterSave.Data.ContainsKey(server))
-            {
-                foreach (string BadWord in SaveHandler.FilterSave.Data[server].Words)
-                    if (s.Split(' ').Contains(BadWord, StringComparer.OrdinalIgnoreCase) || s.Contains(BadWord, StringComparison.OrdinalIgnoreCase)) return true;
-
-            }
-            return false;
-        }
-
-        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("InitializeFilter"), Alias("InitFilter"), Summary("Starts a word filter.")]
-        public async Task InitFilter(bool Use_Default_Filter_Values = true)
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (!SaveHandler.FilterSave.Data.ContainsKey(Context.Guild.Id))
-            {
-                List<string> List = new List<string>();
-                if (Use_Default_Filter_Values) List.AddRange(File.ReadAllLines(FilterDefaults.FullName));
-                SaveHandler.FilterSave.Data.Add(Context.Guild.Id, new FilterData(List));
-                await ReplyAsync("Filter Initialized!");
-            }
-            else await Error.SendDiscordError(Context, Value: "Filter has been initialized already!");
-        }
-
-        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("RemoveFilterData"), Summary("Removes all filter data.")]
-        public async Task RemoveFilterData()
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.FilterSave.Data.Remove(Context.Guild.Id)) await ReplyAsync("Filter data removed!");
-            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
-        }
-
-        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("EnableFilter"), Summary("Enables word filtering.")]
-        public async Task EnableFilter()
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.FilterSave.Data.ContainsKey(Context.Guild.Id))
-            {
-                if (!SaveHandler.FilterSave.Data[Context.Guild.Id].IsEnabled)
-                {
-                    SaveHandler.FilterSave.Data[Context.Guild.Id].IsEnabled = true;
-                    await ReplyAsync("Filter disabled!");
-                }
-                else await Error.SendDiscordError(Context, Value: "Filter is already enabled!");
-            }
-            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
-        }
-
-        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("DisableFilter"), Summary("Disables word filtering.")]
-        public async Task DisableFilter()
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.FilterSave.Data.ContainsKey(Context.Guild.Id))
-            {
-                if (SaveHandler.FilterSave.Data[Context.Guild.Id].IsEnabled)
-                {
-                    SaveHandler.FilterSave.Data[Context.Guild.Id].IsEnabled = false;
-                    await ReplyAsync("Filter disabled!");
-                }
-                else await Error.SendDiscordError(Context, Value: "Filter is already disabled!");
-            }
-            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
-        }
-
-        [RequireBotPermission(GuildPermission.ManageMessages), RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("AddFilteredWord"), Summary("Adds a word to the filter.")]
-        public async Task AddBadWord(string Word)
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.FilterSave.Data.ContainsKey(Context.Guild.Id))
-            {
-                SaveHandler.FilterSave.Data[Context.Guild.Id].Words.Add(Word);
-                await ReplyAsync("Word added!");
-            }
-            else await Error.SendDiscordError(Context, Value: "Filter has not been initialized!");
-        }
-
-        [RequireUserPermission(GuildPermission.ManageMessages)]
-        [Command("ListFilteredWords"), Summary("Sends a DM of all filtered words.")]
-        public async Task ListBadsWords()
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.FilterSave.Data.ContainsKey(Context.Guild.Id))
-            {
-                if (SaveHandler.FilterSave.Data.Count > 0)
-                {
-                    EmbedBuilder builder = new EmbedBuilder
-                    {
-                        Color = Color.Blue,
-                        Title = "Filtered words"
-                    };
-                    string words = string.Join("\n", SaveHandler.FilterSave.Data[Context.Guild.Id]);
-                    if (EmbedBuilder.MaxDescriptionLength < words.Length)
-                    {
-                        string[] msgs = Misc.ConvertToDiscordSendable(words, EmbedBuilder.MaxDescriptionLength);
-                        for (int i = 0; i < msgs.Length; i++)
-                        {
-                            string msg = msgs[i];
-                            builder.Description = msg;
-                            if (i == msgs.Length - 1) builder.WithCurrentTimestamp();
-                            await Context.User.SendMessageAsync(embed: builder.Build());
-                            if (i == 0) builder.Title = null;
-                        }
-                        return;
-                    }
-                    builder.WithCurrentTimestamp();
-                    builder.Description = words;
-                    await Context.User.SendMessageAsync(embed: builder.Build());
-                }
-                else await Error.SendDiscordError(Context, Value: "Filter contains no words!");
-            }
-            else await Error.SendDiscordError(Context, Value: "Filiter has not been initialized!");
         }
     }
 }

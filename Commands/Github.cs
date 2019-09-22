@@ -3,14 +3,14 @@ using CommandLine.Text;
 using Discord;
 using Discord.Commands;
 using Octokit;
-using RK800.Utils;
+using Marina.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Error = RK800.Utils.Error;
+using Error = Marina.Utils.Error;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Github : ModuleBase<SocketCommandContext>
     {
@@ -52,6 +52,7 @@ namespace RK800.Commands
             //Should prevent any exceptions from breaking the bot
             .WithParsed(o => _ = GetReleaseTask(o))
             .WithNotParsed(e => _ = Error.SendDiscordError(Context, Value: "Invalid arguments"));
+            parser.Dispose();
         }
 
         private async Task GetReleaseTask(Options o)

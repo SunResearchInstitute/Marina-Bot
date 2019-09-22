@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace RK800.Utils
+namespace Marina.Utils
 {
     public static class FS
     {

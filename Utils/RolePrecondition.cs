@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 
-namespace RK800.Utils
+namespace Marina.Utils
 {
     //Taken from: https://docs.stillu.cc/api/Discord.Commands.ParameterPreconditionAttribute.html
     public class RequireHierarchyAttribute : ParameterPreconditionAttribute

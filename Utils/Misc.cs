@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace RK800.Utils
+namespace Marina.Utils
 {
     public static class Misc
     {

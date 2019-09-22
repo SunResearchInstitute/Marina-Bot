@@ -4,7 +4,7 @@ using System;
 using Discord.Commands;
 using Discord.Rest;
 
-namespace RK800.Utils
+namespace Marina.Utils
 {
     public class Error
     {

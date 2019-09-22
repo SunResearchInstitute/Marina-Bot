@@ -1,9 +1,9 @@
 using Discord.Commands;
-using RK800.Save;
+using Marina.Save;
 using System;
 using System.Threading.Tasks;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Client : ModuleBase<SocketCommandContext>
     {
@@ -18,9 +18,5 @@ namespace RK800.Commands
             Console.WriteLine("Shutdown via Commmand!");
             Environment.Exit(0);
         }
-
-        [Command("Source")]
-        [Summary("Source Code!")]
-        public async Task GetSource() => await ReplyAsync("I was written in C# using Discord.Net: https://github.com/SunTheCourier/Connor");
     }
 }

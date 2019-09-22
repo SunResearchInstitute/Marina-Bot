@@ -1,13 +1,13 @@
 using Discord;
 using Discord.Commands;
 using Newtonsoft.Json;
-using RK800.Utils;
+using Marina.Utils;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Games : ModuleBase<SocketCommandContext>
     {
@@ -47,9 +47,10 @@ namespace RK800.Commands
                 {
                     await Error.SendDiscordError(Context, Value: "API has failed, please try again later!", e: e, et: Error.ExceptionType.Fatal);
                 }
+                wc.Dispose();
                 return;
             }
-
+            wc.Dispose();
             if (Data.Private)
             {
                 await Error.SendDiscordError(Context, Value: "Profile is private!");

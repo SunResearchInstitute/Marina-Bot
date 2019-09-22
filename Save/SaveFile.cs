@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace RK800.Save
+namespace Marina.Save
 {
 
     public abstract class SaveFile<T> : ISaveFile

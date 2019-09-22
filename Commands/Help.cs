@@ -1,13 +1,13 @@
 using Discord;
 using Discord.Commands;
-using RK800.Utils;
+using Marina.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Discord.Net;
 using System.Threading.Tasks;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Help : ModuleBase<SocketCommandContext>
     {

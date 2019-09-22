@@ -3,19 +3,19 @@ using Discord.Commands;
 using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
-using RK800.Commands;
-using RK800.Save;
-using RK800.Utils;
+using Marina.Commands;
+using Marina.Save;
+using Marina.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Timer = System.Timers.Timer;
 
-namespace RK800
+namespace Marina
 {
     class Program
     {
@@ -26,18 +26,11 @@ namespace RK800
         //Config Stuff
         private static Dictionary<string, string> Config = new Dictionary<string, string>();
         private static FileInfo ConfigFile = new FileInfo("Config.txt");
-        private static readonly FileInfo LogFile = new FileInfo("Connor.log");
-
-        private static readonly Timer Timer = new Timer(60000)
-        {
-            AutoReset = true,
-            Enabled = true,
-        };
+        private static readonly FileInfo LogFile = new FileInfo("Marina.log");
 
         static void Main()
         {
             LoadConfig();
-            Timer.Elapsed += Tracker.CheckTime;
             Program program = new Program();
             program.MainAsync().GetAwaiter().GetResult();
             Thread.Sleep(-1);
@@ -280,21 +273,10 @@ namespace RK800
 
             if (Context.Guild != null)
             {
-                if (SaveHandler.FilterSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.FilterSave.Data[Context.Guild.Id].IsEnabled && Moderation.MessageContainsFilteredWord(Context.Guild.Id, Context.Message.Content))
-                {
-                    await Context.Channel.TriggerTypingAsync();
-                    await Task.Delay(80);
-                    await Context.Channel.SendMessageAsync($"{Context.User.Mention} Your language is highly uncalled for...");
-                    await Context.Message.DeleteAsync();
-                    await Context.Channel.TriggerTypingAsync();
-                    await Task.Delay(200);
-                    await Context.Channel.SendMessageAsync("Thank you in advance for your cooperation.");
-                    return;
-                }
 #if DEBUG
                 if (!Message.HasStringPrefix("d.", ref PrefixPos)) return;
 #else
-                if (!Message.HasStringPrefix("c.", ref PrefixPos)) return;
+                if (!Message.HasStringPrefix("m.", ref PrefixPos)) return;
 #endif
             }
 

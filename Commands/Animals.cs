@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Discord.Net;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Animals : ModuleBase<SocketCommandContext>
     {
