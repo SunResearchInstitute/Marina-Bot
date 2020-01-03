@@ -20,19 +20,14 @@ namespace RK800.Save
 
         private static ISaveFile OpenSaveFile(FileInfo file)
         {
-            switch (file.Extension.ToLower())
+            return (file.Extension.ToLower()) switch
             {
-                case ".tracker":
-                    return new TrackerSaveFile(file);
-                case ".ulongstringlist":
-                    return new FilterSaveFile(file);
-                case ".warn":
-                    return new WarnSaveFile(file);
-                case ".ulongulong":
-                    return new UlongUlongSaveFile(file);
-                default:
-                    throw new Exception("File not a save!");
-            }
+                ".tracker" => new TrackerSaveFile(file),
+                ".ulongstringlist" => new FilterSaveFile(file),
+                ".warn" => new WarnSaveFile(file),
+                ".ulongulong" => new UlongUlongSaveFile(file),
+                _ => throw new Exception("File not a save!"),
+            };
         }
 
         public static void Populate()

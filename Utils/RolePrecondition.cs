@@ -13,20 +13,12 @@ namespace RK800.Utils
             // Hierarchy is only available under the socket variant of the user.
             if (!(context.User is SocketGuildUser guildUser))
                 return PreconditionResult.FromError("This command cannot be used outside of a guild.");
-
-            SocketGuildUser targetUser;
-            switch (value)
+            var targetUser = value switch
             {
-                case SocketGuildUser targetGuildUser:
-                    targetUser = targetGuildUser;
-                    break;
-                case ulong userId:
-                    targetUser = await context.Guild.GetUserAsync(userId).ConfigureAwait(false) as SocketGuildUser;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
+                SocketGuildUser targetGuildUser => targetGuildUser,
+                ulong userId => await context.Guild.GetUserAsync(userId).ConfigureAwait(false) as SocketGuildUser,
+                _ => throw new ArgumentOutOfRangeException(),
+            };
             if (guildUser == targetUser)
                 return PreconditionResult.FromError("Target cannot be yourself!");
 
