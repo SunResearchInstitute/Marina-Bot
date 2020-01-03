@@ -16,22 +16,14 @@ namespace Marina.Save
         public static UlongUlongSaveFile LogChannelsSave => SaveHandler.Saves["LogChannels"] as UlongUlongSaveFile;
         public static TrackerSaveFile TrackersSave => SaveHandler.Saves["Trackers"] as TrackerSaveFile;
 
-        private static ISaveFile OpenSaveFile(FileInfo file)
+        private static ISaveFile OpenSaveFile(FileInfo file) => (file.Extension.ToLower()) switch
         {
-            switch (file.Extension.ToLower())
-            {
-                case ".tracker":
-                    return new TrackerSaveFile(file);
-                case ".ulongstringlist":
-                    return new FilterSaveFile(file);
-                case ".warn":
-                    return new WarnSaveFile(file);
-                case ".ulongulong":
-                    return new UlongUlongSaveFile(file);
-                default:
-                    throw new Exception("File not a save!");
-            }
-        }
+            ".tracker" => new TrackerSaveFile(file),
+            ".ulongstringlist" => new FilterSaveFile(file),
+            ".warn" => new WarnSaveFile(file),
+            ".ulongulong" => new UlongUlongSaveFile(file),
+            _ => throw new Exception("File not a save!"),
+        };
 
         public static void Populate()
         {

@@ -23,7 +23,7 @@ namespace Marina.Commands
                 await Error.SendDiscordError(Context, Value: "Invalid Platform, must be \"pc\", \"xbl\" or \"psn\"");
                 return;
             }
-            if (Username[Username.Length - 6] == '#')
+            if (Username[^6] == '#')
             {
                 char[] user = Username.ToArray();
                 user[Username.Length - 6] = '-';
@@ -74,34 +74,17 @@ namespace Marina.Commands
             await ReplyAsync(embed: builder.Build());
         }
 
-        private string GetOverwatchRankName(int SR)
+        private string GetOverwatchRankName(int SR) => SR switch
         {
-            switch (SR)
-            {
-                case int n when n >= 1 && n <= 1499:
-                    return "Bronze";
-
-                case int n when n >= 1500 && n <= 1999:
-                    return "Silver";
-
-                case int n when n >= 2000 && n <= 2499:
-                    return "Gold";
-
-                case int n when n >= 2500 && n <= 2999:
-                    return "Platinum";
-
-                case int n when n >= 3000 && n <= 3499:
-                    return "Diamond";
-
-                case int n when n >= 3500 && n <= 3999:
-                    return "Master";
-
-                case int n when n >= 4000:
-                    return "Grandmaster";
-                default:
-                    return null;
-            }
-        }
+            int n when n >= 1 && n <= 1499 => "Bronze",
+            int n when n >= 1500 && n <= 1999 => "Silver",
+            int n when n >= 2000 && n <= 2499 => "Gold",
+            int n when n >= 2500 && n <= 2999 => "Platinum",
+            int n when n >= 3000 && n <= 3499 => "Diamond",
+            int n when n >= 3500 && n <= 3999 => "Master",
+            int n when n >= 4000 => "Grandmaster",
+            _ => null,
+        };
     }
 
     public class GameTotal
