@@ -7,7 +7,6 @@ namespace Marina.Utils
     {
         public static string ConvertToReadableSize(double size)
         {
-            string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
             int unit = 0;
 
             while (size >= 1024)
@@ -16,6 +15,7 @@ namespace Marina.Utils
                 ++unit;
             }
 
+            string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
             return string.Format("{0:0.#} {1}", size, units[unit]);
         }
 

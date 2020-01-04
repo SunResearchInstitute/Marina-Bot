@@ -8,8 +8,7 @@ namespace Marina.Utils
 {
     public class Error
     {
-        public enum ExceptionType { User, Fatal }
-        public static async Task SendDiscordError(SocketCommandContext Context, string Key = "An error has occured.", string Value = "View the help menu for help.", Exception e = null, ExceptionType et = ExceptionType.User)
+        public static async Task SendDiscordError(SocketCommandContext Context, string Key = "An error has occured.", string Value = "View the help menu for help.", Exception e = null)
         {
             EmbedBuilder builder = new EmbedBuilder
             {
@@ -19,7 +18,7 @@ namespace Marina.Utils
             builder.AddField(Key, Value);
             builder.WithCurrentTimestamp();
             await Context.Channel.SendMessageAsync(embed: builder.Build());
-            if (et == ExceptionType.Fatal)
+            if (e != null)
             {
                 EmbedBuilder errorbuilder = new EmbedBuilder
                 {
@@ -35,9 +34,9 @@ namespace Marina.Utils
 
         public static void SendApplicationError(string ErrorMsg, int code = 0)
         {
-            Console.WriteLine(ErrorMsg);
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            Console.ConsoleWriteLog(ErrorMsg);
+            Console.ConsoleWriteLog("Press any key to continue...");
+            System.Console.ReadKey();
             Environment.Exit(code);
         }
     }

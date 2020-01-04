@@ -1,16 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Net;
-using Discord.Rest;
 using Discord.WebSocket;
 using Marina.Commands;
-using Marina.Save;
 using Marina.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,9 +20,10 @@ namespace Marina
         public static CommandService Commands;
 
         //Config Stuff
-        private static Dictionary<string, string> Config = new Dictionary<string, string>();
-        private static FileInfo ConfigFile = new FileInfo("Config.txt");
-        private static readonly FileInfo LogFile = new FileInfo("Marina.log");
+        private static readonly Dictionary<string, string> Config = new Dictionary<string, string>();
+        private static readonly DirectoryInfo BaseDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+        private static readonly FileInfo ConfigFile = BaseDirectory.GetFile("Config.txt");
+        public static readonly FileInfo LogFile = BaseDirectory.GetFile("Marina.log");
 
         static void Main()
         {
@@ -72,8 +69,6 @@ namespace Marina
             {
                 Error.SendApplicationError("Token is invalid!", -1);
             }
-            //Workaround until we have a save that starts earlier
-            SaveHandler.Populate();
             //a Static Method Starts too early
             Help.Populate();
             await Client.StartAsync();
@@ -90,176 +85,30 @@ namespace Marina
         }
 
         private async Task UserBanned(SocketUser User, SocketGuild Guild)
-        {
-            if (SaveHandler.LogChannelsSave.Data.ContainsKey(Guild.Id))
-            {
-                if (Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Guild.Id]) is ISocketMessageChannel LogChannel)
-                {
-                    IEnumerable<RestAuditLogEntry> Logs = await Guild.GetAuditLogsAsync(5).FlattenAsync();
-                    RestAuditLogEntry LastBan = Logs.First(l => l.Action == ActionType.Ban);
-                    EmbedBuilder builder = new EmbedBuilder
-                    {
-                        Color = Color.Blue,
-                        Title = "**Banned**",
-                        Description = $"{LastBan.User.Mention} banned {User.Mention} | {User}"
-                    };
-                    builder.WithCurrentTimestamp();
-                    if (!string.IsNullOrWhiteSpace(LastBan.Reason)) builder.Description += $"\n__Reason__: \"{LastBan.Reason}\"";
-                    await LogChannel.SendMessageAsync(embed: builder.Build());
-                }
-                else SaveHandler.LogChannelsSave.Data.Remove(Guild.Id);
-            }
+        { 
+
         }
+
         private async Task UserLeft(SocketGuildUser User)
         {
-            if (SaveHandler.LogChannelsSave.Data.ContainsKey(User.Guild.Id))
-            {
-                SocketGuildChannel GuildChannel = User.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[User.Guild.Id]);
-                if (GuildChannel != null)
-                {
-                    EmbedBuilder builder = new EmbedBuilder
-                    {
-                        Color = Color.Blue,
-                        Title = "User Left",
-                        Description = $"{User.Mention} | {User.Username}"
-                    };
-                    builder.WithCurrentTimestamp();
-                    ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                    await LogChannel.SendMessageAsync(embed: builder.Build());
-                }
-                else SaveHandler.LogChannelsSave.Data.Remove(User.Guild.Id);
-            }
+
         }
 
         private async Task MessageUpdated(Cacheable<IMessage, ulong> OldMessage, SocketMessage NewMessage, ISocketMessageChannel Channel)
         {
-            if (OldMessage.HasValue && OldMessage.Value.Content != NewMessage.Content && !NewMessage.Author.IsBot)
-            {
-                SocketCommandContext Context = new SocketCommandContext(Client, OldMessage.Value as SocketUserMessage);
-                if (!string.IsNullOrWhiteSpace(OldMessage.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
-                {
-                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Context.Guild.Id]);
-                    if (GuildChannel != null)
-                    {
-                        ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                        EmbedBuilder builder = new EmbedBuilder
-                        {
-                            Color = Color.Blue,
-                            Title = "Message Edited",
-                            Description = $"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}"
-                        };
-                        if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
-                        {
-                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
-                            for (int i = 0; i < Msgs.Length; i++)
-                            {
-                                string msg = Msgs[i];
-                                builder.Description = msg;
-                                if (Msgs.Length - 1 == i)
-                                {
-                                    builder.WithCurrentTimestamp();
-                                }
-                                await LogChannel.SendMessageAsync(embed: builder.Build());
-                                if (i == 0) builder.Title = null;
-                            }
-                        }
-                        else
-                        {
-                            builder.WithCurrentTimestamp();
-                            await LogChannel.SendMessageAsync(embed: builder.Build());
-                        }
-                    }
-                    else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
-                }
-            }
+
         }
 
         private async Task MessageDeleted(Cacheable<IMessage, ulong> Message, ISocketMessageChannel Channel)
         {
-            if (Message.HasValue && !Message.Value.Author.IsBot)
-            {
-                SocketCommandContext Context = new SocketCommandContext(Client, Message.Value as SocketUserMessage);
-                if (!string.IsNullOrWhiteSpace(Message.Value.Content) && SaveHandler.LogChannelsSave.Data.ContainsKey(Context.Guild.Id) && SaveHandler.LogChannelsSave.Data[Context.Guild.Id] != Context.Channel.Id)
-                {
-                    SocketGuildChannel GuildChannel = Context.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[Context.Guild.Id]);
-                    if (GuildChannel != null)
-                    {
-                        ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                        EmbedBuilder builder = new EmbedBuilder
-                        {
-                            Color = Color.Blue,
-                            Title = "Message Deleted",
-                            Description = $"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}"
-                        };
-
-                        if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
-                        {
-                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
-                            for (int i = 0; i < Msgs.Length; i++)
-                            {
-                                string msg = Msgs[i];
-                                builder.Description = msg;
-                                if (Msgs.Length - 1 == i)
-                                {
-                                    builder.WithCurrentTimestamp();
-                                }
-                                await LogChannel.SendMessageAsync(embed: builder.Build());
-                                if (i == 0) builder.Title = null;
-                            }
-                        }
-                        else
-                        {
-                            builder.WithCurrentTimestamp();
-                            await LogChannel.SendMessageAsync(embed: builder.Build());
-                        }
-                    }
-                    else SaveHandler.LogChannelsSave.Data.Remove(Context.Guild.Id);
-                }
-            }
+            
         }
 
         private async Task GuildMemberUpdated(SocketGuildUser Before, SocketGuildUser After)
         {
             if (Before.IsBot) return;
 
-            if (SaveHandler.TrackersSave.Data.Keys.Contains(After.Id) && SaveHandler.TrackersSave.Data[After.Id].IsTrackerEnabled && Before.Status != After.Status)
-            {
-                SaveHandler.TrackersSave.Data[After.Id].dt = DateTime.Now;
-            }
-
-            if (SaveHandler.LogChannelsSave.Data.ContainsKey(After.Guild.Id))
-            {
-                SocketGuildChannel GuildChannel = After.Guild.GetChannel(SaveHandler.LogChannelsSave.Data[After.Guild.Id]);
-                if (GuildChannel != null)
-                {
-                    if (Before.Nickname != After.Nickname)
-                    {
-                        ISocketMessageChannel LogChannel = GuildChannel as ISocketMessageChannel;
-                        EmbedBuilder builder = new EmbedBuilder
-                        {
-                            Color = Color.Blue
-                        };
-                        builder.WithCurrentTimestamp();
-                        if (string.IsNullOrWhiteSpace(After.Nickname))
-                        {
-                            builder.Title = "Nickname Removal";
-                            builder.Description = $"{After.Mention}:\n`{Before.Nickname}` -> `None`";
-                        }
-                        else if (string.IsNullOrWhiteSpace(Before.Nickname))
-                        {
-                            builder.Title = "Nickname Changed";
-                            builder.Description = $"{After.Mention}:\n`None` -> `{After.Nickname}`";
-                        }
-                        else
-                        {
-                            builder.Title = "Nickname Changed";
-                            builder.Description = $"{After.Mention}:\n`{Before.Nickname}` -> `{After.Nickname}`";
-                        }
-                        await LogChannel.SendMessageAsync(embed: builder.Build());
-                    }
-                }
-                else SaveHandler.LogChannelsSave.Data.Remove(After.Guild.Id);
-            }
+            
         }
 
         private async Task MessageReceived(SocketMessage arg)
@@ -286,7 +135,7 @@ namespace Marina
 
         private async Task Client_Ready()
         {
-            Console.WriteLine("Ready!");
+            Utils.Console.ConsoleWriteLog("Ready!");
             while (true)
             {
                 if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | c.help");

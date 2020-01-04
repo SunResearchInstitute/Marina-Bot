@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
+using System.Text;
 
 namespace Marina.Utils
 {
@@ -29,5 +30,14 @@ namespace Marina.Utils
         }
 
         public static IEnumerable<FileInfo> EnumerateFilesRecursively(this DirectoryInfo obj) => obj.EnumerateFiles("*", SearchOption.AllDirectories);
+
+        public static void AppendAllText(this FileInfo obj, string contents) => File.AppendAllText(obj.FullName, contents);
+        public static void AppendAllText(this FileInfo obj, string contents, Encoding encoding) => File.AppendAllText(obj.FullName, contents, encoding);
+
+        public static string ReadAllText(this FileInfo obj) => File.ReadAllText(obj.FullName);
+        public static string ReadAllText(this FileInfo obj, Encoding encoding) => File.ReadAllText(obj.FullName, encoding);
+
+        public static void WriteAllText(this FileInfo obj, string contents) => File.WriteAllText(obj.FullName, contents);
+        public static void WriteAllText(this FileInfo obj, string contents, Encoding encoding) => File.WriteAllText(obj.FullName, contents, encoding);
     }
 }

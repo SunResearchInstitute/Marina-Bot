@@ -68,7 +68,7 @@ namespace Marina.Commands
             catch (ApiException e)
             {
                 if (e.StatusCode == HttpStatusCode.NotFound) await Error.SendDiscordError(Context, Value: "Repository does not exist.");
-                else await Error.SendDiscordError(Context, Value: "Command failed: error reported!", e: e, et: Error.ExceptionType.Fatal);
+                else await Error.SendDiscordError(Context, Value: "Command failed: error reported!", e: e);
                 return;
             }
 
