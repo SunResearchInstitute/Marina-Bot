@@ -1,9 +1,8 @@
 using CommandLine;
-using CommandLine.Text;
 using Discord;
 using Discord.Commands;
-using Octokit;
 using Marina.Utils;
+using Octokit;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -82,7 +81,7 @@ namespace Marina.Commands
             {
                 EmbedBuilder embed = new EmbedBuilder
                 {
-                    Color = Color.Blue,
+                    Color = Color.Teal,
                     Title = "Tags",
                 };
                 for (int i = 0; i < releases.Count; i++)
@@ -132,7 +131,7 @@ namespace Marina.Commands
             EmbedBuilder builder = new EmbedBuilder
             {
                 Title = tag.Name,
-                Color = Color.Blue,
+                Color = Color.Teal,
                 Url = tag.HtmlUrl
             };
             if (o.Desc)

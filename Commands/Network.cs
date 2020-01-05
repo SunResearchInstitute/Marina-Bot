@@ -1,8 +1,8 @@
-using System.Net.NetworkInformation;
 using Discord;
 using Discord.Commands;
-using System.Threading.Tasks;
 using Marina.Utils;
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 
 namespace Marina.Commands
 {

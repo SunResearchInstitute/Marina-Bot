@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Discord.Rest;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Discord.Net;
 
 namespace Marina.Commands
 {
@@ -27,7 +27,7 @@ namespace Marina.Commands
             }
             EmbedBuilder builder = new EmbedBuilder
             {
-                Color = Color.Blue,
+                Color = Color.Teal,
                 ImageUrl = jsondata["message"]
             };
             builder.WithCurrentTimestamp();
@@ -53,7 +53,7 @@ namespace Marina.Commands
 
             EmbedBuilder builder = new EmbedBuilder
             {
-                Color = Color.Blue,
+                Color = Color.Teal,
                 ImageUrl = jsondata[0]["url"].ToString()
             };
             builder.WithCurrentTimestamp();

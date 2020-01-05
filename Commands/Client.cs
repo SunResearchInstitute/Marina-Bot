@@ -18,5 +18,17 @@ namespace Marina.Commands
             Utils.Console.ConsoleWriteLog("Shutdown via Commmand!");
             Environment.Exit(0);
         }
+
+        [Command("Say")]
+        [RequireOwner]
+        public async Task ForceSay(string str)
+        {
+            try
+            {
+                await Context.Message.DeleteAsync();
+            }
+            catch { }
+            await ReplyAsync(str);
+        }
     }
 }

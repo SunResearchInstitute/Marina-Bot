@@ -1,10 +1,10 @@
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Marina.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using Discord.Net;
 using System.Threading.Tasks;
 
 namespace Marina.Commands
@@ -54,7 +54,7 @@ namespace Marina.Commands
         {
             EmbedBuilder builder = new EmbedBuilder
             {
-                Color = Color.Blue,
+                Color = Color.Teal,
                 Title = "Help Menu"
             };
 

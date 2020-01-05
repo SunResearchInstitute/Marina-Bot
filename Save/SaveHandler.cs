@@ -1,5 +1,6 @@
 ﻿using Marina.Save.Types;
 using System.Collections.Generic;
+using System.Timers;
 
 namespace Marina.Save
 {
@@ -12,6 +13,15 @@ namespace Marina.Save
 
         //Easy Accessors 
         public static UlongUlongSave LogSaveFile => Saves["Logs"] as UlongUlongSave;
+
+        //15 min. timer
+        private static readonly Timer _timer = new Timer(900000)
+        {
+            AutoReset = true
+        };
+        static SaveHandler() => _timer.Elapsed += Timer_Elapsed;
+
+        private static void Timer_Elapsed(object sender, ElapsedEventArgs e) => SaveAll();
 
         public static void SaveAll()
         {
