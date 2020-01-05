@@ -24,9 +24,8 @@ namespace Marina
 
         //Config Stuff
         private static readonly Dictionary<string, string> Config = new Dictionary<string, string>();
-        private static readonly DirectoryInfo BaseDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-        private static readonly FileInfo ConfigFile = BaseDirectory.GetFile("Config.txt");
-        public static readonly FileInfo LogFile = BaseDirectory.GetFile("Marina.log");
+        private static readonly FileInfo ConfigFile = new FileInfo("Config.txt");
+        public static readonly FileInfo LogFile = new FileInfo("Marina.log");
 
         static void Main()
         {
@@ -70,7 +69,7 @@ namespace Marina
             }
             catch (HttpException)
             {
-                Error.SendApplicationError("Token is invalid!", -1);
+                Error.SendApplicationError($"Token is invalid! check you config at {ConfigFile.FullName}", -1);
             }
             //a Static Method Starts too early
             Help.Populate();
@@ -288,8 +287,8 @@ namespace Marina
             Utils.Console.ConsoleWriteLog("Ready!");
             while (true)
             {
-                if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | c.help");
-                else await Client.SetGameAsync($"on {Client.Guilds.Count} server | c.help");
+                if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | m.help");
+                else await Client.SetGameAsync($"on {Client.Guilds.Count} server | m.help");
                 await Task.Delay(600000);
             }
         }
@@ -311,7 +310,7 @@ namespace Marina
                 {
                     "Token={token}"
                 });
-                Error.SendApplicationError("Config does not exist, it has been created for you!");
+                Error.SendApplicationError($"Config does not exist, it has been created for you at {ConfigFile.FullName}!");
             }
         }
     }

@@ -9,13 +9,13 @@ namespace Marina.Save
         {
             {"Logs", new DictionarySaveFile<ulong, ulong>("Logs")},
             {"BlackList", new ListSaveFile<ulong>("BlackList")},
-            {"Suggestions", new DictionarySaveFile<ulong, string>("Suggestions")}
+            {"Suggestions", new DictionarySaveFile<ulong, List<string>>("Suggestions")}
         };
 
         //Easy Accessors 
         public static DictionarySaveFile<ulong, ulong> LogSave => Saves["Logs"] as DictionarySaveFile<ulong, ulong>;
         public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
-        public static DictionarySaveFile<ulong, string> SuggestionsSave => Saves["Suggestions"] as DictionarySaveFile<ulong, string>;
+        public static DictionarySaveFile<ulong, List<string>> SuggestionsSave => Saves["Suggestions"] as DictionarySaveFile<ulong, List<string>>;
 
         //15 min. timer
         private static readonly Timer _timer = new Timer(900000)

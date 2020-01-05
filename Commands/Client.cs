@@ -5,6 +5,7 @@ using Marina.Save;
 using Marina.Utils;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Marina.Commands
 {
@@ -68,7 +69,12 @@ namespace Marina.Commands
                 return;
             }
 
-            SaveHandler.SuggestionsSave.Data.Add(Context.User.Id, string.Join(" ", Suggestion));
+            if (!SaveHandler.SuggestionsSave.Data.ContainsKey(Context.User.Id))
+            {
+                SaveHandler.SuggestionsSave.Data.Add(Context.User.Id, new List<string>());
+            }
+
+            SaveHandler.SuggestionsSave.Data[Context.User.Id].Add(string.Join(" ", Suggestion));
             await ReplyAsync("Thanks for the suggestion");
         }
 
