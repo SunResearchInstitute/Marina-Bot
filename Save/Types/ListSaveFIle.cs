@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Marina.Save
+namespace Marina.Save.Types
 {
     public class ListSaveFile<T> : SaveFile<List<T>>
     {
