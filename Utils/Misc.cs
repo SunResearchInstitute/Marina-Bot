@@ -1,5 +1,6 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Timers;
 
 namespace Marina.Utils
 {
@@ -28,6 +29,12 @@ namespace Marina.Utils
                 readable.Add(s.Substring(i, length));
             }
             return readable.ToArray();
+        }
+
+        public static void Reset(this Timer obj)
+        {
+            obj.Stop();
+            obj.Start();
         }
     }
 }

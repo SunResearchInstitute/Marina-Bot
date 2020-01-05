@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Marina.Utils;
+using System.Collections.Generic;
 using System.Timers;
 
 namespace Marina.Save
@@ -20,14 +21,17 @@ namespace Marina.Save
         //15 min. timer
         private static readonly Timer _timer = new Timer(900000)
         {
-            AutoReset = true
+            AutoReset = true,
+            Enabled = true
         };
+
         static SaveHandler() => _timer.Elapsed += Timer_Elapsed;
 
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e) => SaveAll();
 
         public static void SaveAll()
         {
+            _timer.Reset();
             foreach (ISaveFile save in Saves.Values)
                 save.Write();
         }
