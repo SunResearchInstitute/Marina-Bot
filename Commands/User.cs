@@ -10,6 +10,7 @@ namespace Marina.Commands
         [Summary("Gets a avatar of self or another user.")]
         public async Task GetAvatar(IUser User = null)
         {
+            await Context.Channel.TriggerTypingAsync();
             if (User == null)
                 User = Context.User;
 

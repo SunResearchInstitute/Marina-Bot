@@ -16,7 +16,7 @@ namespace Marina.Commands
         public async Task SendDog()
         {
             //This just downloads the json which should be fine
-            WebClient wc = new WebClient();
+            using WebClient wc = new WebClient();
             Dictionary<string, string> jsondata = JsonConvert.DeserializeObject<Dictionary<string, string>>(wc.DownloadString("https://dog.ceo/api/breeds/image/random"));
             wc.Dispose();
             if (jsondata["status"] != "success")

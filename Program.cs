@@ -79,10 +79,7 @@ namespace Marina
 
         private Task Log(LogMessage log)
         {
-            using (StreamWriter writer = File.AppendText(LogFile.FullName))
-            {
-                writer.WriteLine($"{log.Source} {log.Exception.Message}: {log.Exception.Message} {log.Exception.StackTrace}");
-            }
+            LogFile.AppendAllText($"{log.Source} {log.Exception.Message}: {log.Exception.Message} {log.Exception.StackTrace}");
 
             return Task.CompletedTask;
         }
