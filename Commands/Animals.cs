@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Discord.Rest;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Discord.Net;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Animals : ModuleBase<SocketCommandContext>
     {
@@ -16,7 +16,7 @@ namespace RK800.Commands
         public async Task SendDog()
         {
             //This just downloads the json which should be fine
-            WebClient wc = new WebClient();
+            using WebClient wc = new WebClient();
             Dictionary<string, string> jsondata = JsonConvert.DeserializeObject<Dictionary<string, string>>(wc.DownloadString("https://dog.ceo/api/breeds/image/random"));
             wc.Dispose();
             if (jsondata["status"] != "success")
@@ -27,7 +27,7 @@ namespace RK800.Commands
             }
             EmbedBuilder builder = new EmbedBuilder
             {
-                Color = Color.Blue,
+                Color = Color.Teal,
                 ImageUrl = jsondata["message"]
             };
             builder.WithCurrentTimestamp();
@@ -53,7 +53,7 @@ namespace RK800.Commands
 
             EmbedBuilder builder = new EmbedBuilder
             {
-                Color = Color.Blue,
+                Color = Color.Teal,
                 ImageUrl = jsondata[0]["url"].ToString()
             };
             builder.WithCurrentTimestamp();

@@ -1,16 +1,15 @@
 using CommandLine;
-using CommandLine.Text;
 using Discord;
 using Discord.Commands;
+using Marina.Utils;
 using Octokit;
-using RK800.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Error = RK800.Utils.Error;
+using Error = Marina.Utils.Error;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Github : ModuleBase<SocketCommandContext>
     {
@@ -52,6 +51,7 @@ namespace RK800.Commands
             //Should prevent any exceptions from breaking the bot
             .WithParsed(o => _ = GetReleaseTask(o))
             .WithNotParsed(e => _ = Error.SendDiscordError(Context, Value: "Invalid arguments"));
+            parser.Dispose();
         }
 
         private async Task GetReleaseTask(Options o)
@@ -67,7 +67,7 @@ namespace RK800.Commands
             catch (ApiException e)
             {
                 if (e.StatusCode == HttpStatusCode.NotFound) await Error.SendDiscordError(Context, Value: "Repository does not exist.");
-                else await Error.SendDiscordError(Context, Value: "Command failed: error reported!", e: e, et: Error.ExceptionType.Fatal);
+                else await Error.SendDiscordError(Context, Value: "Command failed: error reported!", e: e);
                 return;
             }
 
@@ -81,7 +81,7 @@ namespace RK800.Commands
             {
                 EmbedBuilder embed = new EmbedBuilder
                 {
-                    Color = Color.Blue,
+                    Color = Color.Teal,
                     Title = "Tags",
                 };
                 for (int i = 0; i < releases.Count; i++)
@@ -131,7 +131,7 @@ namespace RK800.Commands
             EmbedBuilder builder = new EmbedBuilder
             {
                 Title = tag.Name,
-                Color = Color.Blue,
+                Color = Color.Teal,
                 Url = tag.HtmlUrl
             };
             if (o.Desc)

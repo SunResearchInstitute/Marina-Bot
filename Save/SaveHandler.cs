@@ -1,51 +1,30 @@
-﻿using RK800.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
+using System.Timers;
 
-namespace RK800.Save
+namespace Marina.Save
 {
-    class SaveHandler
+    public class SaveHandler
     {
-        public static readonly DirectoryInfo save = new DirectoryInfo("save");
-
-        public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>();
-
-        private static readonly string[] PreDefinedSaves = { "Trackers.Tracker", "Filters.UlongStringList", "Warns.Warn", "LogChannels.UlongUlong" };
-
-        public static FilterSaveFile FilterSave => SaveHandler.Saves["Filters"] as FilterSaveFile;
-        public static WarnSaveFile WarnsSave => SaveHandler.Saves["Warns"] as WarnSaveFile;
-        public static UlongUlongSaveFile LogChannelsSave => SaveHandler.Saves["LogChannels"] as UlongUlongSaveFile;
-        public static TrackerSaveFile TrackersSave => SaveHandler.Saves["Trackers"] as TrackerSaveFile;
-
-        private static ISaveFile OpenSaveFile(FileInfo file)
+        public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>()
         {
-            return (file.Extension.ToLower()) switch
-            {
-                ".tracker" => new TrackerSaveFile(file),
-                ".ulongstringlist" => new FilterSaveFile(file),
-                ".warn" => new WarnSaveFile(file),
-                ".ulongulong" => new UlongUlongSaveFile(file),
-                _ => throw new Exception("File not a save!"),
-            };
-        }
+            {"Logs", new DictionarySaveFile<ulong, ulong>("Logs")},
+            {"BlackList", new ListSaveFile<ulong>("BlackList")},
+            {"Suggestions", new DictionarySaveFile<ulong, string>("Suggestions")}
+        };
 
-        public static void Populate()
+        //Easy Accessors 
+        public static DictionarySaveFile<ulong, ulong> LogSave => Saves["Logs"] as DictionarySaveFile<ulong, ulong>;
+        public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
+        public static DictionarySaveFile<ulong, string> SuggestionsSave => Saves["Suggestions"] as DictionarySaveFile<ulong, string>;
+
+        //15 min. timer
+        private static readonly Timer _timer = new Timer(900000)
         {
-            save.Create();
-            foreach (string str in PreDefinedSaves)
-            {
-                FileInfo info = save.GetFile(str);
-                if (!info.Exists)
-                    info.Create().Close();
-            }
+            AutoReset = true
+        };
+        static SaveHandler() => _timer.Elapsed += Timer_Elapsed;
 
-            foreach (FileInfo file in save.EnumerateFiles())
-                Saves[Path.GetFileNameWithoutExtension(file.FullName)] = OpenSaveFile(file);
-
-            foreach (ISaveFile file in Saves.Values)
-                file.Read();
-        }
+        private static void Timer_Elapsed(object sender, ElapsedEventArgs e) => SaveAll();
 
         public static void SaveAll()
         {

@@ -1,15 +1,20 @@
+﻿using Marina.Utils;
+using System;
 using System.IO;
 
-namespace RK800.Save
+namespace Marina.Save
 {
     public abstract class ISaveFile
     {
-        public abstract void Read();
+        public static DirectoryInfo SaveDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).GetDirectory("Save");
+
+        static ISaveFile()
+        {
+            if (!SaveDirectory.Exists)
+                SaveDirectory.Create();
+        }
+
+        public FileInfo FileInfo;
         public abstract void Write();
-        protected FileInfo File;
-        protected Stream Open() => File.Open(FileMode.Open, FileAccess.ReadWrite);
-        
-        public ISaveFile(FileInfo file) => File = file;
-        
     }
 }

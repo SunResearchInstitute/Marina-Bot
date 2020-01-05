@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 
-namespace RK800.Utils
+namespace Marina.Utils
 {
     //Taken from: https://docs.stillu.cc/api/Discord.Commands.ParameterPreconditionAttribute.html
     public class RequireHierarchyAttribute : ParameterPreconditionAttribute
@@ -13,7 +13,7 @@ namespace RK800.Utils
             // Hierarchy is only available under the socket variant of the user.
             if (!(context.User is SocketGuildUser guildUser))
                 return PreconditionResult.FromError("This command cannot be used outside of a guild.");
-            var targetUser = value switch
+            SocketGuildUser targetUser = value switch
             {
                 SocketGuildUser targetGuildUser => targetGuildUser,
                 ulong userId => await context.Guild.GetUserAsync(userId).ConfigureAwait(false) as SocketGuildUser,

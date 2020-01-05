@@ -1,17 +1,17 @@
 using Discord;
 using Discord.Commands;
-using RK800.Utils;
+using Discord.Net;
+using Marina.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using Discord.Net;
 using System.Threading.Tasks;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Help : ModuleBase<SocketCommandContext>
     {
-        private static Dictionary<string, string> cmds = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>();
 
         public static void Populate()
         {
@@ -25,7 +25,7 @@ namespace RK800.Commands
                 {
                     if (HasNoArgs)
                     {
-                        cmds.Add(cmd.Name, "No info available!");
+                        _commands.Add(cmd.Name, "No info available!");
                         continue;
                     }
                     else s = "args: ";
@@ -34,7 +34,7 @@ namespace RK800.Commands
                 {
                     if (HasNoArgs)
                     {
-                        cmds.Add(cmd.Name, cmd.Summary);
+                        _commands.Add(cmd.Name, cmd.Summary);
                         continue;
                     }
                     else s = $"{cmd.Summary}\nargs: ";
@@ -45,7 +45,7 @@ namespace RK800.Commands
                     if (param.DefaultValue != null) s += $"[{param.Name.Replace('_', ' ')} = {param.DefaultValue}] ";
                     else s += $"<{param.Name.Replace('_', ' ')}> ";
                 }
-                cmds.Add(cmd.Name, s);
+                _commands.Add(cmd.Name, s);
             }
         }
 
@@ -54,19 +54,19 @@ namespace RK800.Commands
         {
             EmbedBuilder builder = new EmbedBuilder
             {
-                Color = Color.Blue,
+                Color = Color.Teal,
                 Title = "Help Menu"
             };
 
             if (Command == null)
             {
-                foreach (KeyValuePair<string, string> cmd in cmds)
+                foreach (KeyValuePair<string, string> cmd in _commands)
                 {
                     builder.AddField(cmd.Key, cmd.Value);
                     //future proofing
                     if (builder.Fields.Count == EmbedBuilder.MaxFieldCount)
                     {
-                        if (builder.Fields.Count == cmds.Count)
+                        if (builder.Fields.Count == _commands.Count)
                         {
                             builder.WithCurrentTimestamp();
                             builder.WithFooter("All commands start with 'c.' unless in DMs.");
@@ -104,7 +104,7 @@ namespace RK800.Commands
                 KeyValuePair<string, string> cmd;
                 try
                 {
-                    cmd = cmds.First(c => c.Key.Contains(Command, StringComparison.OrdinalIgnoreCase));
+                    cmd = _commands.First(c => c.Key.Contains(Command, StringComparison.OrdinalIgnoreCase));
                 }
                 catch (InvalidOperationException)
                 {

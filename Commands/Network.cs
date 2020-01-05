@@ -1,19 +1,19 @@
-using System.Net.NetworkInformation;
 using Discord;
 using Discord.Commands;
+using Marina.Utils;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using RK800.Utils;
 
-namespace RK800.Commands
+namespace Marina.Commands
 {
     public class Network : ModuleBase<SocketCommandContext>
     {
         [Command("Ping"), Summary("Pings an IP."), Alias("ddos")]
         public async Task Ping(string Ip)
         {
-            Ping pinger = new Ping();
             try
             {
+                using Ping pinger = new Ping();
                 PingReply reply = pinger.Send(Ip);
                 if (reply.Status == IPStatus.Success)
                 {
