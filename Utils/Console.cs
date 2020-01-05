@@ -7,7 +7,7 @@ namespace Marina.Utils
         public static void ConsoleWriteLog(string str)
         {
             System.Console.WriteLine(str);
-            Program.LogFile.AppendAllText($"[{DateTime.Now}]: {str}");
+            Program.LogFile.AppendAllText($"\n[{DateTime.Now}]: {str}");
         }
     }
 }

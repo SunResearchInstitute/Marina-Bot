@@ -1,4 +1,6 @@
+using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using Marina.Save;
 using Marina.Utils;
 using System;
@@ -8,6 +10,45 @@ namespace Marina.Commands
 {
     public class Client : ModuleBase<SocketCommandContext>
     {
+        [Command("BanUser")]
+        [RequireOwner]
+        public async Task AddUserToBlacklist(IUser user)
+        {
+            if (!SaveHandler.BlacklistSave.Data.Contains(user.Id))
+            {
+                SaveHandler.BlacklistSave.Data.Add(user.Id);
+                await ReplyAsync("User added to blacklist!");
+            }
+            else
+                await ReplyAsync("User already in blacklist!");
+        }
+
+        [Command("UnbanUser")]
+        [RequireOwner]
+        public async Task RemoveUserFromBlacklist(IUser user)
+        {
+            if (SaveHandler.BlacklistSave.Data.Remove(user.Id))
+                await ReplyAsync("User removed from blacklist");
+            else
+                await ReplyAsync("User not added to blacklist!");
+        }
+
+
+        [Command("Announce")]
+        [RequireOwner]
+        public async Task Announce(params string[] announcement)
+        {
+            foreach (SocketGuild guild in Context.Client.Guilds)
+            {
+                try
+                {
+                    await (guild.Owner as SocketUser).SendMessageAsync(string.Join(" ", announcement));
+                }
+                catch { }
+            }
+            await ReplyAsync("Announcement sent to all Guild Owners! :ok_hand:");
+        }
+
         [Command("Suggest")]
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
         public async Task AddSuggestion(params string[] Suggestion)
@@ -62,5 +103,9 @@ namespace Marina.Commands
             catch { }
             await ReplyAsync(str);
         }
+
+        [Command("Source")]
+        [Summary("Source Code!")]
+        public async Task GetSource() => await ReplyAsync("I was written in C# using Discord.Net: https://sunthecourier.net/marina-bot");
     }
 }

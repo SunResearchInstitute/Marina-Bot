@@ -79,7 +79,7 @@ namespace Marina
 
         private Task Log(LogMessage log)
         {
-            LogFile.AppendAllText($"{log.Source} {log.Exception.Message}: {log.Exception.Message} {log.Exception.StackTrace}");
+            LogFile.AppendAllText($"\n[{DateTime.Now}]: {log.Source} {log.Message}: {log.Exception.StackTrace}");
 
             return Task.CompletedTask;
         }
