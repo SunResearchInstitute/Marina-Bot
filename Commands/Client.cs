@@ -83,11 +83,12 @@ namespace Marina.Commands
         public async Task UploadSuggestions()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.BlacklistSave.Data.Count == 0)
+            if (SaveHandler.SuggestionsSave.Data.Count == 0)
             {
                 await Error.SendDiscordError(Context, Value: "No suggestions");
                 return;
             }
+            SaveHandler.SaveAll();
             await Context.Channel.SendFileAsync(SaveHandler.SuggestionsSave.FileInfo.FullName);
         }
 
