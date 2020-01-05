@@ -14,9 +14,7 @@ namespace Marina.Save
                 SaveDirectory.Create();
         }
 
-        public string Name;
         public FileInfo FileInfo;
         public abstract void Write();
-        public abstract string Extension { get; }
     }
 }

@@ -36,9 +36,9 @@ namespace Marina.Commands
             await ReplyAsync($"kicked {User} :boot:");
 
             //Kicks need to be manually logged
-            if (SaveHandler.LogSaveFile.Data.ContainsKey(User.Guild.Id))
+            if (SaveHandler.LogSave.Data.ContainsKey(User.Guild.Id))
             {
-                SocketTextChannel LogChannel = User.Guild.GetTextChannel(SaveHandler.LogSaveFile.Data[User.Guild.Id]);
+                SocketTextChannel LogChannel = User.Guild.GetTextChannel(SaveHandler.LogSave.Data[User.Guild.Id]);
                 if (LogChannel != null)
                 {
                     EmbedBuilder builder = new EmbedBuilder
@@ -50,7 +50,7 @@ namespace Marina.Commands
                     if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
-                else SaveHandler.LogSaveFile.Data.Remove(User.Guild.Id);
+                else SaveHandler.LogSave.Data.Remove(User.Guild.Id);
             }
         }
     }
