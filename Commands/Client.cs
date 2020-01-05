@@ -116,11 +116,19 @@ namespace Marina.Commands
         }
 
         [Command("Source")]
-        [Summary("Source Code!")]
+        [Summary("Source code!")]
         public async Task GetSource()
         {
             await Context.Channel.TriggerTypingAsync();
-            await ReplyAsync("I was written in C# using Discord.Net: https://sunthecourier.net/marina-bot");
+            await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
+        }
+
+        [Command("invite")]
+        [Summary("Invite link!")]
+        public async Task GetInvite()
+        {
+            await Context.Channel.TriggerTypingAsync();
+            await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
         }
 
         [Command("Servers")]
