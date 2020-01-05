@@ -27,11 +27,13 @@ namespace Marina.Save
 
         static SaveHandler() => _timer.Elapsed += Timer_Elapsed;
 
-        private static void Timer_Elapsed(object sender, ElapsedEventArgs e) => SaveAll();
+        private static void Timer_Elapsed(object sender, ElapsedEventArgs e) => SaveAll(false);
 
-        public static void SaveAll()
+        public static void SaveAll(bool restartTimer = true)
         {
-            _timer.Reset();
+            if (restartTimer)
+                _timer.Reset();
+
             foreach (ISaveFile save in Saves.Values)
                 save.Write();
         }
