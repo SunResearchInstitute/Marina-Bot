@@ -17,18 +17,18 @@ namespace Marina.Commands
         {
             //This just downloads the json which should be fine
             using WebClient wc = new WebClient();
-            Dictionary<string, string> jsondata = JsonConvert.DeserializeObject<Dictionary<string, string>>(wc.DownloadString("https://dog.ceo/api/breeds/image/random"));
+            Dictionary<string, string> jsonData = JsonConvert.DeserializeObject<Dictionary<string, string>>(wc.DownloadString("https://dog.ceo/api/breeds/image/random"));
             wc.Dispose();
-            if (jsondata["status"] != "success")
+            if (jsonData["status"] != "success")
             {
                 RestApplication application = await Program.Client.GetApplicationInfoAsync();
-                await application.Owner.SendMessageAsync($"Dog API failed!\nStatus: `{jsondata["status"]}`");
+                await application.Owner.SendMessageAsync($"Dog API failed!\nStatus: `{jsonData["status"]}`");
                 return;
             }
             EmbedBuilder builder = new EmbedBuilder
             {
                 Color = Color.Teal,
-                ImageUrl = jsondata["message"]
+                ImageUrl = jsonData["message"]
             };
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://dog.ceo/dog-api/");

@@ -12,6 +12,7 @@ namespace Marina.Commands
         [Command("SetLogs"), Summary("Sets the logging channel.")]
         public async Task SetLogs(SocketTextChannel Channel)
         {
+            await Context.Channel.TriggerTypingAsync();
             if (SaveHandler.LogSave.Data.ContainsKey(Context.Guild.Id))
                 SaveHandler.LogSave.Data[Context.Guild.Id] = Channel.Id;
 
@@ -25,6 +26,7 @@ namespace Marina.Commands
         [Command("RemoveLogs"), Summary("Removes the logging channel.")]
         public async Task RemoveLogs()
         {
+            await Context.Channel.TriggerTypingAsync();
             if (SaveHandler.LogSave.Data.Remove(Context.Guild.Id))
                 await ReplyAsync("Logs removed.");
             else

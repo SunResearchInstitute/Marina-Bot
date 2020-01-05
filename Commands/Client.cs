@@ -14,6 +14,7 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task AddUserToBlacklist(IUser user)
         {
+            await Context.Channel.TriggerTypingAsync();
             if (!SaveHandler.BlacklistSave.Data.Contains(user.Id))
             {
                 SaveHandler.BlacklistSave.Data.Add(user.Id);
@@ -27,6 +28,7 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task RemoveUserFromBlacklist(IUser user)
         {
+            await Context.Channel.TriggerTypingAsync();
             if (SaveHandler.BlacklistSave.Data.Remove(user.Id))
                 await ReplyAsync("User removed from blacklist");
             else
@@ -38,6 +40,7 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task Announce(params string[] announcement)
         {
+            await Context.Channel.TriggerTypingAsync();
             foreach (SocketGuild guild in Context.Client.Guilds)
             {
                 try
@@ -53,6 +56,7 @@ namespace Marina.Commands
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
         public async Task AddSuggestion(params string[] Suggestion)
         {
+            await Context.Channel.TriggerTypingAsync();
             if (SaveHandler.BlacklistSave.Data.Contains(Context.User.Id))
             {
                 await Error.SendDiscordError(Context, Value: "You are banned from using this command");
@@ -72,6 +76,7 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task UploadSuggestions()
         {
+            await Context.Channel.TriggerTypingAsync();
             if (SaveHandler.BlacklistSave.Data.Count == 0)
             {
                 await Error.SendDiscordError(Context, Value: "No suggestions");
@@ -106,6 +111,54 @@ namespace Marina.Commands
 
         [Command("Source")]
         [Summary("Source Code!")]
-        public async Task GetSource() => await ReplyAsync("I was written in C# using Discord.Net: https://sunthecourier.net/marina-bot");
+        public async Task GetSource()
+        {
+            await Context.Channel.TriggerTypingAsync();
+            await ReplyAsync("I was written in C# using Discord.Net: https://sunthecourier.net/marina-bot");
+        }
+
+        [Command("Servers")]
+        [RequireOwner]
+        public async Task Getservers()
+        {
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.WithTitle("Server List");
+            builder.WithColor(Color.Teal);
+
+            switch (Context.Client.Guilds.Count)
+            {
+                case 1:
+                    builder.Description += "I am currently only in this server.";
+                    break;
+                default:
+                    builder.Description += $"```{Context.Client.Guilds.Count} total servers:\n";
+                    foreach (SocketGuild guild in Context.Client.Guilds)
+                    {
+                        builder.Description += $"{guild.Name}\n";
+                    }
+                    builder.Description += "```";
+                    break;
+            }
+
+            if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+            {
+                string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
+                for (int i = 0; i < Msgs.Length; i++)
+                {
+                    builder.Description = Msgs[i];
+                    if (Msgs.Length - 1 == i)
+                        builder.WithCurrentTimestamp();
+
+                    await ReplyAsync(embed: builder.Build());
+                    if (i == 0)
+                        builder.Title = null;
+                }
+            }
+            else
+            {
+                builder.WithCurrentTimestamp();
+                await ReplyAsync(embed: builder.Build());
+            }
+        }
     }
 }

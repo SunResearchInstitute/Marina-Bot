@@ -11,6 +11,7 @@ namespace Marina.Commands
         [Command("Ping"), Summary("Pings an IP."), Alias("ddos")]
         public async Task Ping(string Ip)
         {
+            await Context.Channel.TriggerTypingAsync();
             try
             {
                 using Ping pinger = new Ping();

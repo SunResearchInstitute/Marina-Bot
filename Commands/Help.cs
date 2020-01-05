@@ -101,6 +101,7 @@ namespace Marina.Commands
             }
             else
             {
+                await Context.Channel.TriggerTypingAsync();
                 KeyValuePair<string, string> cmd;
                 try
                 {
