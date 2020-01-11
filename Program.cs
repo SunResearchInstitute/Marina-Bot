@@ -69,7 +69,7 @@ namespace Marina
             }
             catch (HttpException)
             {
-                Error.SendApplicationError($"Token is invalid! check you config at {ConfigFile.FullName}", -1);
+                Error.SendApplicationError($"Token is invalid! check you config at {ConfigFile.FullName}", 1);
             }
             //a Static Method Starts too early
             Help.Populate();
@@ -78,7 +78,7 @@ namespace Marina
 
         private Task Log(LogMessage log)
         {
-            LogFile.AppendAllText($"\n[{DateTime.Now}]: {log.Source} {log.Message}: {log.Exception.StackTrace}");
+            LogFile.AppendAllText($"[{DateTime.Now}]: {log.Source} {log.Message}: {log.Exception.StackTrace}\n");
 
             return Task.CompletedTask;
         }
@@ -310,7 +310,7 @@ namespace Marina
                 {
                     "Token={token}"
                 });
-                Error.SendApplicationError($"Config does not exist, it has been created for you at {ConfigFile.FullName}!");
+                Error.SendApplicationError($"Config does not exist, it has been created for you at {ConfigFile.FullName}!", 1);
             }
         }
     }
