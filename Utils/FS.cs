@@ -11,11 +11,7 @@ namespace Marina.Utils
 
         public static DirectoryInfo GetDirectory(this DirectoryInfo obj, string foldername) => new DirectoryInfo($"{obj.FullName}{Path.DirectorySeparatorChar}{foldername.Replace('/', Path.DirectorySeparatorChar)}");
 
-        public static long GetSize(this DirectoryInfo obj)
-        {
-            IEnumerable<FileInfo> files = obj.EnumerateFilesRecursively();
-            return files.Sum((f) => f.Length);
-        }
+        public static long GetSize(this DirectoryInfo obj) => obj.EnumerateFilesRecursively().Sum((f) => f.Length);
 
         public static void DeleteContents(this DirectoryInfo obj)
         {

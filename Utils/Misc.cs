@@ -17,7 +17,7 @@ namespace Marina.Utils
             }
 
             string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-            return string.Format("{0:0.#} {1}", size, units[unit]);
+            return $"{size:0.#} {units[unit]}";
         }
 
         public static string[] ConvertToDiscordSendable(string s, int size = 2000)

@@ -4,8 +4,8 @@ using Discord.WebSocket;
 using Marina.Save;
 using Marina.Utils;
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Marina.Commands
 {
@@ -174,6 +174,15 @@ namespace Marina.Commands
                 builder.WithCurrentTimestamp();
                 await ReplyAsync(embed: builder.Build());
             }
+        }
+
+        [Command("Save")]
+        [RequireOwner]
+        public async Task ForceSaving()
+        {
+            await Context.Channel.TriggerTypingAsync();
+            SaveHandler.SaveAll();
+            await ReplyAsync("Saved all data!");
         }
     }
 }

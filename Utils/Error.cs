@@ -1,8 +1,7 @@
 ﻿using Discord;
-using System.Threading.Tasks;
-using System;
 using Discord.Commands;
-using Discord.Rest;
+using System;
+using System.Threading.Tasks;
 
 namespace Marina.Utils
 {
@@ -20,15 +19,13 @@ namespace Marina.Utils
             await Context.Channel.SendMessageAsync(embed: builder.Build());
             if (e != null)
             {
-                EmbedBuilder errorbuilder = new EmbedBuilder
-                {
-                    Color = Color.Red,
-                    Description = $"```{e.Message}\n\n{e.Source}\n{e.StackTrace}```"
-                };
-                errorbuilder.WithCurrentTimestamp();
+                builder.Title = string.Empty;
+                builder.Fields.Clear();
+
+                builder.Description = $"```{e.Message}\n\n{e.Source}\n{e.StackTrace}```";
+                builder.WithCurrentTimestamp();
                 //should we send anything else?
-                RestApplication info = await Context.Client.GetApplicationInfoAsync();
-                await info.Owner.SendMessageAsync(embed: errorbuilder.Build());
+                await (await Context.Client.GetApplicationInfoAsync()).Owner.SendMessageAsync(embed: builder.Build());
             }
         }
 
