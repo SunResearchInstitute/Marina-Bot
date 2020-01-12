@@ -34,16 +34,8 @@ namespace Marina.Commands.Animals
                 Color = Color.Teal,
                 ImageUrl = jsondata.Url.OriginalString
             };
-            if (jsondata.Categories != null)
-            {
-                if (jsondata.Categories.First() != null)
-                {
-                    if (jsondata.Categories.First().Name != null)
-                    {
-                        builder.Title = jsondata.Categories.First().Name;
-                    }
-                }
-            }
+            if (jsondata.Categories != null && jsondata.Categories.First() != null && jsondata.Categories.First().Name != null)
+                builder.Title = jsondata.Categories.First().Name;
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");
             try
