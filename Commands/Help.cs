@@ -69,7 +69,7 @@ namespace Marina.Commands
                         if (builder.Fields.Count == _commands.Count)
                         {
                             builder.WithCurrentTimestamp();
-                            builder.WithFooter("All commands start with 'c.' unless in DMs.");
+                            builder.WithFooter("All commands start with 'm.' unless in DMs.");
                             try
                             {
                                 await Context.User.SendMessageAsync(embed: builder.Build());
@@ -88,7 +88,7 @@ namespace Marina.Commands
                     }
                 }
                 builder.WithCurrentTimestamp();
-                builder.WithFooter("All commands start with 'c.' unless in DMs.");
+                builder.WithFooter("All commands start with 'm.' unless in DMs.");
                 try
                 {
                     await Context.User.SendMessageAsync(embed: builder.Build());

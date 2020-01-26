@@ -92,7 +92,7 @@ namespace Marina.Commands
             await Context.Channel.SendFileAsync(SaveHandler.SuggestionsSave.FileInfo.FullName);
         }
 
-        [Command("Shutdown"), Alias("Quit")]
+        [Command("Shutdown"), Alias("Quit", "Shutoff")]
         [RequireOwner]
         public async Task Shutdown()
         {
