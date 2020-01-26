@@ -53,45 +53,6 @@ namespace Marina.Commands
             await ReplyAsync("Announcement sent to all Guild Owners! :ok_hand:");
         }
 
-        [Command("Suggest")]
-        [Summary("Send a suggestion for a feature! Please use this command responsibly")]
-        public async Task AddSuggestion(params string[] Suggestion)
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.BlacklistSave.Data.Contains(Context.User.Id))
-            {
-                await Error.SendDiscordError(Context, Value: "You are banned from using this command");
-                return;
-            }
-            if (Suggestion.Length == 0)
-            {
-                await Error.SendDiscordError(Context, "The input text has too few parameters.");
-                return;
-            }
-
-            if (!SaveHandler.SuggestionsSave.Data.ContainsKey(Context.User.Id))
-            {
-                SaveHandler.SuggestionsSave.Data.Add(Context.User.Id, new List<string>());
-            }
-
-            SaveHandler.SuggestionsSave.Data[Context.User.Id].Add(string.Join(" ", Suggestion));
-            await ReplyAsync("Thanks for the suggestion");
-        }
-
-        [Command("GetSuggestions")]
-        [RequireOwner]
-        public async Task UploadSuggestions()
-        {
-            await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.SuggestionsSave.Data.Count == 0)
-            {
-                await Error.SendDiscordError(Context, Value: "No suggestions");
-                return;
-            }
-            SaveHandler.SaveAll();
-            await Context.Channel.SendFileAsync(SaveHandler.SuggestionsSave.FileInfo.FullName);
-        }
-
         [Command("Shutdown"), Alias("Quit", "Shutoff")]
         [RequireOwner]
         public async Task Shutdown()

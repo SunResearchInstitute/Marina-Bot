@@ -66,8 +66,10 @@ namespace Marina.Commands
             }
             catch (ApiException e)
             {
-                if (e.StatusCode == HttpStatusCode.NotFound) await Error.SendDiscordError(Context, Value: "Repository does not exist.");
-                else await Error.SendDiscordError(Context, Value: "Command failed: error reported!", e: e);
+                if (e.StatusCode == HttpStatusCode.NotFound)
+                    await Error.SendDiscordError(Context, Value: "Repository does not exist.");
+                else
+                    await Error.SendDiscordError(Context, Value: "Command failed: error reported!", e: e);
                 return;
             }
 
@@ -113,7 +115,8 @@ namespace Marina.Commands
             }
             else
             {
-                if (o.AllowPrerelease) tag = releases.First();
+                if (o.AllowPrerelease)
+                    tag = releases.First();
                 else
                 {
                     try

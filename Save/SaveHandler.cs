@@ -10,8 +10,7 @@ namespace Marina.Save
         public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>()
         {
             {"Logs", new DictionarySaveFile<ulong, ulong>("Logs")},
-            {"BlackList", new ListSaveFile<ulong>("BlackList")},
-            {"Suggestions", new DictionarySaveFile<ulong, List<string>>("Suggestions")}
+            {"BlackList", new ListSaveFile<ulong>("BlackList")}
         };
 
         //Easy Accessors 

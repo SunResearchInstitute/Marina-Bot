@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Marina.Save;
 using Marina.Utils;
+using System;
 using System.Threading.Tasks;
 
 namespace Marina.Commands
@@ -52,6 +53,31 @@ namespace Marina.Commands
                 }
                 else SaveHandler.LogSave.Data.Remove(User.Guild.Id);
             }
+        }
+
+        [Command("Purge")]
+        [RequireBotPermission(ChannelPermission.ManageMessages)]
+        [RequireUserPermission(ChannelPermission.ManageMessages)]
+        public async Task Purge(int cnt)
+        {
+            int rmCnt = 0;
+            foreach (IMessage msg in await Context.Channel.GetMessagesAsync(cnt).FlattenAsync())
+            {
+                try
+                {
+                    await msg.DeleteAsync();
+                    rmCnt++;
+                }
+                catch { }
+            }
+
+            IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt} messages");
+            await Task.Delay(TimeSpan.FromSeconds(3));
+            try
+            {
+                await resultMsg.DeleteAsync();
+            }
+            catch { }
         }
     }
 }
