@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Marina.Commands
 {
-    class Moderation : ModuleBase<SocketCommandContext>
+    public class Moderation : ModuleBase<SocketCommandContext>
     {
         [RequireUserPermission(GuildPermission.BanMembers), RequireBotPermission(GuildPermission.BanMembers)]
         [Command("Ban")]
@@ -37,9 +37,9 @@ namespace Marina.Commands
             await ReplyAsync($"kicked {User} :boot:");
 
             //Kicks need to be manually logged
-            if (SaveHandler.LogSave.Data.ContainsKey(User.Guild.Id))
+            if (SaveHandler.LogSave.ContainsKey(User.Guild.Id))
             {
-                SocketTextChannel LogChannel = User.Guild.GetTextChannel(SaveHandler.LogSave.Data[User.Guild.Id]);
+                SocketTextChannel LogChannel = User.Guild.GetTextChannel(SaveHandler.LogSave[User.Guild.Id]);
                 if (LogChannel != null)
                 {
                     EmbedBuilder builder = new EmbedBuilder
@@ -51,17 +51,23 @@ namespace Marina.Commands
                     if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
                     await LogChannel.SendMessageAsync(embed: builder.Build());
                 }
-                else SaveHandler.LogSave.Data.Remove(User.Guild.Id);
+                else SaveHandler.LogSave.Remove(User.Guild.Id);
             }
         }
 
         [Command("Purge")]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         [RequireUserPermission(ChannelPermission.ManageMessages)]
-        public async Task Purge(int cnt)
+        public async Task Purge(int Count = 50)
         {
+            if (Count <= 0)
+            {
+                await Error.SendDiscordError(Context, Value: "Invalid parameters");
+                return;
+            }
+
             int rmCnt = 0;
-            foreach (IMessage msg in await Context.Channel.GetMessagesAsync(cnt).FlattenAsync())
+            foreach (IMessage msg in await Context.Channel.GetMessagesAsync(Count).FlattenAsync())
             {
                 try
                 {
@@ -71,7 +77,7 @@ namespace Marina.Commands
                 catch { }
             }
 
-            IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt} messages");
+            IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt - 1} messages");
             await Task.Delay(TimeSpan.FromSeconds(3));
             try
             {

@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using Marina.Save;
 using Marina.Utils;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Marina.Commands
@@ -16,9 +15,9 @@ namespace Marina.Commands
         public async Task AddUserToBlacklist(IUser user)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (!SaveHandler.BlacklistSave.Data.Contains(user.Id))
+            if (!SaveHandler.BlacklistSave.Contains(user.Id))
             {
-                SaveHandler.BlacklistSave.Data.Add(user.Id);
+                SaveHandler.BlacklistSave.Add(user.Id);
                 await ReplyAsync("User added to blacklist!");
             }
             else
@@ -30,7 +29,7 @@ namespace Marina.Commands
         public async Task RemoveUserFromBlacklist(IUser user)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.BlacklistSave.Data.Remove(user.Id))
+            if (SaveHandler.BlacklistSave.Remove(user.Id))
                 await ReplyAsync("User removed from blacklist");
             else
                 await ReplyAsync("User not added to blacklist!");
@@ -53,7 +52,7 @@ namespace Marina.Commands
             await ReplyAsync("Announcement sent to all Guild Owners! :ok_hand:");
         }
 
-        [Command("Shutdown"), Alias("Quit", "Shutoff")]
+        [Command("Shutdown"), Alias("Quit", "Shutoff", "Stop")]
         [RequireOwner]
         public async Task Shutdown()
         {

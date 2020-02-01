@@ -13,11 +13,11 @@ namespace Marina.Commands
         public async Task SetLogs(SocketTextChannel Channel)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.LogSave.Data.ContainsKey(Context.Guild.Id))
-                SaveHandler.LogSave.Data[Context.Guild.Id] = Channel.Id;
+            if (SaveHandler.LogSave.ContainsKey(Context.Guild.Id))
+                SaveHandler.LogSave[Context.Guild.Id] = Channel.Id;
 
             else
-                SaveHandler.LogSave.Data.Add(Context.Guild.Id, Channel.Id);
+                SaveHandler.LogSave.Add(Context.Guild.Id, Channel.Id);
 
             await ReplyAsync($"Logs will now be put in {Channel.Name}");
         }
@@ -27,7 +27,7 @@ namespace Marina.Commands
         public async Task RemoveLogs()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (SaveHandler.LogSave.Data.Remove(Context.Guild.Id))
+            if (SaveHandler.LogSave.Remove(Context.Guild.Id))
                 await ReplyAsync("Logs removed.");
             else
                 await ReplyAsync("No logs to remove.");

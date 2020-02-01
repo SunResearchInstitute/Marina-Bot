@@ -5,14 +5,14 @@ namespace Marina.Save
 {
     public abstract class SaveFile<T> : ISaveFile where T : new()
     {
-        public T Data;
+        protected T _data;
 
         public SaveFile(string name)
         {
             FileInfo = SaveDirectory.GetFile(name);
-            Data = FileInfo.Exists ? JsonConvert.DeserializeObject<T>(FileInfo.ReadAllText()) : new T();
+            _data = FileInfo.Exists ? JsonConvert.DeserializeObject<T>(FileInfo.ReadAllText()) : new T();
         }
 
-        public override void Write() => FileInfo.WriteAllText(JsonConvert.SerializeObject(Data, Formatting.Indented));
+        public override void Write() => FileInfo.WriteAllText(JsonConvert.SerializeObject(_data, Formatting.Indented));
     }
 }

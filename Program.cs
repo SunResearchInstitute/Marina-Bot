@@ -41,7 +41,7 @@ namespace Marina
             Client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 //Chaching for Moderation
-                MessageCacheSize = 60,
+                MessageCacheSize = 250,
                 LogLevel = LogSeverity.Error
             });
 
@@ -85,9 +85,9 @@ namespace Marina
 
         private async Task UserBanned(SocketUser User, SocketGuild Guild)
         {
-            if (SaveHandler.LogSave.Data.ContainsKey(Guild.Id))
+            if (SaveHandler.LogSave.ContainsKey(Guild.Id))
             {
-                SocketTextChannel logChannel = Guild.GetTextChannel(SaveHandler.LogSave.Data[Guild.Id]);
+                SocketTextChannel logChannel = Guild.GetTextChannel(SaveHandler.LogSave[Guild.Id]);
                 if (logChannel != null)
                 {
                     RestAuditLogEntry lastBan = (await Guild.GetAuditLogsAsync(5).FlattenAsync()).First(l => l.Action == ActionType.Ban);
@@ -101,15 +101,15 @@ namespace Marina
                     if (!string.IsNullOrWhiteSpace(lastBan.Reason)) builder.Description += $"\n__Reason__: \"{lastBan.Reason}\"";
                     await logChannel.SendMessageAsync(embed: builder.Build());
                 }
-                else SaveHandler.LogSave.Data.Remove(Guild.Id);
+                else SaveHandler.LogSave.Remove(Guild.Id);
             }
         }
 
         private async Task UserLeft(SocketGuildUser User)
         {
-            if (SaveHandler.LogSave.Data.ContainsKey(User.Guild.Id))
+            if (SaveHandler.LogSave.ContainsKey(User.Guild.Id))
             {
-                SocketTextChannel logChannel = User.Guild.GetTextChannel(SaveHandler.LogSave.Data[User.Guild.Id]);
+                SocketTextChannel logChannel = User.Guild.GetTextChannel(SaveHandler.LogSave[User.Guild.Id]);
                 if (logChannel != null)
                 {
                     EmbedBuilder builder = new EmbedBuilder
@@ -121,7 +121,7 @@ namespace Marina
                     builder.WithCurrentTimestamp();
                     await logChannel.SendMessageAsync(embed: builder.Build());
                 }
-                else SaveHandler.LogSave.Data.Remove(User.Guild.Id);
+                else SaveHandler.LogSave.Remove(User.Guild.Id);
             }
         }
 
@@ -131,9 +131,9 @@ namespace Marina
                 return;
 
             SocketGuild guild = (Channel as SocketTextChannel).Guild;
-            if (SaveHandler.LogSave.Data.ContainsKey(guild.Id))
+            if (SaveHandler.LogSave.ContainsKey(guild.Id))
             {
-                SocketTextChannel LogChannel = guild.GetTextChannel(SaveHandler.LogSave.Data[guild.Id]);
+                SocketTextChannel LogChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
                 if (LogChannel != null)
                 {
                     if (OldMessage.Value.Content != NewMessage.Content)
@@ -168,7 +168,7 @@ namespace Marina
                     }
                 }
                 else
-                    SaveHandler.LogSave.Data.Remove(guild.Id);
+                    SaveHandler.LogSave.Remove(guild.Id);
             }
         }
 
@@ -178,9 +178,9 @@ namespace Marina
                 return;
 
             SocketGuild guild = (Channel as SocketGuildChannel).Guild;
-            if (SaveHandler.LogSave.Data.ContainsKey(guild.Id))
+            if (SaveHandler.LogSave.ContainsKey(guild.Id))
             {
-                SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave.Data[guild.Id]);
+                SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
                 if (logChannel != null)
                 {
                     if (logChannel.Id != Channel.Id && !string.IsNullOrWhiteSpace(Message.Value.Content))
@@ -215,7 +215,7 @@ namespace Marina
                     }
                 }
                 else
-                    SaveHandler.LogSave.Data.Remove(Channel.Id);
+                    SaveHandler.LogSave.Remove(Channel.Id);
             }
         }
 
@@ -223,9 +223,9 @@ namespace Marina
         {
             if (Before.IsBot) return;
 
-            if (SaveHandler.LogSave.Data.ContainsKey(After.Guild.Id))
+            if (SaveHandler.LogSave.ContainsKey(After.Guild.Id))
             {
-                SocketGuildChannel GuildChannel = After.Guild.GetChannel(SaveHandler.LogSave.Data[After.Guild.Id]);
+                SocketGuildChannel GuildChannel = After.Guild.GetChannel(SaveHandler.LogSave[After.Guild.Id]);
                 if (GuildChannel != null)
                 {
                     if (Before.Nickname != After.Nickname)
@@ -254,7 +254,7 @@ namespace Marina
                         await LogChannel.SendMessageAsync(embed: builder.Build());
                     }
                 }
-                else SaveHandler.LogSave.Data.Remove(After.Guild.Id);
+                else SaveHandler.LogSave.Remove(After.Guild.Id);
             }
         }
 
