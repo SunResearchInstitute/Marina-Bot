@@ -11,7 +11,7 @@ namespace Marina.Commands
 {
     public class Help : ModuleBase<SocketCommandContext>
     {
-        private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>();
+        private static readonly SortedDictionary<string, string> _commands = new SortedDictionary<string, string>();
 
         public static void Populate()
         {
