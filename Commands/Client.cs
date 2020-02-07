@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
 using System;
@@ -10,6 +11,13 @@ namespace Marina.Commands
 {
     public class Client : ModuleBase<SocketCommandContext>
     {
+        [Command("Commit"), Alias("Version")]
+        public async Task GetVersion()
+        {
+            await Context.Channel.TriggerTypingAsync();
+            await ReplyAsync($"Git Commit: {Resources.CurrentCommit}");
+        }
+
         [Command("BanUser")]
         [RequireOwner]
         public async Task AddUserToBlacklist(IUser user)
