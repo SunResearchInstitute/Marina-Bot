@@ -6,11 +6,11 @@ using System.Threading;
 
 namespace Marina.Save.Types
 {
-    public class ListSaveFile<T> : SaveFile<List<T>>, IList<T>, IList, IReadOnlyList<T>
+    //Follow normal list specs
+    public class ListSaveFile<T> : SaveFile<List<T>>, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IList
     {
         [NonSerialized]
         private object _syncRoot;
-
 
         public ListSaveFile(string name) : base(name) { }
 

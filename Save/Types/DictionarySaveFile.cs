@@ -8,7 +8,8 @@ using System.Threading;
 
 namespace Marina.Save.Types
 {
-    public class DictionarySaveFile<T, K> : SaveFile<Dictionary<T, K>>, IDictionary<T, K>, IDictionary, IReadOnlyDictionary<T, K>, ISerializable, IDeserializationCallback
+    //follow normal dictionary specs
+    public class DictionarySaveFile<T, K> : SaveFile<Dictionary<T, K>>, ICollection<KeyValuePair<T, K>>, IEnumerable<KeyValuePair<T, K>>, IEnumerable, IDictionary<T, K>, IReadOnlyCollection<KeyValuePair<T, K>>, IReadOnlyDictionary<T, K>, ICollection, IDictionary, IDeserializationCallback, ISerializable where T : notnull
     {
         private object _syncRoot;
 
@@ -63,7 +64,6 @@ namespace Marina.Save.Types
         public bool ContainsKey(T key) => _data.ContainsKey(key);
 
         public void CopyTo(KeyValuePair<T, K>[] array, int arrayIndex) => _data.ToArray().CopyTo(array, arrayIndex);
-
 
         public void CopyTo(Array array, int index)
         {
