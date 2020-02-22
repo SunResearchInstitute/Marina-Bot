@@ -61,12 +61,21 @@ namespace Marina.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to e997e63
-        ///.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static string CurrentCommit {
+        internal static byte[] CurrentCommit {
             get {
-                return ResourceManager.GetString("CurrentCommit", resourceCulture);
+                object obj = ResourceManager.GetObject("CurrentCommit", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to dsdsd.
+        /// </summary>
+        internal static string KeyHash {
+            get {
+                return ResourceManager.GetString("KeyHash", resourceCulture);
             }
         }
     }

@@ -5,6 +5,7 @@ using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Marina.Commands
@@ -15,7 +16,7 @@ namespace Marina.Commands
         public async Task GetVersion()
         {
             await Context.Channel.TriggerTypingAsync();
-            await ReplyAsync($"Git Commit: {Resources.CurrentCommit}");
+            await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
         }
 
         [Command("BanUser")]
@@ -92,7 +93,7 @@ namespace Marina.Commands
             await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
         }
 
-        [Command("invite")]
+        [Command("Invite")]
         [Summary("Invite link!")]
         public async Task GetInvite()
         {

@@ -6,7 +6,7 @@ namespace Marina.Commands
 {
     public class User : ModuleBase<SocketCommandContext>
     {
-        [Command("Avatar")]
+        [Command("Avatar"), Alias("pfp", "ava")]
         [Summary("Gets a avatar of self or another user.")]
         public async Task GetAvatar(IUser User = null)
         {

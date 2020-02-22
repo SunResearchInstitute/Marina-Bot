@@ -56,13 +56,13 @@ namespace Marina.Commands
 
         private async Task GetReleaseTask(Options o)
         {
-            GitHubClient client = new GitHubClient(new ProductHeaderValue("Github"));
+            GitHubClient client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
             IReadOnlyList<Release> releases;
             Repository repo;
             try
             {
-                releases = await client.Repository.Release.GetAll(o.User, o.Repo);
                 repo = await client.Repository.Get(o.User, o.Repo);
+                releases = await client.Repository.Release.GetAll(o.User, o.Repo);
             }
             catch (ApiException e)
             {
@@ -88,8 +88,7 @@ namespace Marina.Commands
                 };
                 for (int i = 0; i < releases.Count; i++)
                 {
-                    Release release = releases[i];
-                    embed.Description += $"{release.TagName}\n";
+                    embed.Description += $"{releases[i].TagName}\n";
                     if (i == o.Length - 1)
                     {
                         embed.Description += $"{releases.Count - o.Length} more...";
@@ -115,9 +114,7 @@ namespace Marina.Commands
             }
             else
             {
-                if (o.AllowPrerelease)
-                    tag = releases.First();
-                else
+                if (!o.AllowPrerelease)
                 {
                     try
                     {
@@ -129,6 +126,8 @@ namespace Marina.Commands
                         return;
                     }
                 }
+                else
+                    tag = releases.First();
             }
 
             EmbedBuilder builder = new EmbedBuilder
@@ -168,9 +167,8 @@ namespace Marina.Commands
             }
 
             foreach (ReleaseAsset asset in tag.Assets)
-            {
                 builder.AddField(asset.Name, $"[Download]({asset.BrowserDownloadUrl})");
-            }
+            
             await ReplyAsync(embed: builder.Build());
             return;
         }
