@@ -17,7 +17,7 @@ namespace Marina.Commands
 {
     public class Github : ModuleBase<SocketCommandContext>
     {
-        private static GitHubClient _client;
+        private static readonly GitHubClient _client;
 
         public class Options
         {
