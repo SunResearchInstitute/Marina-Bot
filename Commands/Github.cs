@@ -1,11 +1,15 @@
 using CommandLine;
 using Discord;
 using Discord.Commands;
+using Marina.Properties;
 using Marina.Utils;
 using Octokit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Error = Marina.Utils.Error;
 
@@ -13,6 +17,8 @@ namespace Marina.Commands
 {
     public class Github : ModuleBase<SocketCommandContext>
     {
+        private static GitHubClient _client;
+
         public class Options
         {
             [Option('t', "tag", Required = false)]
@@ -54,15 +60,24 @@ namespace Marina.Commands
             parser.Dispose();
         }
 
+        static Github()
+        {
+            SHA256 hash = SHA256.Create();
+            _client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
+            string curKeyHash = BitConverter.ToString(hash.ComputeHash(Resources.OAuth)).Replace("-", string.Empty);
+            if (curKeyHash == Resources.KeyHash)
+                _client.Credentials = new Credentials(Encoding.UTF8.GetString(Resources.OAuth));
+            
+        }
+
         private async Task GetReleaseTask(Options o)
         {
-            GitHubClient client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
             IReadOnlyList<Release> releases;
             Repository repo;
             try
             {
-                repo = await client.Repository.Get(o.User, o.Repo);
-                releases = await client.Repository.Release.GetAll(o.User, o.Repo);
+                repo = await _client.Repository.Get(o.User, o.Repo);
+                releases = await _client.Repository.Release.GetAll(o.User, o.Repo);
             }
             catch (ApiException e)
             {
@@ -168,7 +183,7 @@ namespace Marina.Commands
 
             foreach (ReleaseAsset asset in tag.Assets)
                 builder.AddField(asset.Name, $"[Download]({asset.BrowserDownloadUrl})");
-            
+
             await ReplyAsync(embed: builder.Build());
             return;
         }

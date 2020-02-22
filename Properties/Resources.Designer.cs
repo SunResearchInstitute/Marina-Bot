@@ -71,11 +71,21 @@ namespace Marina.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to dsdsd.
+        ///   Looks up a localized string similar to 12127575542E92E131302AD3EBA5BE9BF1997E1DD98C038C1E1BBAC3ABD9B97E.
         /// </summary>
         internal static string KeyHash {
             get {
                 return ResourceManager.GetString("KeyHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] OAuth {
+            get {
+                object obj = ResourceManager.GetObject("OAuth", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }
