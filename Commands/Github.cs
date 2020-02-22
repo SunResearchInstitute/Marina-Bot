@@ -64,10 +64,9 @@ namespace Marina.Commands
         {
             SHA256 hash = SHA256.Create();
             _client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
-            string curKeyHash = BitConverter.ToString(hash.ComputeHash(Resources.OAuth)).Replace("-", string.Empty);
+            string curKeyHash = BitConverter.ToString(hash.ComputeHash(Resources.Personal)).Replace("-", string.Empty);
             if (curKeyHash == Resources.KeyHash)
-                _client.Credentials = new Credentials(Encoding.UTF8.GetString(Resources.OAuth));
-            
+                _client.Credentials = new Credentials(Encoding.UTF8.GetString(Resources.Personal));
         }
 
         private async Task GetReleaseTask(Options o)

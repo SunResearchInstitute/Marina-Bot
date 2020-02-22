@@ -82,9 +82,9 @@ namespace Marina.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] OAuth {
+        internal static byte[] Personal {
             get {
-                object obj = ResourceManager.GetObject("OAuth", resourceCulture);
+                object obj = ResourceManager.GetObject("Personal", resourceCulture);
                 return ((byte[])(obj));
             }
         }

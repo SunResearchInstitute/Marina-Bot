@@ -126,7 +126,7 @@
     <value>12127575542E92E131302AD3EBA5BE9BF1997E1DD98C038C1E1BBAC3ABD9B97E</value>
     <comment>Hash for OAuth Key</comment>
   </data>
-  <data name="OAuth" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\OAuth.key;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="Personal" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Personal.key;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
