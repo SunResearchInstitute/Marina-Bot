@@ -15,7 +15,6 @@ namespace Marina.Commands
         [Command("Commit"), Alias("Version")]
         public async Task GetVersion()
         {
-            await Context.Channel.TriggerTypingAsync();
             await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
         }
 
@@ -23,7 +22,6 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task AddUserToBlacklist(IUser user)
         {
-            await Context.Channel.TriggerTypingAsync();
             if (!SaveHandler.BlacklistSave.Contains(user.Id))
             {
                 SaveHandler.BlacklistSave.Add(user.Id);
@@ -37,7 +35,6 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task RemoveUserFromBlacklist(IUser user)
         {
-            await Context.Channel.TriggerTypingAsync();
             if (SaveHandler.BlacklistSave.Remove(user.Id))
                 await ReplyAsync("User removed from blacklist");
             else
@@ -49,7 +46,6 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task Announce(params string[] announcement)
         {
-            await Context.Channel.TriggerTypingAsync();
             foreach (SocketGuild guild in Context.Client.Guilds)
             {
                 try
@@ -65,7 +61,6 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task Shutdown()
         {
-            await Context.Channel.TriggerTypingAsync();
             await ReplyAsync("Shutting down!");
             await Context.Client.LogoutAsync();
             SaveHandler.SaveAll();
@@ -89,7 +84,6 @@ namespace Marina.Commands
         [Summary("Source code!")]
         public async Task GetSource()
         {
-            await Context.Channel.TriggerTypingAsync();
             await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
         }
 
@@ -97,7 +91,6 @@ namespace Marina.Commands
         [Summary("Invite link!")]
         public async Task GetInvite()
         {
-            await Context.Channel.TriggerTypingAsync();
             await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
         }
 
@@ -149,7 +142,6 @@ namespace Marina.Commands
         [RequireOwner]
         public async Task ForceSaving()
         {
-            await Context.Channel.TriggerTypingAsync();
             SaveHandler.SaveAll();
             await ReplyAsync("Saved all data!");
         }

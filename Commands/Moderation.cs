@@ -14,7 +14,6 @@ namespace Marina.Commands
         [Command("Ban")]
         public async Task BanUser([RequireHierarchy]SocketGuildUser User, params string[] Reason)
         {
-            await Context.Channel.TriggerTypingAsync();
             string reasonJoined = Reason.Length != 0 ? string.Join(' ', Reason) : null;
             string msg = $"You were banned from {Context.Guild.Name}";
             if (reasonJoined != null) msg += $"\nReason: {reasonJoined}";
@@ -28,7 +27,6 @@ namespace Marina.Commands
         [Command("Kick")]
         public async Task Kickuser([RequireHierarchy]SocketGuildUser User, params string[] Reason)
         {
-            await Context.Channel.TriggerTypingAsync();
             string joined = Reason.Length != 0 ? string.Join(' ', Reason) : null;
             string msg = $"You were kicked from {Context.Guild.Name}";
             if (joined != null) msg += $"\nReason: {joined}";

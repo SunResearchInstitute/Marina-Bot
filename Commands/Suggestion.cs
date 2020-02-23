@@ -16,7 +16,6 @@ namespace Marina.Commands
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
         public async Task AddSuggestion(params string[] Suggestion)
         {
-            await Context.Channel.TriggerTypingAsync();
             if (SaveHandler.BlacklistSave.Contains(Context.User.Id))
             {
                 await Error.SendDiscordError(Context, Value: "You are banned from using this command");

@@ -59,6 +59,7 @@ namespace Marina
             Client.UserBanned += UserBanned;
             Client.MessageUpdated += MessageUpdated;
             Client.GuildMemberUpdated += GuildMemberUpdated;
+
             Client.Log += Log;
             Commands.Log += Log;
 
@@ -278,6 +279,7 @@ namespace Marina
 #endif
             }
 
+            await Context.Channel.TriggerTypingAsync();
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
             if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
         }
