@@ -45,7 +45,7 @@ namespace Marina.Commands
 
         [Command("GitRelease")]
         [Summary("Gets a release from the specificed Github repository.\nUser and Repository must be included anywhere in the command in that order.\nAvaliable options:\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--tags, -l=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
-        public async Task GetRelease(params string[] Arguments)
+        public Task GetRelease(params string[] Arguments)
         {
             Parser parser = new Parser(config =>
             {
@@ -54,9 +54,10 @@ namespace Marina.Commands
             });
             parser.ParseArguments<Options>(Arguments)
             //Should prevent any exceptions from breaking the bot
-            .WithParsed(o => _ = GetReleaseTask(o))
-            .WithNotParsed(e => _ = Error.SendDiscordError(Context, Value: "Invalid arguments"));
+            .WithParsed(async o => await GetReleaseTask(o))
+            .WithNotParsed(async e => await Error.SendDiscordError(Context, Value: "Invalid arguments"));
             parser.Dispose();
+            return Task.CompletedTask;
         }
 
         static Github()

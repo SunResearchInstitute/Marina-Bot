@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Console = Marina.Utils.Console;
 
 namespace Marina
 {
@@ -75,13 +76,6 @@ namespace Marina
             //a Static Method Starts too early
             Help.Populate();
             await Client.StartAsync();
-        }
-
-        private Task Log(LogMessage log)
-        {
-            LogFile.AppendAllText($"[{DateTime.Now}]: {log.ToString()}\n");
-
-            return Task.CompletedTask;
         }
 
         private async Task UserBanned(SocketUser User, SocketGuild Guild)
@@ -281,18 +275,23 @@ namespace Marina
 
             await Context.Channel.TriggerTypingAsync();
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
-            if (!Result.IsSuccess) await Error.SendDiscordError(Context, Result.ErrorReason);
+            if (!Result.IsSuccess)
+                await Error.SendDiscordError(Context, Result.ErrorReason);
         }
 
         private async Task Client_Ready()
         {
-            Utils.Console.ConsoleWriteLog("Ready!");
-            while (true)
+            await Console.ConsoleWriteLog("Ready!");
+            //make Client_Ready exit and run on our own Task
+            await Task.Run(async () =>
             {
-                if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | m.help");
-                else await Client.SetGameAsync($"on {Client.Guilds.Count} server | m.help");
-                await Task.Delay(600000);
-            }
+                while (true)
+                {
+                    if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | m.help");
+                    else await Client.SetGameAsync($"on {Client.Guilds.Count} server | m.help");
+                    await Task.Delay(TimeSpan.FromHours(1));
+                }
+            });
         }
 
         private static void LoadConfig()
@@ -315,5 +314,7 @@ namespace Marina
                 Error.SendApplicationError($"Config does not exist, it has been created for you at {ConfigFile.FullName}!", 1);
             }
         }
+
+        private async Task Log(LogMessage log) => await Console.ConsoleWriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
     }
 }

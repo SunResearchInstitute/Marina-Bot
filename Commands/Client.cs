@@ -64,7 +64,7 @@ namespace Marina.Commands
             await ReplyAsync("Shutting down!");
             await Context.Client.LogoutAsync();
             SaveHandler.SaveAll();
-            Utils.Console.ConsoleWriteLog("Shutdown via Commmand!");
+            await Utils.Console.ConsoleWriteLog("Shutdown via Commmand!");
             Environment.Exit(0);
         }
 
