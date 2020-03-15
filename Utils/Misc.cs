@@ -6,20 +6,6 @@ namespace Marina.Utils
 {
     public static class Misc
     {
-        public static string ConvertToReadableSize(double size)
-        {
-            int unit = 0;
-
-            while (size >= 1024)
-            {
-                size /= 1024;
-                ++unit;
-            }
-
-            string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-            return $"{size:0.#} {units[unit]}";
-        }
-
         public static string[] ConvertToDiscordSendable(string s, int size = 2000)
         {
             List<string> readable = new List<string>();

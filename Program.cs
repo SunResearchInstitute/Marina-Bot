@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.Commands;
 using Discord.Net;
 using Discord.Rest;
@@ -85,7 +85,7 @@ namespace Marina
                 SocketTextChannel logChannel = Guild.GetTextChannel(SaveHandler.LogSave[Guild.Id]);
                 if (logChannel != null)
                 {
-                    RestAuditLogEntry lastBan = (await Guild.GetAuditLogsAsync(5).FlattenAsync()).First(l => l.Action == ActionType.Ban);
+                    RestAuditLogEntry lastBan = (await Guild.GetAuditLogsAsync(3).FlattenAsync()).First(l => l.Action == ActionType.Ban);
                     EmbedBuilder builder = new EmbedBuilder
                     {
                         Color = Color.Teal,
@@ -267,11 +267,13 @@ namespace Marina
             if (Context.Guild != null)
             {
 #if DEBUG
-                if (!Message.HasStringPrefix("d.", ref PrefixPos)) return;
+                if (!Message.HasStringPrefix("d.", ref PrefixPos)) 
 #else
-                if (!Message.HasStringPrefix("m.", ref PrefixPos)) return;
+                if (!Message.HasStringPrefix("m.", ref PrefixPos))
 #endif
+                    return;
             }
+
 
             await Context.Channel.TriggerTypingAsync();
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
@@ -281,7 +283,6 @@ namespace Marina
 
         private async Task Client_Ready()
         {
-            await Console.ConsoleWriteLog("Ready!");
             //make Client_Ready exit and run on our own Task
             await Task.Run(async () =>
             {
