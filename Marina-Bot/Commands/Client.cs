@@ -12,12 +12,6 @@ namespace Marina.Commands
 {
     public class Client : ModuleBase<SocketCommandContext>
     {
-        [Command("Commit"), Alias("Version")]
-        public async Task GetVersion()
-        {
-            await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
-        }
-
         [Command("BanUser")]
         [RequireOwner]
         public async Task AddUserToBlacklist(IUser user)
@@ -80,20 +74,6 @@ namespace Marina.Commands
             await ReplyAsync(str);
         }
 
-        [Command("Source")]
-        [Summary("Source code!")]
-        public async Task GetSource()
-        {
-            await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
-        }
-
-        [Command("Invite")]
-        [Summary("Invite link!")]
-        public async Task GetInvite()
-        {
-            await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
-        }
-
         [Command("Servers")]
         [RequireOwner]
         public async Task Getservers()
@@ -145,5 +125,17 @@ namespace Marina.Commands
             SaveHandler.SaveAll();
             await ReplyAsync("Saved all data!");
         }
+
+        [Command("Commit"), Alias("Version")]
+        [Summary("Revision Number")]
+        public async Task GetVersion() => await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
+
+        [Command("Source")]
+        [Summary("Source code!")]
+        public async Task GetSource() => await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
+
+        [Command("Invite")]
+        [Summary("Invite link!")]
+        public async Task GetInvite() => await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
     }
 }

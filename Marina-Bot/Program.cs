@@ -1,6 +1,5 @@
 using Discord;
 using Discord.Commands;
-using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
 using Marina.Commands;
@@ -20,17 +19,16 @@ namespace Marina
     class Program
     {
         //API Stuff
-        public static DiscordSocketClient Client;
-        public static CommandService Commands;
+        private static DiscordSocketClient _client;
+        public static CommandService Commands { get; private set; }
 
         //Config Stuff
-        private static readonly Dictionary<string, string> Config = new Dictionary<string, string>();
-        private static readonly FileInfo ConfigFile = new FileInfo("Config.txt");
+        private static readonly FileInfo _configFile = new FileInfo("Config.txt");
         public static readonly FileInfo LogFile = new FileInfo("Marina.log");
+        private static readonly Dictionary<string, string> Config = Misc.LoadConfig(_configFile);
 
         static void Main()
         {
-            LoadConfig();
             Program program = new Program();
             program.MainAsync().GetAwaiter().GetResult();
             Thread.Sleep(-1);
@@ -39,7 +37,7 @@ namespace Marina
         private async Task MainAsync()
         {
             //This just configures how we want to handle our client and commands
-            Client = new DiscordSocketClient(new DiscordSocketConfig()
+            _client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 //Chaching for Moderation
                 MessageCacheSize = 250,
@@ -53,29 +51,38 @@ namespace Marina
                 LogLevel = LogSeverity.Error
             });
 
-            Client.Ready += Client_Ready;
-            Client.MessageReceived += MessageReceived;
-            Client.MessageDeleted += MessageDeleted;
-            Client.UserLeft += UserLeft;
-            Client.UserBanned += UserBanned;
-            Client.MessageUpdated += MessageUpdated;
-            Client.GuildMemberUpdated += GuildMemberUpdated;
+            _client.MessageReceived += MessageReceived;
+            _client.MessageDeleted += MessageDeleted;
+            _client.UserLeft += UserLeft;
+            _client.UserBanned += UserBanned;
+            _client.MessageUpdated += MessageUpdated;
+            _client.GuildMemberUpdated += GuildMemberUpdated;
 
-            Client.Log += Log;
+            _client.Log += Log;
             Commands.Log += Log;
 
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
-            try
-            {
-                await Client.LoginAsync(TokenType.Bot, Config["token"]);
-            }
-            catch (HttpException)
-            {
-                Error.SendApplicationError($"Token is invalid! check you config at {ConfigFile.FullName}", 1);
-            }
             //a Static Method Starts too early
             Help.Populate();
-            await Client.StartAsync();
+            try
+            {
+                await _client.LoginAsync(TokenType.Bot, Config["token"]);
+                await _client.StartAsync();
+            }
+            catch
+            {
+                Error.SendApplicationError("Something went wrong, check if your Token is valid!", 1);
+            }
+            
+            await Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (_client.Guilds.Count > 1) await _client.SetGameAsync($"on {_client.Guilds.Count} servers | m.help");
+                    else await _client.SetGameAsync($"on {_client.Guilds.Count} server | m.help");
+                    await Task.Delay(TimeSpan.FromHours(1));
+                }
+            });
         }
 
         private async Task UserBanned(SocketUser User, SocketGuild Guild)
@@ -259,7 +266,7 @@ namespace Marina
             if (!(arg is SocketUserMessage Message))
                 return;
 
-            SocketCommandContext Context = new SocketCommandContext(Client, Message);
+            SocketCommandContext Context = new SocketCommandContext(_client, Message);
             int PrefixPos = 0;
 
             if (string.IsNullOrWhiteSpace(Context.Message.Content) || Context.User.IsBot) return;
@@ -267,7 +274,7 @@ namespace Marina
             if (Context.Guild != null)
             {
 #if DEBUG
-                if (!Message.HasStringPrefix("d.", ref PrefixPos)) 
+                if (!Message.HasStringPrefix("d.", ref PrefixPos))
 #else
                 if (!Message.HasStringPrefix("m.", ref PrefixPos))
 #endif
@@ -279,41 +286,6 @@ namespace Marina
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
             if (!Result.IsSuccess)
                 await Error.SendDiscordError(Context, Result.ErrorReason);
-        }
-
-        private async Task Client_Ready()
-        {
-            //make Client_Ready exit and run on our own Task
-            await Task.Run(async () =>
-            {
-                while (true)
-                {
-                    if (Client.Guilds.Count > 1) await Client.SetGameAsync($"on {Client.Guilds.Count} servers | m.help");
-                    else await Client.SetGameAsync($"on {Client.Guilds.Count} server | m.help");
-                    await Task.Delay(TimeSpan.FromHours(1));
-                }
-            });
-        }
-
-        private static void LoadConfig()
-        {
-            if (ConfigFile.Exists)
-            {
-                foreach (string line in File.ReadAllLines(ConfigFile.FullName))
-                {
-                    //Even though we do not verify any Config items we should be fine
-                    string[] configitems = line.Split('=');
-                    Config.Add(configitems[0].ToLower(), configitems[1]);
-                }
-            }
-            else
-            {
-                File.WriteAllLines(ConfigFile.FullName, new string[]
-                {
-                    "Token={token}"
-                });
-                Error.SendApplicationError($"Config does not exist, it has been created for you at {ConfigFile.FullName}!", 1);
-            }
         }
 
         private async Task Log(LogMessage log) => await Console.ConsoleWriteLog($"[{DateTime.Now}]: {log.ToString()}\n");

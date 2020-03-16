@@ -16,7 +16,6 @@ namespace Marina.Save
         //Easy Accessors 
         public static DictionarySaveFile<ulong, ulong> LogSave => Saves["Logs"] as DictionarySaveFile<ulong, ulong>;
         public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
-        public static DictionarySaveFile<ulong, List<string>> SuggestionsSave => Saves["Suggestions"] as DictionarySaveFile<ulong, List<string>>;
 
         //30 min. timer
         private static readonly Timer _timer = new Timer(1.8e+6)
