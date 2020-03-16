@@ -23,9 +23,8 @@ namespace Marina
         public static CommandService Commands { get; private set; }
 
         //Config Stuff
-        private static readonly FileInfo _configFile = new FileInfo("Config.txt");
         public static readonly FileInfo LogFile = new FileInfo("Marina.log");
-        private static readonly Dictionary<string, string> Config = Misc.LoadConfig(_configFile);
+        private static readonly Dictionary<string, string> Config = Misc.LoadConfig();
 
         static void Main()
         {

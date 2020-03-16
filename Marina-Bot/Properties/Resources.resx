@@ -119,14 +119,6 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="CurrentCommit" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\CurrentCommit.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    <comment>this is set to binary so it is not constantly updated in designer cs</comment>
-  </data>
-  <data name="KeyHash" xml:space="preserve">
-    <value>12127575542E92E131302AD3EBA5BE9BF1997E1DD98C038C1E1BBAC3ABD9B97E</value>
-    <comment>Hash for OAuth Key</comment>
-  </data>
-  <data name="Personal" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Personal.key;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\currentcommit.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

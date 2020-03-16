@@ -1,15 +1,11 @@
 using CommandLine;
 using Discord;
 using Discord.Commands;
-using Marina.Properties;
 using Marina.Utils;
 using Octokit;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Error = Marina.Utils.Error;
 
@@ -17,8 +13,6 @@ namespace Marina.Commands
 {
     public class Github : ModuleBase<SocketCommandContext>
     {
-        private static readonly GitHubClient _client;
-
         public class Options
         {
             [Option('t', "tag", Required = false)]
@@ -37,46 +31,42 @@ namespace Marina.Commands
             public string User { get; set; }
 
             [Value(1, Required = true)]
-            public string Repo { get; set; }
+            public string RepositoryName { get; set; }
 
             [Option('d', "description", Required = false, Default = false)]
-            public bool Desc { get; set; }
+            public bool GetDescription { get; set; }
         }
 
         [Command("GitRelease")]
         [Summary("Gets a release from the specificed Github repository.\nUser and Repository must be included anywhere in the command in that order.\nAvaliable options:\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--tags, -l=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
         public Task GetRelease(params string[] Arguments)
         {
+            GitHubClient client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
+
+            Dictionary<string, string> config = Misc.LoadConfig();
+            if (config.ContainsKey("gitkey"))
+                client.Credentials = new Credentials(config["gitkey"]);
+
             Parser parser = new Parser(config =>
             {
                 config.HelpWriter = null;
                 config.AutoHelp = false;
             });
             parser.ParseArguments<Options>(Arguments)
-            //Should prevent any exceptions from breaking the bot
-            .WithParsed(async o => await GetReleaseTask(o))
+            .WithParsed(async o => await GetReleaseTask(client, o))
             .WithNotParsed(async e => await Error.SendDiscordError(Context, Value: "Invalid arguments"));
             parser.Dispose();
             return Task.CompletedTask;
         }
 
-        static Github()
-        {
-            SHA256 hash = SHA256.Create();
-            _client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
-            string curKeyHash = BitConverter.ToString(hash.ComputeHash(Resources.Personal)).Replace("-", string.Empty);
-            if (curKeyHash == Resources.KeyHash)
-                _client.Credentials = new Credentials(Encoding.UTF8.GetString(Resources.Personal));
-        }
-
-        private async Task GetReleaseTask(Options o)
+        private async Task GetReleaseTask(GitHubClient client, Options options)
         {
             IReadOnlyList<Release> releases;
             Repository repo;
             try
             {
-                repo = await _client.Repository.Get(o.User, o.Repo);
-                releases = await _client.Repository.Release.GetAll(o.User, o.Repo);
+                repo = await client.Repository.Get(options.User, options.RepositoryName);
+                releases = await client.Repository.Release.GetAll(options.User, options.RepositoryName);
             }
             catch (ApiException e)
             {
@@ -93,7 +83,7 @@ namespace Marina.Commands
                 return;
             }
 
-            if (o.ListTags)
+            if (options.ListTags)
             {
                 EmbedBuilder embed = new EmbedBuilder
                 {
@@ -103,9 +93,9 @@ namespace Marina.Commands
                 for (int i = 0; i < releases.Count; i++)
                 {
                     embed.Description += $"{releases[i].TagName}\n";
-                    if (i == o.Length - 1)
+                    if (i == options.Length - 1)
                     {
-                        embed.Description += $"{releases.Count - o.Length} more...";
+                        embed.Description += $"{releases.Count - options.Length} more...";
                         break;
                     }
                 }
@@ -114,11 +104,11 @@ namespace Marina.Commands
             }
 
             Release tag;
-            if (o.Tag != null)
+            if (options.Tag != null)
             {
                 try
                 {
-                    tag = releases.Single(x => x.TagName.ToLower() == o.Tag.ToLower());
+                    tag = releases.Single(x => x.TagName.ToLower() == options.Tag.ToLower());
                 }
                 catch
                 {
@@ -128,11 +118,11 @@ namespace Marina.Commands
             }
             else
             {
-                if (!o.AllowPrerelease)
+                if (!options.AllowPrerelease)
                 {
                     try
                     {
-                        tag = releases.First(x => x.Prerelease == o.AllowPrerelease);
+                        tag = releases.First(x => x.Prerelease == options.AllowPrerelease);
                     }
                     catch
                     {
@@ -150,7 +140,7 @@ namespace Marina.Commands
                 Color = Color.Teal,
                 Url = tag.HtmlUrl
             };
-            if (o.Desc)
+            if (options.GetDescription)
             {
                 if (tag.Body.Length > EmbedBuilder.MaxDescriptionLength)
                 {

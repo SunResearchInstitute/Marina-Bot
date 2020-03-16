@@ -26,8 +26,9 @@ namespace Marina.Utils
             obj.Start();
         }
 
-        public static Dictionary<string, string> LoadConfig(FileInfo configFile)
+        public static Dictionary<string, string> LoadConfig()
         {
+            FileInfo configFile = new FileInfo("Config.txt");
             if (configFile.Exists)
             {
                 Dictionary<string, string> config = new Dictionary<string, string>();
