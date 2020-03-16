@@ -31,8 +31,8 @@ namespace Marina.Utils
 
         public static void SendApplicationError(string ErrorMsg, int code = 0)
         {
-            _ = Console.ConsoleWriteLog(ErrorMsg);
-            _ = Console.ConsoleWriteLog("Press any key to continue...");
+            _ = Console.WriteLog(ErrorMsg);
+            _ = Console.WriteLog("Press any key to continue...");
             System.Console.ReadKey();
             Environment.Exit(code);
         }

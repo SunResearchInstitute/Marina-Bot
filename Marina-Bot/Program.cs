@@ -77,7 +77,7 @@ namespace Marina
 
         private async Task ClientReady()
         {
-            await Console.ConsoleWriteLog("Initalized!");
+            await Console.WriteLog("Initalized!");
             await Task.Run(async () =>
             {
                 while (true)
@@ -290,8 +290,10 @@ namespace Marina
             IResult Result = await Commands.ExecuteAsync(Context, PrefixPos, null);
             if (!Result.IsSuccess)
                 await Error.SendDiscordError(Context, Result.ErrorReason);
+            else
+                await Console.WriteLog($"Ran command {Context.Message}");
         }
 
-        private async Task Log(LogMessage log) => await Console.ConsoleWriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
+        private async Task Log(LogMessage log) => await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
     }
 }
