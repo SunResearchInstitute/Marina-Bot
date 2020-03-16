@@ -56,6 +56,7 @@ namespace Marina
             _client.UserBanned += UserBanned;
             _client.MessageUpdated += MessageUpdated;
             _client.GuildMemberUpdated += GuildMemberUpdated;
+            _client.Ready += ClientReady;
 
             _client.Log += Log;
             Commands.Log += Log;
@@ -72,7 +73,11 @@ namespace Marina
             {
                 Error.SendApplicationError("Something went wrong, check if your Token is valid!", 1);
             }
-            
+        }
+
+        private async Task ClientReady()
+        {
+            await Console.ConsoleWriteLog("Initalized!");
             await Task.Run(async () =>
             {
                 while (true)
