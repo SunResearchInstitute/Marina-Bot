@@ -291,7 +291,7 @@ namespace Marina
             if (!Result.IsSuccess)
                 await Error.SendDiscordError(Context, Result.ErrorReason);
             else
-                await Console.WriteLog($"{Context.User.Username} executed command {Context.Message}");
+                await Console.WriteLog($"{Context.User.Id} executed command {Context.Message}");
         }
 
         private async Task Log(LogMessage log) => await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
