@@ -137,5 +137,9 @@ namespace Marina.Commands
         [Command("Invite")]
         [Summary("Invite link!")]
         public async Task GetInvite() => await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
+
+        [Command("Vote")]
+        [Summary("Top.gg vote link!")]
+        public async Task GetVote() => await ReplyAsync("you can vote for Marina-bot on top.gg: https://top.gg/bot/580901187931603004");
     }
 }
