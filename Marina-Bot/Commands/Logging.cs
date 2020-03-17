@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Marina.Save;
+using Marina.Utils;
 using System.Threading.Tasks;
 
 namespace Marina.Commands
@@ -10,15 +11,15 @@ namespace Marina.Commands
     {
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("SetLogs"), Summary("Sets the logging channel.")]
-        public async Task SetLogs(SocketTextChannel Channel)
+        public async Task SetLogs([Name("Channel")][ManualOptionalParameter("Current Channel")]SocketTextChannel channel = null)
         {
             if (SaveHandler.LogSave.ContainsKey(Context.Guild.Id))
-                SaveHandler.LogSave[Context.Guild.Id] = Channel.Id;
+                SaveHandler.LogSave[Context.Guild.Id] = channel.Id;
 
             else
-                SaveHandler.LogSave.Add(Context.Guild.Id, Channel.Id);
+                SaveHandler.LogSave.Add(Context.Guild.Id, channel.Id);
 
-            await ReplyAsync($"Logs will now be put in {Channel.Name}");
+            await ReplyAsync($"Logs will now be put in {channel.Name}");
         }
 
         [RequireUserPermission(GuildPermission.Administrator)]

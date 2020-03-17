@@ -14,14 +14,14 @@ namespace Marina.Commands
 
         [Command("Suggest")]
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
-        public async Task AddSuggestion(params string[] Suggestion)
+        public async Task AddSuggestion([Name("Suggestion")]params string[] suggestion)
         {
             if (SaveHandler.BlacklistSave.Contains(Context.User.Id))
             {
                 await Error.SendDiscordError(Context, Value: "You are banned from using this command");
                 return;
             }
-            if (Suggestion.Length == 0)
+            if (suggestion.Length == 0)
             {
                 await Error.SendDiscordError(Context, "The input text has too few parameters.");
                 return;
@@ -31,7 +31,7 @@ namespace Marina.Commands
             {
                 Color = Color.Teal,
                 Title = $"Suggestion",
-                Description = $"From {Context.User.Mention}:\n{string.Join(" ", Suggestion)}"
+                Description = $"From {Context.User.Mention}:\n{string.Join(" ", suggestion)}"
             };
             builder.WithCurrentTimestamp();
 

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Marina.Utils;
 using System.Threading.Tasks;
 
 namespace Marina.Commands
@@ -8,16 +9,16 @@ namespace Marina.Commands
     {
         [Command("Avatar"), Alias("pfp", "ava")]
         [Summary("Gets a avatar of self or another user.")]
-        public async Task GetAvatar(IUser User = null)
+        public async Task GetAvatar([ManualOptionalParameter("Self")][Name("User")]IUser user = null)
         {
-            if (User == null)
-                User = Context.User;
+            if (user == null)
+                user = Context.User;
 
             EmbedBuilder builder = new EmbedBuilder
             {
-                Title = $"{User.Username}'s Avatar",
+                Title = $"{user.Username}'s Avatar",
                 Color = Color.Teal,
-                ImageUrl = User.GetAvatarUrl(ImageFormat.Auto, 2048),
+                ImageUrl = user.GetAvatarUrl(ImageFormat.Auto, 2048),
             };
             builder.WithCurrentTimestamp();
 

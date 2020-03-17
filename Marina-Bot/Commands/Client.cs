@@ -63,15 +63,30 @@ namespace Marina.Commands
         }
 
         [Command("Say")]
-        [RequireOwner]
-        public async Task ForceSay(string str)
+        [RequireUserPermission(ChannelPermission.ManageMessages)]
+        [HideCommand]
+        public async Task ForceSay(params string[] str)
         {
             try
             {
                 await Context.Message.DeleteAsync();
             }
             catch { }
-            await ReplyAsync(str);
+            await ReplyAsync(string.Join(' ', str));
+        }
+
+
+        [Command("CSay")]
+        [RequireUserPermission(ChannelPermission.ManageMessages)]
+        [HideCommand]
+        public async Task ChannelForceSay(SocketTextChannel channel, params string[] str)
+        {
+            try
+            {
+                await Context.Message.DeleteAsync();
+            }
+            catch { }
+            await channel.SendMessageAsync(string.Join(' ', str));
         }
 
         [Command("Servers")]
@@ -126,7 +141,7 @@ namespace Marina.Commands
             await ReplyAsync("Saved all data!");
         }
 
-        [Command("Commit"), Alias("Version")]
+        [Command("Version"), Alias("Commit")]
         [Summary("Revision Number")]
         public async Task GetVersion() => await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
 

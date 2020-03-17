@@ -17,9 +17,10 @@ namespace Marina.Commands
         {
             foreach (CommandInfo cmd in Program.Commands.Commands)
             {
-                if (cmd.Preconditions.Any(p => p is RequireOwnerAttribute)) continue;
+                if (cmd.Attributes.Any(a => a is HideCommandAttribute) || cmd.Preconditions.Any(p => p is RequireOwnerAttribute))
+                    continue;
 
-                string s = "";
+                string str = "";
                 bool HasNoArgs = cmd.Parameters.Count == 0;
                 if (string.IsNullOrWhiteSpace(cmd.Summary))
                 {
@@ -28,7 +29,7 @@ namespace Marina.Commands
                         _commands.Add(cmd.Name, "No info available!");
                         continue;
                     }
-                    else s = "args: ";
+                    else str = "args: ";
                 }
                 else
                 {
@@ -37,20 +38,29 @@ namespace Marina.Commands
                         _commands.Add(cmd.Name, cmd.Summary);
                         continue;
                     }
-                    else s = $"{cmd.Summary}\nargs: ";
+                    else str = $"{cmd.Summary}\nargs: ";
                 }
 
                 foreach (ParameterInfo param in cmd.Parameters)
                 {
-                    if (param.DefaultValue != null) s += $"[{param.Name.Replace('_', ' ')} = {param.DefaultValue}] ";
-                    else s += $"<{param.Name.Replace('_', ' ')}> ";
+                    ManualOptionalParameterAttribute attribute = (ManualOptionalParameterAttribute)param.Attributes.SingleOrDefault(x => x is ManualOptionalParameterAttribute);
+                    if (attribute != null)
+                    {
+                        str += $"[{param.Name} = {attribute.ManualDefaultValue}]";
+                    }
+                    else if (param.DefaultValue != null)
+                    {
+                        str += $"[{param.Name} = {param.DefaultValue}]";
+                    }
+                    else
+                        str += $"<{param.Name}> ";
                 }
-                _commands.Add(cmd.Name, s);
+                _commands.Add(cmd.Name, str);
             }
         }
 
         [Command("Help")]
-        public async Task GetHelp(string Command = null)
+        public async Task GetHelp([Name("Command")]string command = null)
         {
             EmbedBuilder builder = new EmbedBuilder
             {
@@ -58,7 +68,7 @@ namespace Marina.Commands
                 Title = "Help Menu"
             };
 
-            if (Command == null)
+            if (command == null)
             {
                 foreach (KeyValuePair<string, string> cmd in _commands)
                 {
@@ -104,7 +114,7 @@ namespace Marina.Commands
                 KeyValuePair<string, string> cmd;
                 try
                 {
-                    cmd = _commands.First(c => c.Key.Contains(Command, StringComparison.OrdinalIgnoreCase));
+                    cmd = _commands.First(c => c.Key.Contains(command, StringComparison.OrdinalIgnoreCase));
                 }
                 catch (InvalidOperationException)
                 {
