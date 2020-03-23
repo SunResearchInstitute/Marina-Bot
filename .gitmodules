@@ -1,3 +1,3 @@
-[submodule "Marina-Bot/Save/LibSave"]
-	path = Marina-Bot/Save/LibSave
+[submodule "LibSave"]
+	path = LibSave
 	url = https://github.com/Sun-Research-University/LibSave.git
