@@ -10,9 +10,21 @@ namespace Marina.Save.Types
     public class ListSaveFile<T> : SaveFile<List<T>>, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IList
     {
         [NonSerialized]
+        private readonly Action<ulong, List<T>> _cleanupAction;
+        [NonSerialized]
         private object _syncRoot;
 
-        public ListSaveFile(string name) : base(name) { }
+        //Should only be used if list is going to be UlongList
+        public ListSaveFile(string name) : base(name)
+        {
+            if (typeof(T) != typeof(ulong))
+                throw new Exception("Default constructor should only be used for ulong");
+
+            _cleanupAction = delegate (ulong guild, List<T> items) { (items as List<ulong>).Remove(guild); };
+        }
+        public ListSaveFile(string name, Action<ulong, List<T>> cleanUp) : base(name) => _cleanupAction = cleanUp;
+
+        public override void CleanUp(ulong id) => _cleanupAction?.Invoke(id, _data);
 
         public T this[int index] { get => _data[index]; set => _data[index] = value; }
         object IList.this[int index] { get => _data[index]; set => _data[index] = (T)value; }

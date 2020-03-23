@@ -6,13 +6,16 @@ namespace Marina.Save
     {
         public static DirectoryInfo SaveDirectory = new DirectoryInfo("Save");
 
+        public FileInfo FileInfo;
+
         static ISaveFile()
         {
             if (!SaveDirectory.Exists)
                 SaveDirectory.Create();
         }
 
-        public FileInfo FileInfo;
         public abstract void Write();
+
+        public abstract void CleanUp(ulong id);
     }
 }

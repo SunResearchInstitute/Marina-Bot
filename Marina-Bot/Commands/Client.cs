@@ -7,6 +7,7 @@ using Marina.Utils;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Marina.Commands
 {
@@ -156,5 +157,22 @@ namespace Marina.Commands
         [Command("Vote")]
         [Summary("Top.gg vote link!")]
         public async Task GetVote() => await ReplyAsync("you can vote for Marina-bot on top.gg: https://top.gg/bot/580901187931603004");
+
+        [Command("SetMode")]
+        [RequireOwner]
+        public async Task SetPriorityMode(ProcessPriorityClass mode)
+        {
+            using Process p = Process.GetCurrentProcess();
+            p.PriorityClass = mode;
+            await ReplyAsync($"Set priority to `{p.PriorityClass}`");
+        }
+
+        [Command("Mode")]
+        [RequireOwner]
+        public async Task GetPriorityMode()
+        {
+            using Process p = Process.GetCurrentProcess();
+            await ReplyAsync($"Priority is set to `{p.PriorityClass}`");
+        }
     }
 }

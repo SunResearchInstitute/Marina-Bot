@@ -7,7 +7,6 @@ using Marina.Save;
 using Marina.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -21,10 +20,6 @@ namespace Marina
         //API Stuff
         private static DiscordSocketClient _client;
         public static CommandService Commands { get; private set; }
-
-        //Config Stuff
-        public static readonly FileInfo LogFile = new FileInfo("Marina.log");
-        private static readonly Dictionary<string, string> Config = Misc.LoadConfig();
 
         static void Main()
         {
@@ -57,6 +52,8 @@ namespace Marina
             _client.MessageUpdated += MessageUpdated;
             _client.GuildMemberUpdated += GuildMemberUpdated;
             _client.Ready += ClientReady;
+            _client.LeftGuild += Client_LeftGuild;
+            _client.ChannelDestroyed += Client_ChannelDestroyed;
 
             _client.Log += Log;
             Commands.Log += Log;
@@ -64,15 +61,34 @@ namespace Marina
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
             //a Static Method Starts too early
             Help.Populate();
+            Dictionary<string, string> config = Misc.LoadConfig();
             try
             {
-                await _client.LoginAsync(TokenType.Bot, Config["token"]);
+                await _client.LoginAsync(TokenType.Bot, config["token"]);
                 await _client.StartAsync();
             }
             catch
             {
                 Error.SendApplicationError("Something went wrong, check if your Token is valid!", 1);
             }
+        }
+
+        private Task Client_ChannelDestroyed(SocketChannel channel)
+        {
+            //Only currently needed for Logs at the moment
+            //Will try to remove the pair if it exists in the list
+            SaveHandler.LogSave.Remove(new KeyValuePair<ulong, ulong>((channel as SocketGuildChannel).Guild.Id, channel.Id));
+            return Task.CompletedTask;
+        }
+
+        private Task Client_LeftGuild(SocketGuild guild)
+        {
+            //Removes guild Marina is no longer in
+            foreach (ISaveFile save in SaveHandler.Saves.Values)
+            {
+                save.CleanUp(guild.Id);
+            }
+            return Task.CompletedTask;
         }
 
         private async Task ClientReady()
@@ -94,20 +110,16 @@ namespace Marina
             if (SaveHandler.LogSave.ContainsKey(Guild.Id))
             {
                 SocketTextChannel logChannel = Guild.GetTextChannel(SaveHandler.LogSave[Guild.Id]);
-                if (logChannel != null)
+                RestAuditLogEntry lastBan = (await Guild.GetAuditLogsAsync(3).FlattenAsync()).First(l => l.Action == ActionType.Ban);
+                EmbedBuilder builder = new EmbedBuilder
                 {
-                    RestAuditLogEntry lastBan = (await Guild.GetAuditLogsAsync(3).FlattenAsync()).First(l => l.Action == ActionType.Ban);
-                    EmbedBuilder builder = new EmbedBuilder
-                    {
-                        Color = Color.Teal,
-                        Title = "**Banned**",
-                        Description = $"{lastBan.User.Mention} banned {User.Mention} | {User}",
-                    };
-                    builder.WithCurrentTimestamp();
-                    if (!string.IsNullOrWhiteSpace(lastBan.Reason)) builder.Description += $"\n__Reason__: \"{lastBan.Reason}\"";
-                    await logChannel.SendMessageAsync(embed: builder.Build());
-                }
-                else SaveHandler.LogSave.Remove(Guild.Id);
+                    Color = Color.Teal,
+                    Title = "**Banned**",
+                    Description = $"{lastBan.User.Mention} banned {User.Mention} | {User}",
+                };
+                builder.WithCurrentTimestamp();
+                if (!string.IsNullOrWhiteSpace(lastBan.Reason)) builder.Description += $"\n__Reason__: \"{lastBan.Reason}\"";
+                await logChannel.SendMessageAsync(embed: builder.Build());
             }
         }
 
@@ -116,18 +128,14 @@ namespace Marina
             if (SaveHandler.LogSave.ContainsKey(User.Guild.Id))
             {
                 SocketTextChannel logChannel = User.Guild.GetTextChannel(SaveHandler.LogSave[User.Guild.Id]);
-                if (logChannel != null)
+                EmbedBuilder builder = new EmbedBuilder
                 {
-                    EmbedBuilder builder = new EmbedBuilder
-                    {
-                        Color = Color.Teal,
-                        Title = "User Left",
-                        Description = $"{User.Mention} | {User.Username}"
-                    };
-                    builder.WithCurrentTimestamp();
-                    await logChannel.SendMessageAsync(embed: builder.Build());
-                }
-                else SaveHandler.LogSave.Remove(User.Guild.Id);
+                    Color = Color.Teal,
+                    Title = "User Left",
+                    Description = $"{User.Mention} | {User.Username}"
+                };
+                builder.WithCurrentTimestamp();
+                await logChannel.SendMessageAsync(embed: builder.Build());
             }
         }
 
@@ -140,41 +148,36 @@ namespace Marina
             if (SaveHandler.LogSave.ContainsKey(guild.Id))
             {
                 SocketTextChannel LogChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
-                if (LogChannel != null)
+                if (OldMessage.Value.Content != NewMessage.Content)
                 {
-                    if (OldMessage.Value.Content != NewMessage.Content)
+                    EmbedBuilder builder = new EmbedBuilder
                     {
-                        EmbedBuilder builder = new EmbedBuilder
-                        {
-                            Color = Color.Teal,
-                            Title = "Message Edited",
-                            Description = $"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}"
-                        };
+                        Color = Color.Teal,
+                        Title = "Message Edited",
+                        Description = $"From {NewMessage.Author.Mention} in <#{Channel.Id}>:\n**Before:**\n{OldMessage.Value.Content}\n**After:**\n{NewMessage.Content}"
+                    };
 
-                        if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                    if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                    {
+                        string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
+                        for (int i = 0; i < Msgs.Length; i++)
                         {
-                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
-                            for (int i = 0; i < Msgs.Length; i++)
-                            {
-                                string msg = Msgs[i];
-                                builder.Description = msg;
-                                if (Msgs.Length - 1 == i)
-                                    builder.WithCurrentTimestamp();
+                            string msg = Msgs[i];
+                            builder.Description = msg;
+                            if (Msgs.Length - 1 == i)
+                                builder.WithCurrentTimestamp();
 
-                                await LogChannel.SendMessageAsync(embed: builder.Build());
-                                if (i == 0)
-                                    builder.Title = null;
-                            }
-                        }
-                        else
-                        {
-                            builder.WithCurrentTimestamp();
                             await LogChannel.SendMessageAsync(embed: builder.Build());
+                            if (i == 0)
+                                builder.Title = null;
                         }
                     }
+                    else
+                    {
+                        builder.WithCurrentTimestamp();
+                        await LogChannel.SendMessageAsync(embed: builder.Build());
+                    }
                 }
-                else
-                    SaveHandler.LogSave.Remove(guild.Id);
             }
         }
 
@@ -187,41 +190,36 @@ namespace Marina
             if (SaveHandler.LogSave.ContainsKey(guild.Id))
             {
                 SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
-                if (logChannel != null)
+                if (logChannel.Id != Channel.Id && !string.IsNullOrWhiteSpace(Message.Value.Content))
                 {
-                    if (logChannel.Id != Channel.Id && !string.IsNullOrWhiteSpace(Message.Value.Content))
+                    EmbedBuilder builder = new EmbedBuilder
                     {
-                        EmbedBuilder builder = new EmbedBuilder
-                        {
-                            Color = Color.Teal,
-                            Title = "Message Deleted",
-                            Description = $"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}"
-                        };
+                        Color = Color.Teal,
+                        Title = "Message Deleted",
+                        Description = $"From {Message.Value.Author.Mention} in <#{Channel.Id}>:\n{Message.Value.Content}"
+                    };
 
-                        if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                    if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                    {
+                        string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
+                        for (int i = 0; i < Msgs.Length; i++)
                         {
-                            string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
-                            for (int i = 0; i < Msgs.Length; i++)
-                            {
-                                string msg = Msgs[i];
-                                builder.Description = msg;
-                                if (Msgs.Length - 1 == i)
-                                    builder.WithCurrentTimestamp();
+                            string msg = Msgs[i];
+                            builder.Description = msg;
+                            if (Msgs.Length - 1 == i)
+                                builder.WithCurrentTimestamp();
 
-                                await logChannel.SendMessageAsync(embed: builder.Build());
-                                if (i == 0)
-                                    builder.Title = null;
-                            }
-                        }
-                        else
-                        {
-                            builder.WithCurrentTimestamp();
                             await logChannel.SendMessageAsync(embed: builder.Build());
+                            if (i == 0)
+                                builder.Title = null;
                         }
                     }
+                    else
+                    {
+                        builder.WithCurrentTimestamp();
+                        await logChannel.SendMessageAsync(embed: builder.Build());
+                    }
                 }
-                else
-                    SaveHandler.LogSave.Remove(Channel.Id);
             }
         }
 
@@ -273,7 +271,8 @@ namespace Marina
             SocketCommandContext Context = new SocketCommandContext(_client, Message);
             int PrefixPos = 0;
 
-            if (string.IsNullOrWhiteSpace(Context.Message.Content) || Context.User.IsBot) return;
+            if (string.IsNullOrWhiteSpace(Context.Message.Content) || Context.User.IsBot)
+                return;
 
             if (Context.Guild != null)
             {
@@ -291,7 +290,7 @@ namespace Marina
             if (!Result.IsSuccess)
                 await Error.SendDiscordError(Context, Result.ErrorReason);
             else
-                await Console.WriteLog($"{Context.User.Id} executed command {Context.Message}");
+                await Console.WriteLog($"{Context.User} ({Context.User.Id}) executed command: {Context.Message}");
         }
 
         private async Task Log(LogMessage log) => await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");

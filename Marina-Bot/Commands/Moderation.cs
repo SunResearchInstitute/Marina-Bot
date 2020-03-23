@@ -38,18 +38,14 @@ namespace Marina.Commands
             if (SaveHandler.LogSave.ContainsKey(user.Guild.Id))
             {
                 SocketTextChannel LogChannel = user.Guild.GetTextChannel(SaveHandler.LogSave[user.Guild.Id]);
-                if (LogChannel != null)
+                EmbedBuilder builder = new EmbedBuilder
                 {
-                    EmbedBuilder builder = new EmbedBuilder
-                    {
-                        Color = Color.Teal,
-                        Title = "**Kicked**",
-                        Description = $"{Context.User.Mention} kicked {user.Mention} | {user}"
-                    };
-                    if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
-                    await LogChannel.SendMessageAsync(embed: builder.Build());
-                }
-                else SaveHandler.LogSave.Remove(user.Guild.Id);
+                    Color = Color.Teal,
+                    Title = "**Kicked**",
+                    Description = $"{Context.User.Mention} kicked {user.Mention} | {user}"
+                };
+                if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
+                await LogChannel.SendMessageAsync(embed: builder.Build());
             }
         }
 

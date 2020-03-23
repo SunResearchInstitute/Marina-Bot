@@ -11,9 +11,21 @@ namespace Marina.Save.Types
     //follow normal dictionary specs
     public class DictionarySaveFile<T, K> : SaveFile<Dictionary<T, K>>, ICollection<KeyValuePair<T, K>>, IEnumerable<KeyValuePair<T, K>>, IEnumerable, IDictionary<T, K>, IReadOnlyCollection<KeyValuePair<T, K>>, IReadOnlyDictionary<T, K>, ICollection, IDictionary, IDeserializationCallback, ISerializable where T : notnull
     {
+        [NonSerialized]
         private object _syncRoot;
+        [NonSerialized]
+        private readonly Action<ulong, Dictionary<T, K>> _cleanupAction;
 
-        public DictionarySaveFile(string name) : base(name) { }
+        public DictionarySaveFile(string name) : base(name)
+        {
+            if (typeof(T) != typeof(ulong))
+                throw new Exception("Default constructor should only be used if T is ulong");
+
+            _cleanupAction = delegate (ulong guild, Dictionary<T, K> dictionary) { (dictionary as Dictionary<ulong, K>).Remove(guild); };
+        }
+        public DictionarySaveFile(string name, Action<ulong, Dictionary<T, K>> cleanUp) : base(name) => _cleanupAction = cleanUp;
+
+        public override void CleanUp(ulong id) => _cleanupAction?.Invoke(id, _data);
 
         public K this[T key] { get => _data[key]; set => _data[key] = value; }
         public object this[object key] { get => _data[(T)key]; set => _data[(T)key] = (K)value; }
