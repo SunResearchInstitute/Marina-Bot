@@ -1,14 +1,13 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Net;
-using Marina.Commands.Animals.Cat;
-using Marina.Utils;
-using Newtonsoft.Json;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.Net;
+using Marina.Utils;
+using Newtonsoft.Json;
 
-namespace Marina.Commands.Animals
+namespace Marina.Commands.Animals.Cat
 {
     public class CatUpload : ModuleBase<SocketCommandContext>
     {
@@ -17,25 +16,28 @@ namespace Marina.Commands.Animals
         public async Task UploadCat()
         {
             using WebClient wc = new WebClient();
-            CatData jsondata;
+            CatData jsonData;
             try
             {
-                jsondata = JsonConvert.DeserializeObject<CatData[]>(wc.DownloadString("https://api.thecatapi.com/v1/images/search?format=json")).First();
+                jsonData = JsonConvert
+                    .DeserializeObject<CatData[]>(
+                        wc.DownloadString("https://api.thecatapi.com/v1/images/search?format=json")).First();
             }
             catch (WebException e)
             {
-                await Error.SendDiscordError(Context, Value: $"{e.Message}", e: e);
+                await Error.SendDiscordError(Context, value: $"{e.Message}", e: e);
                 return;
             }
+
             wc.Dispose();
 
             EmbedBuilder builder = new EmbedBuilder
             {
                 Color = Color.Teal,
-                ImageUrl = jsondata.Url.OriginalString
+                ImageUrl = jsonData.Url.OriginalString
             };
-            if (jsondata.Categories != null && jsondata.Categories.First() != null && jsondata.Categories.First().Name != null)
-                builder.Title = jsondata.Categories.First().Name;
+            if (jsonData.Categories?.First() != null && jsonData.Categories.First().Name != null)
+                builder.Title = jsonData.Categories.First().Name;
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");
             try
@@ -45,7 +47,6 @@ namespace Marina.Commands.Animals
             catch (HttpException)
             {
                 await ReplyAsync("Unable to send DM!");
-                return;
             }
         }
     }

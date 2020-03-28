@@ -9,18 +9,19 @@ namespace Marina.Commands
     public class Suggestion : ModuleBase<SocketCommandContext>
     {
         //IDs to my discord and desired suggestions output
-        const ulong GuildID = 506248420525342769;
-        const ulong ChannelID = 670888046480195585;
+        private const ulong GuildId = 506248420525342769;
+        private const ulong ChannelId = 670888046480195585;
 
         [Command("Suggest")]
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
-        public async Task AddSuggestion([Name("Suggestion")]params string[] suggestion)
+        public async Task AddSuggestion([Name("Suggestion")] params string[] suggestion)
         {
             if (SaveHandler.BlacklistSave.Contains(Context.User.Id))
             {
-                await Error.SendDiscordError(Context, Value: "You are banned from using this command");
+                await Error.SendDiscordError(Context, value: "You are banned from using this command");
                 return;
             }
+
             if (suggestion.Length == 0)
             {
                 await Error.SendDiscordError(Context, "The input text has too few parameters.");
@@ -30,12 +31,12 @@ namespace Marina.Commands
             EmbedBuilder builder = new EmbedBuilder
             {
                 Color = Color.Teal,
-                Title = $"Suggestion",
+                Title = "Suggestion",
                 Description = $"From {Context.User.Mention}:\n{string.Join(" ", suggestion)}"
             };
             builder.WithCurrentTimestamp();
 
-            await Context.Client.GetGuild(GuildID).GetTextChannel(ChannelID).SendMessageAsync(embed: builder.Build());
+            await Context.Client.GetGuild(GuildId).GetTextChannel(ChannelId).SendMessageAsync(embed: builder.Build());
 
             await ReplyAsync("Thanks for the suggestion");
         }

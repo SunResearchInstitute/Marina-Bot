@@ -25,7 +25,7 @@ namespace Marina.Commands
 
         [RequireUserPermission(GuildPermission.KickMembers), RequireBotPermission(GuildPermission.KickMembers)]
         [Command("Kick")]
-        public async Task Kickuser([Name("User")][RequireHierarchy]SocketGuildUser user, [Name("Reason")]params string[] reason)
+        public async Task KickUser([Name("User")][RequireHierarchy]SocketGuildUser user, [Name("Reason")]params string[] reason)
         {
             string joined = reason.Length != 0 ? string.Join(' ', reason) : null;
             string msg = $"You were kicked from {Context.Guild.Name}";
@@ -37,7 +37,7 @@ namespace Marina.Commands
             //Kicks need to be manually logged
             if (SaveHandler.LogSave.ContainsKey(user.Guild.Id))
             {
-                SocketTextChannel LogChannel = user.Guild.GetTextChannel(SaveHandler.LogSave[user.Guild.Id]);
+                SocketTextChannel logChannel = user.Guild.GetTextChannel(SaveHandler.LogSave[user.Guild.Id]);
                 EmbedBuilder builder = new EmbedBuilder
                 {
                     Color = Color.Teal,
@@ -45,7 +45,7 @@ namespace Marina.Commands
                     Description = $"{Context.User.Mention} kicked {user.Mention} | {user}"
                 };
                 if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
-                await LogChannel.SendMessageAsync(embed: builder.Build());
+                await logChannel.SendMessageAsync(embed: builder.Build());
             }
         }
 
@@ -56,7 +56,7 @@ namespace Marina.Commands
         {
             if (count <= 0)
             {
-                await Error.SendDiscordError(Context, Value: "Invalid parameters");
+                await Error.SendDiscordError(Context, value: "Invalid parameters");
                 return;
             }
 
@@ -68,7 +68,10 @@ namespace Marina.Commands
                     await msg.DeleteAsync();
                     rmCnt++;
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
 
             IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt - 1} messages");
@@ -77,7 +80,10 @@ namespace Marina.Commands
             {
                 await resultMsg.DeleteAsync();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
     }
 }

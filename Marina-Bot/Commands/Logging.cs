@@ -11,7 +11,8 @@ namespace Marina.Commands
     {
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("SetLogs"), Summary("Sets the logging channel.")]
-        public async Task SetLogs([Name("Channel")][ManualOptionalParameter("Current Channel")]SocketTextChannel channel = null)
+        public async Task SetLogs([Name("Channel")] [ManualOptionalParameter("Current Channel")]
+            SocketTextChannel channel = null)
         {
             if (SaveHandler.LogSave.ContainsKey(Context.Guild.Id))
                 SaveHandler.LogSave[Context.Guild.Id] = channel.Id;

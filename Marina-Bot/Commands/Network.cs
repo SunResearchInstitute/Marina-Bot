@@ -9,7 +9,7 @@ namespace Marina.Commands
     public class Network : ModuleBase<SocketCommandContext>
     {
         [Command("Ping"), Summary("Pings an IP."), Alias("ddos")]
-        public async Task Ping([Name("IP")]string ip)
+        public async Task Ping([Name("IP")] string ip)
         {
             try
             {
@@ -22,22 +22,18 @@ namespace Marina.Commands
                         Color = Color.Green
                     };
                     builder.WithCurrentTimestamp();
-                    string s;
-                    if (reply.Address.ToString() != ip) s = $"{reply.Address} ({ip})";
-                    else s = $"{reply.Address}";
+                    string s = reply.Address.ToString() != ip ? $"{reply.Address} ({ip})" : $"{reply.Address}";
                     builder.AddField(s, $"RTT: {reply.RoundtripTime}ms");
                     await Context.Channel.SendMessageAsync(embed: builder.Build());
                 }
                 else
                 {
-                    await Error.SendDiscordError(Context, Value: $"Ping failed!\nStatus: {reply.Status}");
-                    return;
+                    await Error.SendDiscordError(Context, value: $"Ping failed!\nStatus: {reply.Status}");
                 }
             }
             catch
             {
-                await Error.SendDiscordError(Context, Value: $"Ping failed!");
-                return;
+                await Error.SendDiscordError(Context, value: "Ping failed!");
             }
         }
     }

@@ -3,12 +3,10 @@
     using Newtonsoft.Json;
     using System;
 
-    public partial class DogData
+    public class DogData
     {
-        [JsonProperty("message")]
-        public Uri ImageUrl { get; set; }
+        [JsonProperty("message")] public Uri ImageUrl { get; set; }
 
-        [JsonProperty("status")]
-        public string Status { get; set; }
+        [JsonProperty("status")] public string Status { get; set; }
     }
 }

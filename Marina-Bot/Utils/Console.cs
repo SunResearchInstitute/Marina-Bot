@@ -6,7 +6,7 @@ namespace Marina.Utils
 {
     public static class Console
     {
-        public static readonly FileInfo LogFile = new FileInfo("Marina.log");
+        private static readonly FileInfo LogFile = new FileInfo("Marina.log");
 
         public static async Task WriteLog(string str)
         {

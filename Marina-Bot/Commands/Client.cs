@@ -45,10 +45,14 @@ namespace Marina.Commands
             {
                 try
                 {
-                    await (guild.Owner as SocketUser).SendMessageAsync(string.Join(" ", announcement));
+                    await guild.Owner.SendMessageAsync(string.Join(" ", announcement));
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
+
             await ReplyAsync("Announcement sent to all Guild Owners! :ok_hand:");
         }
 
@@ -59,7 +63,7 @@ namespace Marina.Commands
             await ReplyAsync("Shutting down!");
             await Context.Client.LogoutAsync();
             SaveHandler.SaveAll();
-            await Utils.Console.WriteLog("***********************Shutdown via Commmand!***********************");
+            await Utils.Console.WriteLog("***********************Shutdown via Command!***********************");
             Environment.Exit(0);
         }
 
@@ -72,7 +76,11 @@ namespace Marina.Commands
             {
                 await Context.Message.DeleteAsync();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
+
             await ReplyAsync(string.Join(' ', str));
         }
 
@@ -86,13 +94,17 @@ namespace Marina.Commands
             {
                 await Context.Message.DeleteAsync();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
+
             await channel.SendMessageAsync(string.Join(' ', str));
         }
 
         [Command("Servers")]
         [RequireOwner]
-        public async Task Getservers()
+        public async Task GetServers()
         {
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithTitle("Server List");
@@ -109,17 +121,18 @@ namespace Marina.Commands
                     {
                         builder.Description += $"{guild.Name}\n";
                     }
+
                     builder.Description += "```";
                     break;
             }
 
             if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
             {
-                string[] Msgs = Misc.ConvertToDiscordSendable(builder.Description, EmbedBuilder.MaxDescriptionLength);
-                for (int i = 0; i < Msgs.Length; i++)
+                string[] msgs = Misc.ConvertToDiscordSendable(builder.Description);
+                for (int i = 0; i < msgs.Length; i++)
                 {
-                    builder.Description = Msgs[i];
-                    if (Msgs.Length - 1 == i)
+                    builder.Description = msgs[i];
+                    if (msgs.Length - 1 == i)
                         builder.WithCurrentTimestamp();
 
                     await ReplyAsync(embed: builder.Build());
@@ -144,19 +157,23 @@ namespace Marina.Commands
 
         [Command("Version"), Alias("Commit")]
         [Summary("Revision Number")]
-        public async Task GetVersion() => await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
+        public async Task GetVersion() =>
+            await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
 
         [Command("Source")]
         [Summary("Source code!")]
-        public async Task GetSource() => await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
+        public async Task GetSource() =>
+            await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
 
         [Command("Invite")]
         [Summary("Invite link!")]
-        public async Task GetInvite() => await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
+        public async Task GetInvite() =>
+            await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
 
         [Command("Vote")]
         [Summary("Top.gg vote link!")]
-        public async Task GetVote() => await ReplyAsync("you can vote for Marina-bot on top.gg: https://top.gg/bot/580901187931603004");
+        public async Task GetVote() =>
+            await ReplyAsync("you can vote for Marina-bot on top.gg: https://top.gg/bot/580901187931603004");
 
         [Command("SetMode")]
         [RequireOwner]

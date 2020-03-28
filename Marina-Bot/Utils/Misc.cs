@@ -1,5 +1,3 @@
-using Discord;
-using Discord.Commands;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +15,7 @@ namespace Marina.Utils
                 int length = Math.Min(s.Length - i, size);
                 readable.Add(s.Substring(i, length));
             }
+
             return readable.ToArray();
         }
 
@@ -35,18 +34,20 @@ namespace Marina.Utils
                 foreach (string line in File.ReadAllLines(configFile.FullName))
                 {
                     //Even though we do not verify any Config items we should be fine
-                    string[] configitems = line.Split('=');
-                    config.Add(configitems[0].ToLower(), configitems[1]);
+                    string[] configItems = line.Split('=');
+                    config.Add(configItems[0].ToLower(), configItems[1]);
                 }
+
                 return config;
             }
             else
             {
-                File.WriteAllLines(configFile.FullName, new string[]
+                File.WriteAllLines(configFile.FullName, new[]
                 {
                     "Token={token}"
                 });
-                Error.SendApplicationError($"Config does not exist, it has been created for you at {configFile.FullName}!", 1);
+                Error.SendApplicationError(
+                    $"Config does not exist, it has been created for you at {configFile.FullName}!", 1);
                 return null;
             }
         }

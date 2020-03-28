@@ -8,7 +8,8 @@ namespace Marina.Utils
     //Taken from: https://docs.stillu.cc/api/Discord.Commands.ParameterPreconditionAttribute.html
     public class RequireHierarchyAttribute : ParameterPreconditionAttribute
     {
-        public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, ParameterInfo parameter, object value, IServiceProvider services)
+        public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context,
+            ParameterInfo parameter, object value, IServiceProvider services)
         {
             // Hierarchy is only available under the socket variant of the user.
             if (!(context.User is SocketGuildUser guildUser))
@@ -26,13 +27,14 @@ namespace Marina.Utils
                 return PreconditionResult.FromError("Target user not found.");
 
             if (guildUser.Hierarchy <= targetUser.Hierarchy)
-                return PreconditionResult.FromError("You cannot target anyone else whose roles are higher or the same as yours.");
+                return PreconditionResult.FromError(
+                    "You cannot target anyone else whose roles are higher or the same as yours.");
 
-            SocketGuildUser currentUser = await context.Guild.GetCurrentUserAsync().ConfigureAwait(false) as SocketGuildUser;
-            if (currentUser?.Hierarchy <= targetUser.Hierarchy)
-                return PreconditionResult.FromError("The bot's role is lower than the targeted user.");
-
-            return PreconditionResult.FromSuccess();
+            SocketGuildUser currentUser =
+                await context.Guild.GetCurrentUserAsync().ConfigureAwait(false) as SocketGuildUser;
+            return currentUser?.Hierarchy <= targetUser.Hierarchy
+                ? PreconditionResult.FromError("The bot's role is lower than the targeted user.")
+                : PreconditionResult.FromSuccess();
         }
     }
 }

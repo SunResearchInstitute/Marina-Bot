@@ -13,10 +13,9 @@ namespace Marina.Commands
 {
     public class Github : ModuleBase<SocketCommandContext>
     {
-        public class Options
+        private class Options
         {
-            [Option('t', "tag", Required = false)]
-            public string Tag { get; set; }
+            [Option('t', "tag", Required = false)] public string Tag { get; set; }
 
             [Option('l', "tags", Required = false, Default = false)]
             public bool ListTags { get; set; }
@@ -27,19 +26,18 @@ namespace Marina.Commands
             [Option('p', "prerelease", Required = false, Default = false)]
             public bool AllowPrerelease { get; set; }
 
-            [Value(0, Required = true)]
-            public string User { get; set; }
+            [Value(0, Required = true)] public string User { get; set; }
 
-            [Value(1, Required = true)]
-            public string RepositoryName { get; set; }
+            [Value(1, Required = true)] public string RepositoryName { get; set; }
 
             [Option('d', "description", Required = false, Default = false)]
             public bool GetDescription { get; set; }
         }
 
         [Command("GitRelease")]
-        [Summary("Gets a release from the specificed Github repository.\nUser and Repository must be included anywhere in the command in that order.\nAvaliable options:\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--tags, -l=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
-        public Task GetRelease([Name("Arugments")]params string[] arguments)
+        [Summary(
+            "Gets a release from the specified Github repository.\nUser and Repository must be included anywhere in the command in that order.\nAvaliable options:\n--tag, -t=string (default: null)\n--description, -d=bool (default: false)\n--prerelease, -p=bool (default: false)\n--tags, -l=bool (default: false)\n--maxtagdisplaylength, -n=int (defualt: 12)")]
+        public Task GetRelease([Name("Arguments")] params string[] arguments)
         {
             GitHubClient client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
 
@@ -53,8 +51,8 @@ namespace Marina.Commands
                 config.AutoHelp = false;
             });
             parser.ParseArguments<Options>(arguments)
-            .WithParsed(async o => await GetReleaseTask(client, o))
-            .WithNotParsed(async e => await Error.SendDiscordError(Context, Value: "Invalid arguments"));
+                .WithParsed(async o => await GetReleaseTask(client, o))
+                .WithNotParsed(async e => await Error.SendDiscordError(Context, value: "Invalid arguments"));
             parser.Dispose();
             return Task.CompletedTask;
         }
@@ -62,24 +60,22 @@ namespace Marina.Commands
         private async Task GetReleaseTask(GitHubClient client, Options options)
         {
             IReadOnlyList<Release> releases;
-            Repository repo;
             try
             {
-                repo = await client.Repository.Get(options.User, options.RepositoryName);
                 releases = await client.Repository.Release.GetAll(options.User, options.RepositoryName);
             }
             catch (ApiException e)
             {
                 if (e.StatusCode == HttpStatusCode.NotFound)
-                    await Error.SendDiscordError(Context, Value: "Repository does not exist.");
+                    await Error.SendDiscordError(Context, value: "Repository does not exist.");
                 else
-                    await Error.SendDiscordError(Context, Value: "Command failed: error reported!", e: e);
+                    await Error.SendDiscordError(Context, value: "Command failed: error reported!", e: e);
                 return;
             }
 
             if (releases.Count == 0)
             {
-                await Error.SendDiscordError(Context, Value: "No Releases have been made!");
+                await Error.SendDiscordError(Context, value: "No Releases have been made!");
                 return;
             }
 
@@ -93,12 +89,11 @@ namespace Marina.Commands
                 for (int i = 0; i < releases.Count; i++)
                 {
                     embed.Description += $"{releases[i].TagName}\n";
-                    if (i == options.Length - 1)
-                    {
-                        embed.Description += $"{releases.Count - options.Length} more...";
-                        break;
-                    }
+                    if (i != options.Length - 1) continue;
+
+                    embed.Description += $"{releases.Count - options.Length} more...";
                 }
+
                 await ReplyAsync(embed: embed.Build());
                 return;
             }
@@ -112,7 +107,7 @@ namespace Marina.Commands
                 }
                 catch
                 {
-                    await Error.SendDiscordError(Context, Value: "A release with that tag was not found!");
+                    await Error.SendDiscordError(Context, value: "A release with that tag was not found!");
                     return;
                 }
             }
@@ -126,7 +121,7 @@ namespace Marina.Commands
                     }
                     catch
                     {
-                        await Error.SendDiscordError(Context, Value: "All releases are Pre-releases!");
+                        await Error.SendDiscordError(Context, value: "All releases are Pre-releases!");
                         return;
                     }
                 }
@@ -144,7 +139,7 @@ namespace Marina.Commands
             {
                 if (tag.Body.Length > EmbedBuilder.MaxDescriptionLength)
                 {
-                    string[] msgs = Misc.ConvertToDiscordSendable(tag.Body, EmbedBuilder.MaxDescriptionLength);
+                    string[] msgs = Misc.ConvertToDiscordSendable(tag.Body);
                     for (int i = 0; i < msgs.Length; i++)
                     {
                         string msg = msgs[i];
@@ -158,6 +153,7 @@ namespace Marina.Commands
                                 builder.AddField(asset.Name, $"[Download]({asset.BrowserDownloadUrl})");
                             }
                         }
+
                         await ReplyAsync(embed: builder.Build());
                         if (i == 0)
                         {
@@ -165,8 +161,10 @@ namespace Marina.Commands
                             builder.Url = null;
                         }
                     }
+
                     return;
                 }
+
                 builder.Description = tag.Body;
             }
 
@@ -174,7 +172,6 @@ namespace Marina.Commands
                 builder.AddField(asset.Name, $"[Download]({asset.BrowserDownloadUrl})");
 
             await ReplyAsync(embed: builder.Build());
-            return;
         }
     }
 }

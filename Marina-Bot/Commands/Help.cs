@@ -7,35 +7,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+// ReSharper disable UseDeconstruction
+
+// ReSharper disable RedundantAssignment
+
 namespace Marina.Commands
 {
     public class Help : ModuleBase<SocketCommandContext>
     {
-        private static readonly SortedDictionary<string, string> _commands = new SortedDictionary<string, string>();
+        private static readonly SortedDictionary<string, string> Commands = new SortedDictionary<string, string>();
 
         public static void Populate()
         {
             foreach (CommandInfo cmd in Program.Commands.Commands)
             {
-                if (cmd.Attributes.Any(a => a is HideCommandAttribute) || cmd.Preconditions.Any(p => p is RequireOwnerAttribute))
+                if (cmd.Attributes.Any(a => a is HideCommandAttribute) ||
+                    cmd.Preconditions.Any(p => p is RequireOwnerAttribute))
                     continue;
 
                 string str = "";
-                bool HasNoArgs = cmd.Parameters.Count == 0;
+                bool hasNoArgs = cmd.Parameters.Count == 0;
                 if (string.IsNullOrWhiteSpace(cmd.Summary))
                 {
-                    if (HasNoArgs)
+                    if (hasNoArgs)
                     {
-                        _commands.Add(cmd.Name, "No info available!");
+                        Commands.Add(cmd.Name, "No info available!");
                         continue;
                     }
                     else str = "args: ";
                 }
                 else
                 {
-                    if (HasNoArgs)
+                    if (hasNoArgs)
                     {
-                        _commands.Add(cmd.Name, cmd.Summary);
+                        Commands.Add(cmd.Name, cmd.Summary);
                         continue;
                     }
                     else str = $"{cmd.Summary}\nargs: ";
@@ -43,7 +48,9 @@ namespace Marina.Commands
 
                 foreach (ParameterInfo param in cmd.Parameters)
                 {
-                    ManualOptionalParameterAttribute attribute = (ManualOptionalParameterAttribute)param.Attributes.SingleOrDefault(x => x is ManualOptionalParameterAttribute);
+                    ManualOptionalParameterAttribute attribute =
+                        (ManualOptionalParameterAttribute) param.Attributes.SingleOrDefault(x =>
+                            x is ManualOptionalParameterAttribute);
                     if (attribute != null)
                     {
                         str += $"[{param.Name} = {attribute.ManualDefaultValue}]";
@@ -55,12 +62,13 @@ namespace Marina.Commands
                     else
                         str += $"<{param.Name}> ";
                 }
-                _commands.Add(cmd.Name, str);
+
+                Commands.Add(cmd.Name, str);
             }
         }
 
         [Command("Help")]
-        public async Task GetHelp([Name("Command")]string command = null)
+        public async Task GetHelp([Name("Command")] string command = null)
         {
             EmbedBuilder builder = new EmbedBuilder
             {
@@ -70,33 +78,34 @@ namespace Marina.Commands
 
             if (command == null)
             {
-                foreach (KeyValuePair<string, string> cmd in _commands)
+                foreach (KeyValuePair<string, string> cmd in Commands)
                 {
                     builder.AddField(cmd.Key, cmd.Value);
                     //future proofing
-                    if (builder.Fields.Count == EmbedBuilder.MaxFieldCount)
+                    if (builder.Fields.Count != EmbedBuilder.MaxFieldCount) continue;
+                    if (builder.Fields.Count == Commands.Count)
                     {
-                        if (builder.Fields.Count == _commands.Count)
+                        builder.WithCurrentTimestamp();
+                        builder.WithFooter("All commands start with 'm.' unless in DMs.");
+                        try
                         {
-                            builder.WithCurrentTimestamp();
-                            builder.WithFooter("All commands start with 'm.' unless in DMs.");
-                            try
-                            {
-                                await Context.User.SendMessageAsync(embed: builder.Build());
-                            }
-                            catch (HttpException)
-                            {
-                                await ReplyAsync("Unable to send DM!");
-                                return;
-                            }
+                            await Context.User.SendMessageAsync(embed: builder.Build());
+                        }
+                        catch (HttpException)
+                        {
+                            await ReplyAsync("Unable to send DM!");
                             return;
                         }
-                        await Context.User.SendMessageAsync(embed: builder.Build());
-                        //clear fields
-                        builder.Fields = new List<EmbedFieldBuilder>();
-                        builder.Title = null;
+
+                        return;
                     }
+
+                    await Context.User.SendMessageAsync(embed: builder.Build());
+                    //clear fields
+                    builder.Fields = new List<EmbedFieldBuilder>();
+                    builder.Title = null;
                 }
+
                 builder.WithCurrentTimestamp();
                 builder.WithFooter("All commands start with 'm.' unless in DMs.");
                 try
@@ -106,7 +115,6 @@ namespace Marina.Commands
                 catch (HttpException)
                 {
                     await ReplyAsync("Unable to send DM!");
-                    return;
                 }
             }
             else
@@ -114,13 +122,14 @@ namespace Marina.Commands
                 KeyValuePair<string, string> cmd;
                 try
                 {
-                    cmd = _commands.First(c => c.Key.Contains(command, StringComparison.OrdinalIgnoreCase));
+                    cmd = Commands.First(c => c.Key.Contains(command, StringComparison.OrdinalIgnoreCase));
                 }
                 catch (InvalidOperationException)
                 {
-                    await Error.SendDiscordError(Context, Value: "Command does not exist!");
+                    await Error.SendDiscordError(Context, value: "Command does not exist!");
                     return;
                 }
+
                 builder.AddField(cmd.Key, cmd.Value);
                 await ReplyAsync(embed: builder.Build());
             }

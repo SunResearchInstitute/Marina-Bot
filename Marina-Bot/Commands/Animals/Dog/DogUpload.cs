@@ -24,13 +24,13 @@ namespace Marina.Commands.Animals.Dog
             }
             catch (WebException e)
             {
-                await Error.SendDiscordError(Context, Value: $"{e.Message}", e: e);
+                await Error.SendDiscordError(Context, value: $"{e.Message}", e: e);
                 return;
             }
             wc.Dispose();
             if (jsonData.Status != "success")
             {
-                await Error.SendDiscordError(Context, Value: "API Failed!", e: new Exception("Dog API Failed!"));
+                await Error.SendDiscordError(Context, value: "API Failed!", e: new Exception("Dog API Failed!"));
             }
             EmbedBuilder builder = new EmbedBuilder
             {
@@ -46,7 +46,6 @@ namespace Marina.Commands.Animals.Dog
             catch (HttpException)
             {
                 await ReplyAsync("Unable to send DM!");
-                return;
             }
         }
     }

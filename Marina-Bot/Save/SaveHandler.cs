@@ -8,7 +8,7 @@ namespace Marina.Save
 {
     public class SaveHandler
     {
-        public static Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>()
+        public static readonly Dictionary<string, SaveFile> Saves = new Dictionary<string, SaveFile>()
         {
             {"Logs", new DictionarySaveFile<ulong, ulong>("Logs")},
             {"BlackList", new ListSaveFile<ulong>("BlackList")}
@@ -19,22 +19,22 @@ namespace Marina.Save
         public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
 
         //30 min. timer
-        private static readonly Timer _timer = new Timer(1.8e+6)
+        private static readonly Timer Timer = new Timer(1.8e+6)
         {
             AutoReset = true,
             Enabled = true
         };
 
-        static SaveHandler() => _timer.Elapsed += Timer_Elapsed;
+        static SaveHandler() => Timer.Elapsed += Timer_Elapsed;
 
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e) => SaveAll(false);
 
         public static void SaveAll(bool restartTimer = true)
         {
             if (restartTimer)
-                _timer.Reset();
+                Timer.Reset();
 
-            foreach (ISaveFile save in Saves.Values)
+            foreach (SaveFile save in Saves.Values)
                 save.Write();
         }
     }
