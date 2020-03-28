@@ -86,7 +86,7 @@ namespace Marina
         private static Task Client_LeftGuild(SocketGuild guild)
         {
             //Removes guild Marina is no longer in
-            foreach (SaveFile save in SaveHandler.Saves.Values) save.CleanUp(guild.Id);
+            foreach (ISaveFile save in SaveHandler.Saves.Values) save.CleanUp(guild.Id);
             return Task.CompletedTask;
         }
 
@@ -164,9 +164,9 @@ namespace Marina
                     if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                     {
                         string[] msgs = Misc.ConvertToDiscordSendable(builder.Description);
-                        for (var i = 0; i < msgs.Length; i++)
+                        for (int i = 0; i < msgs.Length; i++)
                         {
-                            var msg = msgs[i];
+                            string msg = msgs[i];
                             builder.Description = msg;
                             if (msgs.Length - 1 == i)
                                 builder.WithCurrentTimestamp();
@@ -207,9 +207,9 @@ namespace Marina
                     if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
                     {
                         string[] msgs = Misc.ConvertToDiscordSendable(builder.Description);
-                        for (var i = 0; i < msgs.Length; i++)
+                        for (int i = 0; i < msgs.Length; i++)
                         {
-                            var msg = msgs[i];
+                            string msg = msgs[i];
                             builder.Description = msg;
                             if (msgs.Length - 1 == i)
                                 builder.WithCurrentTimestamp();
@@ -278,7 +278,7 @@ namespace Marina
                 return;
 
             SocketCommandContext context = new SocketCommandContext(_client, message);
-            var prefixPos = 0;
+            int prefixPos = 0;
 
             if (string.IsNullOrWhiteSpace(context.Message.Content) || context.User.IsBot)
                 return;

@@ -8,7 +8,7 @@ namespace Marina.Save
 {
     public class SaveHandler
     {
-        public static readonly Dictionary<string, SaveFile> Saves = new Dictionary<string, SaveFile>()
+        public static readonly Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>()
         {
             {"Logs", new DictionarySaveFile<ulong, ulong>("Logs")},
             {"BlackList", new ListSaveFile<ulong>("BlackList")}
@@ -34,7 +34,7 @@ namespace Marina.Save
             if (restartTimer)
                 Timer.Reset();
 
-            foreach (SaveFile save in Saves.Values)
+            foreach (ISaveFile save in Saves.Values)
                 save.Write();
         }
     }
