@@ -1,11 +1,11 @@
-using Discord;
-using Discord.Commands;
-using Discord.Net;
-using Marina.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.Net;
+using Marina.Utils;
 
 // ReSharper disable UseDeconstruction
 
@@ -17,54 +17,55 @@ namespace Marina.Commands
     {
         private static readonly SortedDictionary<string, string> Commands = new SortedDictionary<string, string>();
 
-        public static void Populate()
+        static Help()
         {
-            foreach (CommandInfo cmd in Program.Commands.Commands)
+            Program.Initialize += delegate
             {
-                if (cmd.Attributes.Any(a => a is HideCommandAttribute) ||
-                    cmd.Preconditions.Any(p => p is RequireOwnerAttribute))
-                    continue;
-
-                string str = "";
-                bool hasNoArgs = cmd.Parameters.Count == 0;
-                if (string.IsNullOrWhiteSpace(cmd.Summary))
+                foreach (CommandInfo cmd in Program.Commands.Commands)
                 {
-                    if (hasNoArgs)
-                    {
-                        Commands.Add(cmd.Name, "No info available!");
+                    if (cmd.Attributes.Any(a => a is HideCommandAttribute) ||
+                        cmd.Preconditions.Any(p => p is RequireOwnerAttribute))
                         continue;
-                    }
-                    else str = "args: ";
-                }
-                else
-                {
-                    if (hasNoArgs)
-                    {
-                        Commands.Add(cmd.Name, cmd.Summary);
-                        continue;
-                    }
-                    else str = $"{cmd.Summary}\nargs: ";
-                }
 
-                foreach (ParameterInfo param in cmd.Parameters)
-                {
-                    ManualOptionalParameterAttribute attribute =
-                        (ManualOptionalParameterAttribute) param.Attributes.SingleOrDefault(x =>
-                            x is ManualOptionalParameterAttribute);
-                    if (attribute != null)
+                    string str = "";
+                    bool hasNoArgs = cmd.Parameters.Count == 0;
+                    if (string.IsNullOrWhiteSpace(cmd.Summary))
                     {
-                        str += $"[{param.Name} = {attribute.ManualDefaultValue}]";
-                    }
-                    else if (param.DefaultValue != null)
-                    {
-                        str += $"[{param.Name} = {param.DefaultValue}]";
+                        if (hasNoArgs)
+                        {
+                            Commands.Add(cmd.Name, "No info available!");
+                            continue;
+                        }
+
+                        str = "args: ";
                     }
                     else
-                        str += $"<{param.Name}> ";
-                }
+                    {
+                        if (hasNoArgs)
+                        {
+                            Commands.Add(cmd.Name, cmd.Summary);
+                            continue;
+                        }
 
-                Commands.Add(cmd.Name, str);
-            }
+                        str = $"{cmd.Summary}\nargs: ";
+                    }
+
+                    foreach (ParameterInfo param in cmd.Parameters)
+                    {
+                        ManualOptionalParameterAttribute attribute =
+                            (ManualOptionalParameterAttribute) param.Attributes.SingleOrDefault(x =>
+                                x is ManualOptionalParameterAttribute);
+                        if (attribute != null)
+                            str += $"[{param.Name} = {attribute.ManualDefaultValue}]";
+                        else if (param.DefaultValue != null)
+                            str += $"[{param.Name} = {param.DefaultValue}]";
+                        else
+                            str += $"<{param.Name}> ";
+                    }
+
+                    Commands.Add(cmd.Name, str);
+                }
+            };
         }
 
         [Command("Help")]

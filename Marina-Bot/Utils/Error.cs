@@ -1,11 +1,11 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 
 namespace Marina.Utils
 {
-    public class Error
+    public static class Error
     {
         public static async Task SendDiscordError(SocketCommandContext context, string key = "An error has occured.",
             string value = "View the help menu for help.", Exception e = null)

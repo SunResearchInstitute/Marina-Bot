@@ -1,8 +1,8 @@
-﻿namespace Marina.Commands.Animals.Cat
-{
-    using Newtonsoft.Json;
-    using System;
+﻿using System;
+using Newtonsoft.Json;
 
+namespace Marina.Commands.Animals.Cat
+{
     public class CatData
     {
         [JsonProperty("categories", NullValueHandling = NullValueHandling.Ignore)]

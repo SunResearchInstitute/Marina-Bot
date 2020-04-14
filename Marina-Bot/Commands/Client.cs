@@ -1,13 +1,14 @@
+using System;
+using System.Diagnostics;
+using System.Text;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
-using System;
-using System.Diagnostics;
-using System.Text;
-using System.Threading.Tasks;
+using Console = Marina.Utils.Console;
 
 namespace Marina.Commands
 {
@@ -23,7 +24,9 @@ namespace Marina.Commands
                 await ReplyAsync("User added to blacklist!");
             }
             else
+            {
                 await ReplyAsync("User already in blacklist!");
+            }
         }
 
         [Command("UnbanUser")]
@@ -42,7 +45,6 @@ namespace Marina.Commands
         public async Task Announce(params string[] announcement)
         {
             foreach (SocketGuild guild in Context.Client.Guilds)
-            {
                 try
                 {
                     await guild.Owner.SendMessageAsync(string.Join(" ", announcement));
@@ -51,19 +53,19 @@ namespace Marina.Commands
                 {
                     // ignored
                 }
-            }
 
             await ReplyAsync("Announcement sent to all Guild Owners! :ok_hand:");
         }
 
-        [Command("Shutdown"), Alias("Quit", "Shutoff", "Stop")]
+        [Command("Shutdown")]
+        [Alias("Quit", "Shutoff", "Stop")]
         [RequireOwner]
         public async Task Shutdown()
         {
             await ReplyAsync("Shutting down!");
             await Context.Client.LogoutAsync();
             SaveHandler.SaveAll();
-            await Utils.Console.WriteLog("***********************Shutdown via Command!***********************");
+            await Console.WriteLog("***********************Shutdown via Command!***********************");
             Environment.Exit(0);
         }
 
@@ -118,9 +120,7 @@ namespace Marina.Commands
                 default:
                     builder.Description += $"```{Context.Client.Guilds.Count} total servers:\n";
                     foreach (SocketGuild guild in Context.Client.Guilds)
-                    {
                         builder.Description += $"{guild.Name}\n";
-                    }
 
                     builder.Description += "```";
                     break;
@@ -155,7 +155,8 @@ namespace Marina.Commands
             await ReplyAsync("Saved all data!");
         }
 
-        [Command("Version"), Alias("Commit")]
+        [Command("Version")]
+        [Alias("Commit")]
         [Summary("Revision Number")]
         public async Task GetVersion() =>
             await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");

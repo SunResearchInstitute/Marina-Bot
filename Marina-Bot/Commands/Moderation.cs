@@ -1,18 +1,20 @@
-﻿using Discord;
+﻿using System;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Marina.Save;
 using Marina.Utils;
-using System;
-using System.Threading.Tasks;
 
 namespace Marina.Commands
 {
     public class Moderation : ModuleBase<SocketCommandContext>
     {
-        [RequireUserPermission(GuildPermission.BanMembers), RequireBotPermission(GuildPermission.BanMembers)]
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        [RequireBotPermission(GuildPermission.BanMembers)]
         [Command("Ban")]
-        public async Task BanUser([Name("User")][RequireHierarchy]SocketGuildUser user, [Name("Reason")]params string[] reason)
+        public async Task BanUser([Name("User")] [RequireHierarchy] SocketGuildUser user,
+            [Name("Reason")] params string[] reason)
         {
             string reasonJoined = reason.Length != 0 ? string.Join(' ', reason) : null;
             string msg = $"You were banned from {Context.Guild.Name}";
@@ -23,9 +25,11 @@ namespace Marina.Commands
             //Bans will automatically logged
         }
 
-        [RequireUserPermission(GuildPermission.KickMembers), RequireBotPermission(GuildPermission.KickMembers)]
+        [RequireUserPermission(GuildPermission.KickMembers)]
+        [RequireBotPermission(GuildPermission.KickMembers)]
         [Command("Kick")]
-        public async Task KickUser([Name("User")][RequireHierarchy]SocketGuildUser user, [Name("Reason")]params string[] reason)
+        public async Task KickUser([Name("User")] [RequireHierarchy] SocketGuildUser user,
+            [Name("Reason")] params string[] reason)
         {
             string joined = reason.Length != 0 ? string.Join(' ', reason) : null;
             string msg = $"You were kicked from {Context.Guild.Name}";
@@ -52,7 +56,7 @@ namespace Marina.Commands
         [Command("Purge")]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         [RequireUserPermission(ChannelPermission.ManageMessages)]
-        public async Task Purge([Name("Count")]int count = 50)
+        public async Task Purge([Name("Count")] int count = 50)
         {
             if (count <= 0)
             {
@@ -62,7 +66,6 @@ namespace Marina.Commands
 
             int rmCnt = 0;
             foreach (IMessage msg in await Context.Channel.GetMessagesAsync(count).FlattenAsync())
-            {
                 try
                 {
                     await msg.DeleteAsync();
@@ -72,7 +75,6 @@ namespace Marina.Commands
                 {
                     // ignored
                 }
-            }
 
             IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt - 1} messages");
             await Task.Delay(TimeSpan.FromSeconds(3));

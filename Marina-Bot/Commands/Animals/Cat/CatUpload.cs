@@ -36,7 +36,7 @@ namespace Marina.Commands.Animals.Cat
                 Color = Color.Teal,
                 ImageUrl = jsonData.Url.OriginalString
             };
-            if (jsonData.Categories?.First() != null && jsonData.Categories.First().Name != null)
+            if (jsonData.Categories?.First() != null)
                 builder.Title = jsonData.Categories.First().Name;
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");

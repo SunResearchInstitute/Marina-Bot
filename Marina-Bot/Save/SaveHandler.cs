@@ -1,22 +1,18 @@
-﻿using LibSave;
+﻿using System.Collections.Generic;
+using System.Timers;
+using LibSave;
 using LibSave.Types;
 using Marina.Utils;
-using System.Collections.Generic;
-using System.Timers;
 
 namespace Marina.Save
 {
     public class SaveHandler
     {
-        public static readonly Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>()
+        public static readonly Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>
         {
             {"Logs", new DictionarySaveFile<ulong, ulong>("Logs")},
             {"BlackList", new ListSaveFile<ulong>("BlackList")}
         };
-
-        //Easy Accessors 
-        public static DictionarySaveFile<ulong, ulong> LogSave => Saves["Logs"] as DictionarySaveFile<ulong, ulong>;
-        public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
 
         //30 min. timer
         private static readonly Timer Timer = new Timer(1.8e+6)
@@ -25,9 +21,14 @@ namespace Marina.Save
             Enabled = true
         };
 
-        static SaveHandler() => Timer.Elapsed += Timer_Elapsed;
+        static SaveHandler()
+        {
+            Timer.Elapsed += delegate { SaveAll(false); };
+        }
 
-        private static void Timer_Elapsed(object sender, ElapsedEventArgs e) => SaveAll(false);
+        //Easy Accessors 
+        public static DictionarySaveFile<ulong, ulong> LogSave => Saves["Logs"] as DictionarySaveFile<ulong, ulong>;
+        public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
 
         public static void SaveAll(bool restartTimer = true)
         {

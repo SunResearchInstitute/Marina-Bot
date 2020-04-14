@@ -1,7 +1,7 @@
-﻿using Discord.Commands;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Marina.Utils
 {
@@ -18,7 +18,7 @@ namespace Marina.Utils
             {
                 SocketGuildUser targetGuildUser => targetGuildUser,
                 ulong userId => await context.Guild.GetUserAsync(userId).ConfigureAwait(false) as SocketGuildUser,
-                _ => throw new ArgumentOutOfRangeException(),
+                _ => throw new ArgumentOutOfRangeException()
             };
             if (guildUser == targetUser)
                 return PreconditionResult.FromError("Target cannot be yourself!");
@@ -30,7 +30,7 @@ namespace Marina.Utils
                 return PreconditionResult.FromError(
                     "You cannot target anyone else whose roles are higher or the same as yours.");
 
-            SocketGuildUser currentUser =
+            SocketGuildUser? currentUser =
                 await context.Guild.GetCurrentUserAsync().ConfigureAwait(false) as SocketGuildUser;
             return currentUser?.Hierarchy <= targetUser.Hierarchy
                 ? PreconditionResult.FromError("The bot's role is lower than the targeted user.")

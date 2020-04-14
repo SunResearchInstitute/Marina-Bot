@@ -1,8 +1,8 @@
-﻿namespace Marina.Commands.Animals.Dog
-{
-    using Newtonsoft.Json;
-    using System;
+﻿using System;
+using Newtonsoft.Json;
 
+namespace Marina.Commands.Animals.Dog
+{
     public class DogData
     {
         [JsonProperty("message")] public Uri ImageUrl { get; set; }

@@ -1,14 +1,16 @@
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Marina.Utils;
-using System.Net.NetworkInformation;
-using System.Threading.Tasks;
 
 namespace Marina.Commands
 {
     public class Network : ModuleBase<SocketCommandContext>
     {
-        [Command("Ping"), Summary("Pings an IP."), Alias("ddos")]
+        [Command("Ping")]
+        [Summary("Pings an IP.")]
+        [Alias("ddos")]
         public async Task Ping([Name("IP")] string ip)
         {
             try

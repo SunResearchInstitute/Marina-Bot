@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Timers;
 
 namespace Marina.Utils
@@ -30,26 +31,17 @@ namespace Marina.Utils
             FileInfo configFile = new FileInfo("Config.txt");
             if (configFile.Exists)
             {
-                Dictionary<string, string> config = new Dictionary<string, string>();
-                foreach (string line in File.ReadAllLines(configFile.FullName))
-                {
-                    //Even though we do not verify any Config items we should be fine
-                    string[] configItems = line.Split('=');
-                    config.Add(configItems[0].ToLower(), configItems[1]);
-                }
+                return File.ReadAllLines(configFile.FullName).Select(line => line.Split('='))
+                    .ToDictionary(configItems => configItems[0].ToLower(), configItems => configItems[1]);
+            }
 
-                return config;
-            }
-            else
+            File.WriteAllLines(configFile.FullName, new[]
             {
-                File.WriteAllLines(configFile.FullName, new[]
-                {
-                    "Token={token}"
-                });
-                Error.SendApplicationError(
-                    $"Config does not exist, it has been created for you at {configFile.FullName}!", 1);
-                return null;
-            }
+                "Token={token}"
+            });
+            Error.SendApplicationError(
+                $"Config does not exist, it has been created for you at {configFile.FullName}!", 1);
+            return null;
         }
     }
 }
