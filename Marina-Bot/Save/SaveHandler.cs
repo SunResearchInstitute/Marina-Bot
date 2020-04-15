@@ -6,12 +6,13 @@ using Marina.Utils;
 
 namespace Marina.Save
 {
-    public class SaveHandler
+    public static class SaveHandler
     {
         public static readonly Dictionary<string, ISaveFile> Saves = new Dictionary<string, ISaveFile>
         {
             {"Logs", new DictionarySaveFile<ulong, ulong>("Logs")},
-            {"BlackList", new ListSaveFile<ulong>("BlackList")}
+            {"BlackList", new ListSaveFile<ulong>("BlackList")},
+            {"Lockdowns", new DictionarySaveFile<ulong, List<ulong>>("Lockdowns")}
         };
 
         //30 min. timer
@@ -29,6 +30,9 @@ namespace Marina.Save
         //Easy Accessors 
         public static DictionarySaveFile<ulong, ulong> LogSave => Saves["Logs"] as DictionarySaveFile<ulong, ulong>;
         public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
+
+        public static DictionarySaveFile<ulong, List<ulong>> LockdownSave =>
+            Saves["Lockdowns"] as DictionarySaveFile<ulong, List<ulong>>;
 
         public static void SaveAll(bool restartTimer = true)
         {

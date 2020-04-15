@@ -1,10 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Marina.Save;
 using Marina.Utils;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+// ReSharper disable PossibleInvalidOperationException
 
 namespace Marina.Commands
 {
@@ -86,6 +89,72 @@ namespace Marina.Commands
             {
                 // ignored
             }
+        }
+
+        [Command("Lock")]
+        [RequireUserPermission(GuildPermission.ManageChannels)]
+        [RequireBotPermission(ChannelPermission.ManageChannels)]
+        public async Task Lockdown()
+        {
+            if (!SaveHandler.LockdownSave.ContainsKey(Context.Guild.Id))
+            {
+                SaveHandler.LockdownSave.Add(Context.Guild.Id, new List<ulong>());
+            }
+            else if (SaveHandler.LockdownSave[Context.Guild.Id].Contains(Context.Channel.Id))
+            {
+                await Error.SendDiscordError(Context, value: "Channel is already in lockdown!");
+                return;
+            }
+
+            SocketTextChannel channel = Context.Channel as SocketTextChannel;
+            OverwritePermissions? permissions = channel.GetPermissionOverwrite(Context.Guild.EveryoneRole);
+            if (permissions.HasValue)
+            {
+                if (permissions.Value.SendMessages == PermValue.Deny)
+                {
+                    await Error.SendDiscordError(Context,
+                        value: "Send Messages permission for everyone is already denied!");
+                    return;
+                }
+
+                await channel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole,
+                    permissions.Value.Modify(sendMessages: PermValue.Deny));
+            }
+            else
+            {
+                await channel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole,
+                    new OverwritePermissions(sendMessages: PermValue.Deny));
+            }
+
+            SaveHandler.LockdownSave[Context.Guild.Id].Add(Context.Channel.Id);
+
+            await ReplyAsync("Channel is now locked down!");
+        }
+
+        [Command("Unlock")]
+        [RequireUserPermission(GuildPermission.ManageChannels)]
+        [RequireBotPermission(ChannelPermission.ManageChannels)]
+        public async Task Unlock()
+        {
+            if (!SaveHandler.LockdownSave.ContainsKey(Context.Guild.Id) ||
+                !SaveHandler.LockdownSave[Context.Guild.Id].Contains(Context.Channel.Id))
+            {
+                await ReplyAsync("Channel is not in lockdown!");
+                return;
+            }
+
+            SocketTextChannel channel = Context.Channel as SocketTextChannel;
+            OverwritePermissions? permissions = channel.GetPermissionOverwrite(Context.Guild.EveryoneRole);
+
+            if (permissions.HasValue && permissions.Value.SendMessages == PermValue.Deny)
+            {
+                await channel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole,
+                    permissions.Value.Modify(sendMessages: PermValue.Inherit));
+            }
+
+            SaveHandler.LockdownSave[Context.Guild.Id].Remove(Context.Channel.Id);
+
+            await ReplyAsync("Channel is unlocked!");
         }
     }
 }

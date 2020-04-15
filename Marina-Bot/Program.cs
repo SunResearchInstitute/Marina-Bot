@@ -11,7 +11,7 @@ using Console = Marina.Utils.Console;
 
 namespace Marina
 {
-    internal class Program
+    internal static class Program
     {
         //API Stuff
         private static DiscordSocketClient _client;

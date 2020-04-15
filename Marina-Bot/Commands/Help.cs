@@ -91,6 +91,7 @@ namespace Marina.Commands
                         try
                         {
                             await Context.User.SendMessageAsync(embed: builder.Build());
+                            await ReplyAsync("Sent help menu to DMs!");
                         }
                         catch (HttpException)
                         {
@@ -112,6 +113,7 @@ namespace Marina.Commands
                 try
                 {
                     await Context.User.SendMessageAsync(embed: builder.Build());
+                    await ReplyAsync("Sent help menu to DMs!");
                 }
                 catch (HttpException)
                 {

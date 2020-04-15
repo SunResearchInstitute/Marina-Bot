@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using LibSave;
 using Marina.Save;
 using Marina.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Marina.Commands
 {
@@ -163,12 +163,11 @@ namespace Marina.Commands
 
                     if (SaveHandler.LogSave.ContainsKey(after.Guild.Id))
                     {
-                        SocketGuildChannel guildChannel = after.Guild.GetChannel(SaveHandler.LogSave[after.Guild.Id]);
-                        if (guildChannel != null)
+                        SocketTextChannel logChannel = after.Guild.GetTextChannel(SaveHandler.LogSave[after.Guild.Id]);
+                        if (logChannel != null)
                         {
                             if (before.Nickname != after.Nickname)
                             {
-                                ISocketMessageChannel logChannel = guildChannel as ISocketMessageChannel;
                                 EmbedBuilder builder = new EmbedBuilder
                                 {
                                     Color = Color.Teal
