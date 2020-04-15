@@ -92,6 +92,7 @@ namespace Marina.Commands
         }
 
         [Command("Lock")]
+        [Summary("Denies the Everyone role from sending messages")]
         [RequireUserPermission(GuildPermission.ManageChannels)]
         [RequireBotPermission(ChannelPermission.ManageChannels)]
         public async Task Lockdown()
@@ -132,6 +133,7 @@ namespace Marina.Commands
         }
 
         [Command("Unlock")]
+        [Summary("Unlocks a channels that was previously locked in which did not allow for the Everyone role to send messages in.")]
         [RequireUserPermission(GuildPermission.ManageChannels)]
         [RequireBotPermission(ChannelPermission.ManageChannels)]
         public async Task Unlock()

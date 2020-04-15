@@ -63,8 +63,8 @@ namespace Marina.Commands
         public async Task Shutdown()
         {
             await ReplyAsync("Shutting down!");
-            await Context.Client.LogoutAsync();
-            SaveHandler.SaveAll();
+            await Context.Client.StopAsync();
+            SaveHandler.SaveAll(false);
             await Console.WriteLog("***********************Shutdown via Command!***********************");
             Environment.Exit(0);
         }
