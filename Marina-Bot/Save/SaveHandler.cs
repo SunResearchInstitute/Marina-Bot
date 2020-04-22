@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Timers;
-using LibSave;
+﻿using LibSave;
 using LibSave.Types;
 using Marina.Utils;
+using System.Collections.Generic;
+using System.Timers;
 
 namespace Marina.Save
 {
@@ -28,11 +28,11 @@ namespace Marina.Save
         }
 
         //Easy Accessors 
-        public static DictionarySaveFile<ulong, ulong> LogSave => Saves["Logs"] as DictionarySaveFile<ulong, ulong>;
-        public static ListSaveFile<ulong> BlacklistSave => Saves["BlackList"] as ListSaveFile<ulong>;
+        public static DictionarySaveFile<ulong, ulong> LogSave => (DictionarySaveFile<ulong, ulong>) Saves["Logs"];
+        public static ListSaveFile<ulong> BlacklistSave => (ListSaveFile<ulong>) Saves["BlackList"];
 
         public static DictionarySaveFile<ulong, List<ulong>> LockdownSave =>
-            Saves["Lockdowns"] as DictionarySaveFile<ulong, List<ulong>>;
+            (DictionarySaveFile<ulong, List<ulong>>) Saves["Lockdowns"];
 
         public static void SaveAll(bool restartTimer = true)
         {

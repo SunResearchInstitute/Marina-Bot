@@ -1,12 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using CommandLine;
 using Discord;
 using Discord.Commands;
 using Marina.Utils;
 using Octokit;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Error = Marina.Utils.Error;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Local

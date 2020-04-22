@@ -19,7 +19,7 @@ namespace Marina.Commands
         public async Task BanUser([Name("User")] [RequireHierarchy] SocketGuildUser user,
             [Name("Reason")] params string[] reason)
         {
-            string reasonJoined = reason.Length != 0 ? string.Join(' ', reason) : null;
+            string reasonJoined = (reason != null ? string.Join(' ', reason) : null)!;
             string msg = $"You were banned from {Context.Guild.Name}";
             if (reasonJoined != null) msg += $"\nReason: {reasonJoined}";
             await user.SendMessageAsync(msg);
@@ -34,7 +34,7 @@ namespace Marina.Commands
         public async Task KickUser([Name("User")] [RequireHierarchy] SocketGuildUser user,
             [Name("Reason")] params string[] reason)
         {
-            string joined = reason.Length != 0 ? string.Join(' ', reason) : null;
+            string joined = (reason != null ? string.Join(' ', reason) : null)!;
             string msg = $"You were kicked from {Context.Guild.Name}";
             if (joined != null) msg += $"\nReason: {joined}";
             await user.SendMessageAsync(msg);
@@ -107,7 +107,7 @@ namespace Marina.Commands
                 return;
             }
 
-            SocketTextChannel channel = Context.Channel as SocketTextChannel;
+            SocketTextChannel channel = (SocketTextChannel) Context.Channel;
             OverwritePermissions? permissions = channel.GetPermissionOverwrite(Context.Guild.EveryoneRole);
             if (permissions.HasValue)
             {
@@ -145,7 +145,7 @@ namespace Marina.Commands
                 return;
             }
 
-            SocketTextChannel channel = Context.Channel as SocketTextChannel;
+            SocketTextChannel channel = (SocketTextChannel) Context.Channel;
             OverwritePermissions? permissions = channel.GetPermissionOverwrite(Context.Guild.EveryoneRole);
 
             if (permissions.HasValue && permissions.Value.SendMessages == PermValue.Deny)

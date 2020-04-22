@@ -41,7 +41,7 @@ namespace Marina.Utils
             });
             Error.SendApplicationError(
                 $"Config does not exist, it has been created for you at {configFile.FullName}!", 1);
-            return null;
+            return null!;
         }
     }
 }

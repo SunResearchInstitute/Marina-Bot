@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
 using Marina.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 // ReSharper disable UseDeconstruction
 
@@ -113,7 +113,8 @@ namespace Marina.Commands
                 try
                 {
                     await Context.User.SendMessageAsync(embed: builder.Build());
-                    await ReplyAsync("Sent help menu to DMs!");
+                    if (Context.Guild != null)
+                        await ReplyAsync("Sent help menu to DMs!");
                 }
                 catch (HttpException)
                 {
