@@ -11,7 +11,7 @@ namespace Marina.Commands
         [Command("lmddgtfy")]
         [Alias("real_help")]
         [Summary("For when you need to help someone out with an explanation.")]
-        public async Task Lmddgtfy([Name("SEARCH_TERM")] string searchTerm)
+        public async Task Lmddgtfy([Name("Search term")] string searchTerm)
         {
             try
             {
