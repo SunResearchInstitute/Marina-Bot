@@ -10,12 +10,13 @@ namespace Marina.Commands
     {
         [Command("lmddgtfy")]
         [Alias("real_help")]
-        public async Task Ping([Name("UWU")] string uwu)
+        [Summary("For when you need to help someone out with an explanation.")]
+        public async Task Lmddgtfy([Name("SEARCH_TERM")] string searchTerm)
         {
             try
             {
-                string owo = "https://lmddgtfy.net/?q=" + uwu.Replace(" ", "%20");
-                await Context.Channel.SendMessageAsync(owo);
+                string link = "https://lmddgtfy.net/?q=" + searchTerm.Replace(" ", "%20");
+                await Context.Channel.SendMessageAsync(link);
             }
             catch
             {
