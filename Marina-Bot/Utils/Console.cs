@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 
 namespace Marina.Utils
 {

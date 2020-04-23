@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.Net;
 using Marina.Utils;
 using Newtonsoft.Json;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Marina.Commands.Animals.Dog
 {

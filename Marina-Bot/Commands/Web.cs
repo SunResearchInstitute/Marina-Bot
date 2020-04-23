@@ -1,8 +1,9 @@
-using System.Net.NetworkInformation;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Marina.Utils;
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace Marina.Commands
 {
@@ -38,5 +39,10 @@ namespace Marina.Commands
                 await Error.SendDiscordError(Context, value: "Ping failed!");
             }
         }
+
+        [Command("lmddgtfy")]
+        [Alias("RealHelp")]
+        [Summary("For when you need to help someone out with an explanation.")]
+        public async Task Lmddgtfy([Name("Search term")] params string[] searchTerm) => await Context.Channel.SendMessageAsync($"https://lmddgtfy.net/?q={HttpUtility.UrlEncode(string.Join(' ', searchTerm))}");
     }
 }
