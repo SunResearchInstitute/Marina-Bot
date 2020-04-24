@@ -107,7 +107,7 @@ namespace Marina.Commands
                 return;
             }
 
-            SocketTextChannel channel = (SocketTextChannel) Context.Channel;
+            SocketTextChannel channel = (SocketTextChannel)Context.Channel;
             OverwritePermissions? permissions = channel.GetPermissionOverwrite(Context.Guild.EveryoneRole);
             if (permissions.HasValue)
             {
@@ -145,7 +145,7 @@ namespace Marina.Commands
                 return;
             }
 
-            SocketTextChannel channel = (SocketTextChannel) Context.Channel;
+            SocketTextChannel channel = (SocketTextChannel)Context.Channel;
             OverwritePermissions? permissions = channel.GetPermissionOverwrite(Context.Guild.EveryoneRole);
 
             if (permissions.HasValue && permissions.Value.SendMessages == PermValue.Deny)

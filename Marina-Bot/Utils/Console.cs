@@ -12,9 +12,9 @@ namespace Marina.Utils
 
         static Console()
         {
-            Program.Initialize += delegate(object? sender, DiscordSocketClient client)
+            Program.Initialize += delegate (object? sender, DiscordSocketClient client)
             {
-                client.Log += async delegate(LogMessage log)
+                client.Log += async delegate (LogMessage log)
                 {
                     await WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
                 };

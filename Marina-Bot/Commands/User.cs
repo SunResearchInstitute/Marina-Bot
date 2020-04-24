@@ -13,8 +13,7 @@ namespace Marina.Commands
         public async Task GetAvatar([ManualOptionalParameter("Self")] [Name("User")]
             IUser user = null)
         {
-            if (user == null)
-                user = Context.User;
+            user ??= Context.User;
 
             EmbedBuilder builder = new EmbedBuilder
             {

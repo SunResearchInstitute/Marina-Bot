@@ -149,9 +149,12 @@ namespace Marina.Commands
             await ReplyAsync(embed: builder.Build());
         }
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class Options
         {
+#pragma warning disable 8618
             [Option('t', "tag", Required = false)] public string Tag { get; set; }
+#pragma warning restore 8618
 
             [Option('l', "tags", Required = false, Default = false)]
             public bool ListTags { get; set; }
@@ -162,9 +165,13 @@ namespace Marina.Commands
             [Option('p', "prerelease", Required = false, Default = false)]
             public bool AllowPrerelease { get; set; }
 
+#pragma warning disable 8618
             [Value(0, Required = true)] public string User { get; set; }
+#pragma warning restore 8618
 
+#pragma warning disable 8618
             [Value(1, Required = true)] public string RepositoryName { get; set; }
+#pragma warning restore 8618
 
             [Option('d', "description", Required = false, Default = false)]
             public bool GetDescription { get; set; }

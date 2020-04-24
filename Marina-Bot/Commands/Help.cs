@@ -53,8 +53,8 @@ namespace Marina.Commands
                     foreach (ParameterInfo param in cmd.Parameters)
                     {
                         ManualOptionalParameterAttribute attribute =
-                            (ManualOptionalParameterAttribute) param.Attributes.SingleOrDefault(x =>
-                                x is ManualOptionalParameterAttribute);
+                            (ManualOptionalParameterAttribute)param.Attributes.SingleOrDefault(x =>
+                               x is ManualOptionalParameterAttribute);
                         if (attribute != null)
                             str += $"[{param.Name} = {attribute.ManualDefaultValue}]";
                         else if (param.DefaultValue != null)

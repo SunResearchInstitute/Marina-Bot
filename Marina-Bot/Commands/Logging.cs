@@ -15,24 +15,24 @@ namespace Marina.Commands
     {
         static Logging()
         {
-            Program.Initialize += delegate(object? sender, DiscordSocketClient client)
+            Program.Initialize += delegate (object? sender, DiscordSocketClient client)
             {
-                client.ChannelDestroyed += delegate(SocketChannel channel)
+                client.ChannelDestroyed += delegate (SocketChannel channel)
                 {
                     //Only currently needed for Logs at the moment
                     //Will try to remove the pair if it exists in the list
-                    SaveHandler.LogSave.Remove(new KeyValuePair<ulong, ulong>(((SocketGuildChannel) channel).Guild.Id,
+                    SaveHandler.LogSave.Remove(new KeyValuePair<ulong, ulong>(((SocketGuildChannel)channel).Guild.Id,
                         channel.Id));
                     return Task.CompletedTask;
                 };
 
-                client.MessageUpdated += async delegate(Cacheable<IMessage, ulong> oldMessage, SocketMessage newMessage,
+                client.MessageUpdated += async delegate (Cacheable<IMessage, ulong> oldMessage, SocketMessage newMessage,
                     ISocketMessageChannel channel)
                 {
                     if (!oldMessage.HasValue || newMessage.Author.IsBot)
                         return;
 
-                    SocketGuild guild = ((SocketTextChannel) channel).Guild;
+                    SocketGuild guild = ((SocketTextChannel)channel).Guild;
                     if (SaveHandler.LogSave.ContainsKey(guild.Id))
                     {
                         SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
@@ -70,7 +70,7 @@ namespace Marina.Commands
                     }
                 };
 
-                client.UserLeft += async delegate(SocketGuildUser user)
+                client.UserLeft += async delegate (SocketGuildUser user)
                 {
                     if (SaveHandler.LogSave.ContainsKey(user.Guild.Id))
                     {
@@ -86,14 +86,14 @@ namespace Marina.Commands
                     }
                 };
 
-                client.LeftGuild += delegate(SocketGuild guild)
+                client.LeftGuild += delegate (SocketGuild guild)
                 {
                     //Removes guild Marina is no longer in
                     foreach (ISaveFile save in SaveHandler.Saves.Values) save.CleanUp(guild.Id);
                     return Task.CompletedTask;
                 };
 
-                client.UserBanned += async delegate(SocketUser user, SocketGuild guild)
+                client.UserBanned += async delegate (SocketUser user, SocketGuild guild)
                 {
                     if (SaveHandler.LogSave.ContainsKey(guild.Id))
                     {
@@ -114,12 +114,12 @@ namespace Marina.Commands
                 };
 
                 client.MessageDeleted +=
-                    async delegate(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
+                    async delegate (Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
                     {
                         if (!message.HasValue || message.Value.Author.IsBot)
                             return;
 
-                        SocketGuild guild = ((SocketGuildChannel) channel).Guild;
+                        SocketGuild guild = ((SocketGuildChannel)channel).Guild;
                         if (SaveHandler.LogSave.ContainsKey(guild.Id))
                         {
                             SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
@@ -157,7 +157,7 @@ namespace Marina.Commands
                         }
                     };
 
-                client.GuildMemberUpdated += async delegate(SocketGuildUser before, SocketGuildUser after)
+                client.GuildMemberUpdated += async delegate (SocketGuildUser before, SocketGuildUser after)
                 {
                     if (before.IsBot) return;
 
