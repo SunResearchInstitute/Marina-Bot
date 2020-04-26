@@ -14,6 +14,23 @@ namespace Marina.Commands
 {
     public class Client : ModuleBase<SocketCommandContext>
     {
+        static Client()
+        {
+            Program.Initialize += delegate (object? sender, DiscordSocketClient client)
+            {
+                async Task OnClientOnJoinedGuild(SocketGuild arg)
+                {
+                    if (client.Guilds.Count > 1)
+                        await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help");
+                    else
+                        await client.SetGameAsync($"on {client.Guilds.Count} server | m.help");
+                }
+
+                client.LeftGuild += OnClientOnJoinedGuild;
+                client.JoinedGuild += OnClientOnJoinedGuild;
+            };
+        }
+
         [Command("BanUser")]
         [RequireOwner]
         public async Task AddUserToBlacklist(IUser user)

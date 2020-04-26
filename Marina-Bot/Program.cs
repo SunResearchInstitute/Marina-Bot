@@ -13,10 +13,13 @@ namespace Marina
 {
     internal static class Program
     {
+#pragma warning disable 8618
         //API Stuff
         private static DiscordSocketClient _client;
         public static CommandService Commands { get; private set; }
+
         public static event EventHandler<DiscordSocketClient> Initialize;
+#pragma warning restore 8618
 
         private static void Main()
         {
@@ -44,7 +47,7 @@ namespace Marina
             _client.MessageReceived += MessageReceived;
             _client.Ready += ClientReady;
 
-            Commands.Log += async delegate(LogMessage log)
+            Commands.Log += async delegate (LogMessage log)
             {
                 await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
             };
@@ -68,16 +71,11 @@ namespace Marina
         private static async Task ClientReady()
         {
             await Console.WriteLog("Initialized!");
-            await Task.Run(async () =>
-            {
-                while (true)
-                {
-                    if (_client.Guilds.Count > 1)
-                        await _client.SetGameAsync($"on {_client.Guilds.Count} servers | m.help");
-                    else await _client.SetGameAsync($"on {_client.Guilds.Count} server | m.help");
-                    await Task.Delay(TimeSpan.FromHours(1));
-                }
-            });
+
+            if (_client.Guilds.Count > 1)
+                await _client.SetGameAsync($"on {_client.Guilds.Count} servers | m.help");
+            else
+                await _client.SetGameAsync($"on {_client.Guilds.Count} server | m.help");
         }
 
         private static async Task MessageReceived(SocketMessage arg)
