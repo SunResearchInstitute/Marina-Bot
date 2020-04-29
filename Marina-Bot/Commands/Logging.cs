@@ -208,6 +208,8 @@ namespace Marina.Commands
         public async Task SetLogs([Name("Channel")] [ManualOptionalParameter("Current Channel")]
             SocketTextChannel channel = null)
         {
+            channel ??= (SocketTextChannel)Context.Channel;
+
             if (SaveHandler.LogSave.ContainsKey(Context.Guild.Id))
                 SaveHandler.LogSave[Context.Guild.Id] = channel.Id;
 

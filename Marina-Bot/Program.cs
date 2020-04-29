@@ -44,16 +44,13 @@ namespace Marina
                 LogLevel = LogSeverity.Error
             });
 
-            _client.MessageReceived += MessageReceived;
-            _client.Ready += ClientReady;
-
+            await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
             Commands.Log += async delegate (LogMessage log)
             {
                 await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
             };
-
-            await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
-
+            _client.MessageReceived += MessageReceived;
+            _client.Connected += async delegate { await Console.WriteLog("Initialized!"); };
             Initialize?.Invoke(null, _client);
 
             Dictionary<string, string> config = Misc.LoadConfig();
@@ -66,16 +63,6 @@ namespace Marina
             {
                 Error.SendApplicationError("Something went wrong, check if your Token is valid!", 1);
             }
-        }
-
-        private static async Task ClientReady()
-        {
-            await Console.WriteLog("Initialized!");
-
-            if (_client.Guilds.Count > 1)
-                await _client.SetGameAsync($"on {_client.Guilds.Count} servers | m.help");
-            else
-                await _client.SetGameAsync($"on {_client.Guilds.Count} server | m.help");
         }
 
         private static async Task MessageReceived(SocketMessage arg)

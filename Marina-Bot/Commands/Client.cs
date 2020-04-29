@@ -18,16 +18,23 @@ namespace Marina.Commands
         {
             Program.Initialize += delegate (object? sender, DiscordSocketClient client)
             {
-                async Task OnClientOnJoinedGuild(SocketGuild arg)
+                async Task UpdatePresence(SocketGuild arg)
                 {
                     if (client.Guilds.Count > 1)
                         await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help");
                     else
                         await client.SetGameAsync($"on {client.Guilds.Count} server | m.help");
                 }
+                client.Connected += async delegate
+                {
+                    if (client.Guilds.Count > 1)
+                        await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help");
+                    else
+                        await client.SetGameAsync($"on {client.Guilds.Count} server | m.help");
+                };
 
-                client.LeftGuild += OnClientOnJoinedGuild;
-                client.JoinedGuild += OnClientOnJoinedGuild;
+                client.LeftGuild += UpdatePresence;
+                client.JoinedGuild += UpdatePresence;
             };
         }
 
