@@ -200,7 +200,7 @@ namespace Marina.Commands
             };
         }
 
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.ManageChannels)]
         [Command("SetLogs")]
         [Summary("Sets the logging channel.")]
         public async Task SetLogs([Name("Channel")] [ManualOptionalParameter("Current Channel")]
@@ -217,7 +217,7 @@ namespace Marina.Commands
             await ReplyAsync($"Logs will now be put in {channel.Name}");
         }
 
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.ManageChannels)]
         [Command("RemoveLogs")]
         [Summary("Removes the logging channel.")]
         public async Task RemoveLogs()
