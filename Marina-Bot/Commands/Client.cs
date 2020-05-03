@@ -150,7 +150,7 @@ namespace Marina.Commands
                     break;
             }
 
-            if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+            if (builder.Length > EmbedBuilder.MaxDescriptionLength)
             {
                 string[] msgs = Misc.ConvertToDiscordSendable(builder.Description);
                 for (int i = 0; i < msgs.Length; i++)

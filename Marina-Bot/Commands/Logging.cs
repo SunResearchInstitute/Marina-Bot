@@ -46,7 +46,7 @@ namespace Marina.Commands
                                     $"From {newMessage.Author.Mention} in <#{channel.Id}>:\n**Before:**\n{oldMessage.Value.Content}\n**After:**\n{newMessage.Content}"
                             };
 
-                            if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                            if (builder.Length > EmbedBuilder.MaxDescriptionLength)
                             {
                                 string[] msgs = Misc.ConvertToDiscordSendable(builder.Description);
                                 for (int i = 0; i < msgs.Length; i++)
@@ -89,7 +89,9 @@ namespace Marina.Commands
                 client.LeftGuild += delegate (SocketGuild guild)
                 {
                     //Removes guild Marina is no longer in
-                    foreach (ISaveFile save in SaveHandler.Saves.Values) save.CleanUp(guild.Id);
+                    foreach (ISaveFile save in SaveHandler.Saves.Values)
+                        save.CleanUp(guild.Id);
+
                     return Task.CompletedTask;
                 };
 
@@ -133,7 +135,7 @@ namespace Marina.Commands
                                         $"From {message.Value.Author.Mention} in <#{channel.Id}>:\n{message.Value.Content}"
                                 };
 
-                                if (builder.Description.Length > EmbedBuilder.MaxDescriptionLength)
+                                if (builder.Length > EmbedBuilder.MaxDescriptionLength)
                                 {
                                     string[] msgs = Misc.ConvertToDiscordSendable(builder.Description);
                                     for (int i = 0; i < msgs.Length; i++)
@@ -192,10 +194,6 @@ namespace Marina.Commands
 
                                 await logChannel.SendMessageAsync(embed: builder.Build());
                             }
-                        }
-                        else
-                        {
-                            SaveHandler.LogSave.Remove(after.Guild.Id);
                         }
                     }
                 };

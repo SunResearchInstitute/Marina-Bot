@@ -50,7 +50,6 @@ namespace Marina
                 await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
             };
             _client.MessageReceived += MessageReceived;
-            _client.Connected += async delegate { await Console.WriteLog("Initialized!"); };
             Initialize?.Invoke(null, _client);
 
             Dictionary<string, string> config = Misc.LoadConfig();
@@ -63,6 +62,7 @@ namespace Marina
             {
                 Error.SendApplicationError("Something went wrong, check if your Token is valid!", 1);
             }
+            await Console.WriteLog("Initialized!");
         }
 
         private static async Task MessageReceived(SocketMessage arg)
