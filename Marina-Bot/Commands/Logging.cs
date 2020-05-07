@@ -23,6 +23,8 @@ namespace Marina.Commands
                     //Will try to remove the pair if it exists in the list
                     SaveHandler.LogSave.Remove(new KeyValuePair<ulong, ulong>(((SocketGuildChannel)channel).Guild.Id,
                         channel.Id));
+                    SaveHandler.LockdownSave[((SocketGuildChannel)channel).Guild.Id]
+                        .Remove(((SocketGuildChannel)channel).Id);
                     return Task.CompletedTask;
                 };
 
@@ -125,15 +127,23 @@ namespace Marina.Commands
                         if (SaveHandler.LogSave.ContainsKey(guild.Id))
                         {
                             SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
-                            if (logChannel.Id != channel.Id && !string.IsNullOrWhiteSpace(message.Value.Content))
+                            if (logChannel.Id != channel.Id && (!string.IsNullOrWhiteSpace(message.Value.Content) || message.Value.Attachments.Any()))
                             {
                                 EmbedBuilder builder = new EmbedBuilder
                                 {
                                     Color = Color.Teal,
                                     Title = "Message Deleted",
-                                    Description =
-                                        $"From {message.Value.Author.Mention} in <#{channel.Id}>:\n{message.Value.Content}"
                                 };
+                                if (!string.IsNullOrWhiteSpace(message.Value.Content))
+                                    builder.Description =
+                                        $"From {message.Value.Author.Mention} in <#{channel.Id}>:\n{message.Value.Content}";
+
+                                if (message.Value.Attachments.Any())
+                                {
+                                    builder.Description += "\n\nAttachments:\n";
+                                    foreach (IAttachment attachment in message.Value.Attachments)
+                                        builder.Description += $"{attachment.Url}\n";
+                                }
 
                                 if (builder.Length > EmbedBuilder.MaxDescriptionLength)
                                 {
