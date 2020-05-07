@@ -127,7 +127,8 @@ namespace Marina.Commands
                         if (SaveHandler.LogSave.ContainsKey(guild.Id))
                         {
                             SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
-                            if (logChannel.Id != channel.Id && (!string.IsNullOrWhiteSpace(message.Value.Content) || message.Value.Attachments.Any()))
+                            if (logChannel.Id != channel.Id &&
+                                (!string.IsNullOrWhiteSpace(message.Value.Content) || message.Value.Attachments.Any()))
                             {
                                 EmbedBuilder builder = new EmbedBuilder
                                 {

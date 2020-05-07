@@ -62,6 +62,7 @@ namespace Marina
             {
                 Error.SendApplicationError("Something went wrong, check if your Token is valid!", 1);
             }
+
             await Console.WriteLog("Initialized!");
         }
 

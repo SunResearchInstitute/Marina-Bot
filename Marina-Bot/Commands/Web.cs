@@ -43,6 +43,8 @@ namespace Marina.Commands
         [Command("lmddgtfy")]
         [Alias("RealHelp")]
         [Summary("For when you need to help someone out with an explanation.")]
-        public async Task Lmddgtfy([Name("Search term")] params string[] searchTerm) => await Context.Channel.SendMessageAsync($"https://lmddgtfy.net/?q={HttpUtility.UrlEncode(string.Join(' ', searchTerm))}");
+        public async Task Lmddgtfy([Name("Search term")] params string[] searchTerm) =>
+            await Context.Channel.SendMessageAsync(
+                $"https://lmddgtfy.net/?q={HttpUtility.UrlEncode(string.Join(' ', searchTerm))}");
     }
 }

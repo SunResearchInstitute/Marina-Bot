@@ -25,6 +25,7 @@ namespace Marina.Commands
                     else
                         await client.SetGameAsync($"on {client.Guilds.Count} server | m.help");
                 }
+
                 client.Connected += async delegate
                 {
                     if (client.Guilds.Count > 1)
