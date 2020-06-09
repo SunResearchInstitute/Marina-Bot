@@ -165,13 +165,14 @@ namespace Marina.Commands
                                     Title = "Message Deleted",
                                 };
                                 RestAuditLogEntry messageDeleted = (await guild.GetAuditLogsAsync(3, actionType: ActionType.MessageDeleted).FlattenAsync()).FirstOrDefault(l => (l.Data as MessageDeleteAuditLogData).AuthorId == message.Value.Author.Id);
-                                if (messageDeleted != null)
-                                    builder.Description += $"By {messageDeleted.User.Mention}, f";
-                                else builder.Description += "F";
 
                                 if (!string.IsNullOrWhiteSpace(message.Value.Content))
-                                    builder.Description +=
-                                        $"rom {message.Value.Author.Mention}, in <#{channel.Id}>:\n{message.Value.Content}";
+                                    builder.Description += $"From {message.Value.Author.Mention}, in <#{channel.Id}>";
+
+                                if (messageDeleted != null)
+                                    builder.Description += $", deleted by {messageDeleted.User.Mention}";
+
+                                builder.Description += $":\n{message.Value.Content}";
 
                                 if (message.Value.Attachments.Any())
                                 {
