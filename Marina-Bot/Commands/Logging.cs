@@ -77,7 +77,7 @@ namespace Marina.Commands
                     if (SaveHandler.LogSave.ContainsKey(user.Guild.Id))
                     {
                         SocketTextChannel logChannel = user.Guild.GetTextChannel(SaveHandler.LogSave[user.Guild.Id]);
-                        RestAuditLogEntry lastKick = (await user.Guild.GetAuditLogsAsync(3, actionType: ActionType.Kick).FlattenAsync()).First(l => (l.Data as KickAuditLogData).Target == user);
+                        RestAuditLogEntry lastKick = (await user.Guild.GetAuditLogsAsync(3, actionType: ActionType.Kick).FlattenAsync()).FirstOrDefault(l => (l.Data as KickAuditLogData).Target == user);
                         EmbedBuilder builder = new EmbedBuilder
                         {
                             Color = Color.Teal
@@ -120,7 +120,7 @@ namespace Marina.Commands
                     if (SaveHandler.LogSave.ContainsKey(guild.Id))
                     {
                         RestAuditLogEntry lastBan =
-                            (await guild.GetAuditLogsAsync(3, actionType: ActionType.Ban).FlattenAsync()).First(l => (l.Data as BanAuditLogData).Target == user);
+                            (await guild.GetAuditLogsAsync(3, actionType: ActionType.Ban).FlattenAsync()).FirstOrDefault(l => (l.Data as BanAuditLogData).Target == user);
                         if (lastBan != null)
                         {
                             string msg = $"You were banned from {guild.Name}";
@@ -164,7 +164,7 @@ namespace Marina.Commands
                                     Color = Color.Teal,
                                     Title = "Message Deleted",
                                 };
-                                RestAuditLogEntry messageDeleted = (await guild.GetAuditLogsAsync(3, actionType: ActionType.MessageDeleted).FlattenAsync()).First(l => (l.Data as MessageDeleteAuditLogData).AuthorId == message.Value.Author.Id);
+                                RestAuditLogEntry messageDeleted = (await guild.GetAuditLogsAsync(3, actionType: ActionType.MessageDeleted).FlattenAsync()).FirstOrDefault(l => (l.Data as MessageDeleteAuditLogData).AuthorId == message.Value.Author.Id);
                                 if (messageDeleted != null)
                                     builder.Description += $"By {messageDeleted.User}, f";
                                 else builder.Description += "F";
