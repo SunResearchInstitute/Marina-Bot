@@ -166,7 +166,7 @@ namespace Marina.Commands
                                 };
                                 RestAuditLogEntry messageDeleted = (await guild.GetAuditLogsAsync(3, actionType: ActionType.MessageDeleted).FlattenAsync()).FirstOrDefault(l => (l.Data as MessageDeleteAuditLogData).AuthorId == message.Value.Author.Id);
                                 if (messageDeleted != null)
-                                    builder.Description += $"By {messageDeleted.User}, f";
+                                    builder.Description += $"By {messageDeleted.User.Mention}, f";
                                 else builder.Description += "F";
 
                                 if (!string.IsNullOrWhiteSpace(message.Value.Content))
