@@ -32,7 +32,7 @@ namespace Marina.Commands
             {
                 Color = Color.Teal,
                 Title = "Suggestion",
-                Description = $"From {Context.User.Mention} | {Context.User.Username}:\n{string.Join(" ", suggestion)}"
+                Description = $"From {Context.User.Mention} | {Context.User}:\n{string.Join(" ", suggestion)}"
             };
             builder.WithCurrentTimestamp();
 

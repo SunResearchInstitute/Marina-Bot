@@ -77,13 +77,31 @@ namespace Marina.Commands
                     if (SaveHandler.LogSave.ContainsKey(user.Guild.Id))
                     {
                         SocketTextChannel logChannel = user.Guild.GetTextChannel(SaveHandler.LogSave[user.Guild.Id]);
+                        RestAuditLogEntry lastKick = (await user.Guild.GetAuditLogsAsync(3, actionType: ActionType.Kick).FlattenAsync()).First(l => (l.Data as KickAuditLogData).Target == user);
                         EmbedBuilder builder = new EmbedBuilder
                         {
-                            Color = Color.Teal,
-                            Title = "User Left",
-                            Description = $"{user.Mention} | {user.Username}"
+                            Color = Color.Teal
                         };
+
+                        if (lastKick != null)
+                        {
+                            string msg = $"You were kicked from {user.Guild.Name}";
+                            if (lastKick.Reason != null) msg += $"\nReason: {lastKick.Reason}";
+                            try
+                            {
+                                await user.SendMessageAsync(msg);
+                            }
+                            catch { }
+                            builder.WithCurrentTimestamp();
+                            builder.Title = "User Kicked";
+                            builder.Description = $"{lastKick.User.Mention} kicked {user.Mention} | {user}";
+                            if (lastKick.Reason != null) builder.Description += $"\n__Reason__: \"{lastKick.Reason}\"";
+                            await logChannel.SendMessageAsync(embed: builder.Build());
+                        }
+
                         builder.WithCurrentTimestamp();
+                        builder.Title = "User Left";
+                        builder.Description = $"{user.Mention} | {user}";
                         await logChannel.SendMessageAsync(embed: builder.Build());
                     }
                 };
@@ -101,22 +119,32 @@ namespace Marina.Commands
                 {
                     if (SaveHandler.LogSave.ContainsKey(guild.Id))
                     {
-                        SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
                         RestAuditLogEntry lastBan =
-                            (await guild.GetAuditLogsAsync(3).FlattenAsync()).First(l => l.Action == ActionType.Ban);
-                        EmbedBuilder builder = new EmbedBuilder
+                            (await guild.GetAuditLogsAsync(3, actionType: ActionType.Ban).FlattenAsync()).First(l => (l.Data as BanAuditLogData).Target == user);
+                        if (lastBan != null)
                         {
-                            Color = Color.Teal,
-                            Title = "**Banned**",
-                            Description = $"{lastBan.User.Mention} banned {user.Mention} | {user}"
-                        };
-                        builder.WithCurrentTimestamp();
-                        if (!string.IsNullOrWhiteSpace(lastBan.Reason))
-                            builder.Description += $"\n__Reason__: \"{lastBan.Reason}\"";
-                        await logChannel.SendMessageAsync(embed: builder.Build());
+                            string msg = $"You were banned from {guild.Name}";
+                            if (lastBan.Reason != null) msg += $"\nReason: {lastBan.Reason}";
+                            try
+                            {
+                                await user.SendMessageAsync(msg);
+                            }
+                            catch { }
+
+                            SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
+                            EmbedBuilder builder = new EmbedBuilder
+                            {
+                                Color = Color.Teal,
+                                Title = "User Banned",
+                                Description = $"{lastBan.User.Mention} banned {user.Mention} | {user}"
+                            };
+                            builder.WithCurrentTimestamp();
+                            if (!string.IsNullOrWhiteSpace(lastBan.Reason))
+                                builder.Description += $"\n__Reason__: \"{lastBan.Reason}\"";
+                            await logChannel.SendMessageAsync(embed: builder.Build());
+                        }
                     }
                 };
-
                 client.MessageDeleted +=
                     async delegate (Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
                     {

@@ -16,13 +16,10 @@ namespace Marina.Commands
         [RequireUserPermission(GuildPermission.BanMembers)]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [Command("Ban")]
-        public async Task BanUser([Name("User")] [RequireHierarchy] SocketGuildUser user,
+        public async Task BanUser([Name("User")][RequireHierarchy] SocketGuildUser user,
             [Name("Reason")] params string[] reason)
         {
             string reasonJoined = (reason != null ? string.Join(' ', reason) : null)!;
-            string msg = $"You were banned from {Context.Guild.Name}";
-            if (reasonJoined != null) msg += $"\nReason: {reasonJoined}";
-            await user.SendMessageAsync(msg);
             await user.BanAsync(reason: reasonJoined);
             await ReplyAsync($"{user} is now b& :thumbsup:");
             //Bans will automatically logged
@@ -31,29 +28,12 @@ namespace Marina.Commands
         [RequireUserPermission(GuildPermission.KickMembers)]
         [RequireBotPermission(GuildPermission.KickMembers)]
         [Command("Kick")]
-        public async Task KickUser([Name("User")] [RequireHierarchy] SocketGuildUser user,
+        public async Task KickUser([Name("User")][RequireHierarchy] SocketGuildUser user,
             [Name("Reason")] params string[] reason)
         {
             string joined = (reason != null ? string.Join(' ', reason) : null)!;
-            string msg = $"You were kicked from {Context.Guild.Name}";
-            if (joined != null) msg += $"\nReason: {joined}";
-            await user.SendMessageAsync(msg);
             await user.KickAsync(joined);
             await ReplyAsync($"kicked {user} :boot:");
-
-            //Kicks need to be manually logged
-            if (SaveHandler.LogSave.ContainsKey(user.Guild.Id))
-            {
-                SocketTextChannel logChannel = user.Guild.GetTextChannel(SaveHandler.LogSave[user.Guild.Id]);
-                EmbedBuilder builder = new EmbedBuilder
-                {
-                    Color = Color.Teal,
-                    Title = "**Kicked**",
-                    Description = $"{Context.User.Mention} kicked {user.Mention} | {user}"
-                };
-                if (joined != null) builder.Description += $"\n__Reason__: \"{joined}\"";
-                await logChannel.SendMessageAsync(embed: builder.Build());
-            }
         }
 
         [Command("Purge")]
@@ -66,9 +46,15 @@ namespace Marina.Commands
                 await Error.SendDiscordError(Context, value: "Invalid parameters");
                 return;
             }
+            if (count >= 500)
+            {
+                await Error.SendDiscordError(Context, value: "Too many messages to remove!");
+                return;
+            }
 
             int rmCnt = 0;
             foreach (IMessage msg in await Context.Channel.GetMessagesAsync(count).FlattenAsync())
+            {
                 try
                 {
                     await msg.DeleteAsync();
@@ -76,11 +62,18 @@ namespace Marina.Commands
                 }
                 catch
                 {
+                    continue;
                     // ignored
                 }
+            }
 
+            if (rmCnt == 0)
+            {
+                await Error.SendDiscordError(Context, value: "Could not remove any messages");
+                return;
+            }
             IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt - 1} messages");
-            await Task.Delay(TimeSpan.FromSeconds(3));
+            await Task.Delay(TimeSpan.FromSeconds(2.5));
             try
             {
                 await resultMsg.DeleteAsync();
