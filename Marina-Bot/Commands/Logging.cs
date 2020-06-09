@@ -160,12 +160,18 @@ namespace Marina.Commands
                             {
                                 EmbedBuilder builder = new EmbedBuilder
                                 {
+                                    Description = "",
                                     Color = Color.Teal,
                                     Title = "Message Deleted",
                                 };
+                                RestAuditLogEntry messageDeleted = (await guild.GetAuditLogsAsync(3, actionType: ActionType.MessageDeleted).FlattenAsync()).First(l => (l.Data as MessageDeleteAuditLogData).AuthorId == message.Value.Author.Id);
+                                if (messageDeleted != null)
+                                    builder.Description += $"By {messageDeleted.User}, f";
+                                else builder.Description += "F";
+
                                 if (!string.IsNullOrWhiteSpace(message.Value.Content))
-                                    builder.Description =
-                                        $"From {message.Value.Author.Mention} in <#{channel.Id}>:\n{message.Value.Content}";
+                                    builder.Description +=
+                                        $"rom {message.Value.Author.Mention}, in <#{channel.Id}>:\n{message.Value.Content}";
 
                                 if (message.Value.Attachments.Any())
                                 {
