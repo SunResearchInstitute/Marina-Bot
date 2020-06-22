@@ -186,15 +186,10 @@ namespace Marina.Commands
         public async Task GetVersion() =>
             await ReplyAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
 
-        [Command("Source")]
-        [Summary("Source code!")]
-        public async Task GetSource() =>
-            await ReplyAsync("I was written in C# using Discord.Net!: https://github.com/SunTheCourier/Marina-Bot");
-
-        [Command("Invite")]
-        [Summary("Invite link!")]
-        public async Task GetInvite() =>
-            await ReplyAsync("You can invite me using this link!: https://sunthecourier.net/marina-bot");
+        [Command("Info"), Alias("Invite", "Source", "Vote")]
+        [Summary("Bot information!")]
+        public async Task GetInfo() =>
+            await ReplyAsync("You can find my voting, source, and invite links here: https://link.sunthecourier.net/marina-bot");
 
         [Command("SetMode")]
         [RequireOwner]
