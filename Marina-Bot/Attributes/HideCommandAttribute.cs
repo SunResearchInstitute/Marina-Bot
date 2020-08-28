@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Marina.Utils
+namespace Marina.Attributes
 {
     public class HideCommandAttribute : Attribute
     {

@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using Marina.Utils;
+using Marina.Attributes;
 using System.Threading.Tasks;
 
 namespace Marina.Commands

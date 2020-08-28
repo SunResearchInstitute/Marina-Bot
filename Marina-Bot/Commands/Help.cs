@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.Net;
+using Marina.Attributes;
 using Marina.Utils;
 using System;
 using System.Collections.Generic;

@@ -1,25 +1,26 @@
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using LibSave;
+using Marina.Save;
+using Marina.Utils;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Marina.Utils;
 using Console = Marina.Utils.Console;
 
 namespace Marina
 {
     internal static class Program
     {
-#pragma warning disable 8618
         //API Stuff
         private static DiscordSocketClient _client;
         public static CommandService Commands { get; private set; }
 
         public static event EventHandler<DiscordSocketClient> Initialize;
-#pragma warning restore 8618
+        public static SaveController SaveController { get; private set; }
 
         private static void Main()
         {
@@ -44,24 +45,26 @@ namespace Marina
                 LogLevel = LogSeverity.Error
             });
 
-            await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
-            Commands.Log += async delegate (LogMessage log)
-            {
-                await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
-            };
-            _client.MessageReceived += MessageReceived;
-            Initialize?.Invoke(null, _client);
-
             Dictionary<string, string> config = Misc.LoadConfig();
             try
             {
                 await _client.LoginAsync(TokenType.Bot, config["token"]);
                 await _client.StartAsync();
             }
-            catch
+            catch (Exception e)
             {
-                Error.SendApplicationError("Something went wrong, check if your Token is valid!", 1);
+                Error.SendApplicationError(e.Message, 1); ;
+                return;
             }
+            await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
+            Commands.Log += async delegate (LogMessage log)
+            {
+                await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
+            };
+            Initialize?.Invoke(null, _client);
+            _client.MessageReceived += MessageReceived;
+            SaveController = new SaveController("Save");
+            SaveHandler.RegisterSaves(SaveController);
 
             await Console.WriteLog("Initialized!");
         }

@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Marina.Attributes;
 using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;

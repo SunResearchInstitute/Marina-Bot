@@ -32,7 +32,7 @@ namespace Marina.Utils
 
         public static void SendApplicationError(string errorMsg, int code = 0)
         {
-            _ = Console.WriteLog(errorMsg);
+            _ = Console.WriteLog($"EXCEPTION/ERROR: {errorMsg}");
             _ = Console.WriteLog("Press any key to continue...");
             System.Console.ReadKey();
             Environment.Exit(code);
