@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Marina.Save;
 using Marina.Utils;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Marina.Commands
@@ -22,7 +23,7 @@ namespace Marina.Commands
                 return;
             }
 
-            if (suggestion.Length == 0)
+            if (suggestion == null || suggestion.Length == 0)
             {
                 await Error.SendDiscordError(Context, "The input text has too few parameters.");
                 return;

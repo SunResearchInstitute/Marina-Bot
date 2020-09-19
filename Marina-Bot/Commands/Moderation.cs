@@ -47,7 +47,7 @@ namespace Marina.Commands
                 await Error.SendDiscordError(Context, value: "Invalid parameters");
                 return;
             }
-            if (count >= 500)
+            if (count >= 200)
             {
                 await Error.SendDiscordError(Context, value: "Too many messages to remove!");
                 return;
@@ -60,6 +60,7 @@ namespace Marina.Commands
                 {
                     await msg.DeleteAsync();
                     rmCnt++;
+                    await Task.Delay(TimeSpan.FromSeconds(0.06));
                 }
                 catch
                 {
@@ -74,7 +75,7 @@ namespace Marina.Commands
                 return;
             }
             IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt - 1} messages");
-            await Task.Delay(TimeSpan.FromSeconds(2.5));
+            await Task.Delay(TimeSpan.FromSeconds(3));
             try
             {
                 await resultMsg.DeleteAsync();
