@@ -59,7 +59,10 @@ namespace Marina
             await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), null);
             Commands.Log += async delegate (LogMessage log)
             {
-                await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
+                if (log.Exception != null && log.Exception is CommandException exception && log.Exception.InnerException != null)
+                    await Error.SendDiscordError((SocketCommandContext)exception.Context, value: "A Fatal error has occured. This has been reported.", e: log.Exception.InnerException);
+                else
+                    await Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
             };
             Initialize?.Invoke(null, _client);
             _client.MessageReceived += MessageReceived;

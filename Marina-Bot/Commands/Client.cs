@@ -175,7 +175,7 @@ namespace Marina.Commands
 
         [Command("Save")]
         [RequireOwner]
-        public async Task ForceSaving()
+        public async Task ForceSave()
         {
             SaveHandler.SaveAll();
             await ReplyAsync("Saved all data!");

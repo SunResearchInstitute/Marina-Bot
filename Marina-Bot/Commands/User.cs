@@ -9,7 +9,7 @@ namespace Marina.Commands
     {
         [Command("Avatar")]
         [Alias("pfp", "ava")]
-        [Summary("Gets a avatar of self or another user.")]
+        [Summary("Gets an avatar of self or another user.")]
         public async Task GetAvatar([ManualOptionalParameter("Self")] [Name("User")]
             IUser user = null)
         {
