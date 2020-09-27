@@ -47,7 +47,7 @@ namespace Marina.Commands
                 await Error.SendDiscordError(Context, value: "Invalid parameters");
                 return;
             }
-            if (count >= 200)
+            if (count > 200)
             {
                 await Error.SendDiscordError(Context, value: "Too many messages to remove!");
                 return;
