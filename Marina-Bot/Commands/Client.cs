@@ -6,6 +6,7 @@ using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,22 @@ namespace Marina.Commands
 
                 client.LeftGuild += UpdatePresence;
                 client.JoinedGuild += UpdatePresence;
+                //Clean Up
+                client.LeftGuild += async delegate (SocketGuild guild)
+                {
+                    SaveHandler.LogSave.Remove(guild.Id);
+                    foreach(ulong val in SaveHandler.LockdownSave[guild.Id])
+                    {
+                        SocketTextChannel channel = guild.GetTextChannel(val);
+                        OverwritePermissions? permissions = channel.GetPermissionOverwrite(guild.EveryoneRole);
+
+                        if (permissions.HasValue && permissions.Value.SendMessages == PermValue.Deny)
+                        {
+                            await channel.AddPermissionOverwriteAsync(guild.EveryoneRole,
+                                permissions.Value.Modify(sendMessages: PermValue.Inherit));
+                        }
+                    }
+                };
             };
         }
 

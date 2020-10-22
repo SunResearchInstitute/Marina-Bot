@@ -105,17 +105,6 @@ namespace Marina.Commands
                         await logChannel.SendMessageAsync(embed: builder.Build());
                     }
                 };
-                //TODO: reimpl
-                /*
-                client.LeftGuild += delegate (SocketGuild guild)
-                {
-                    //Removes guild Marina is no longer in
-                    foreach (ISaveFile save in Program.SaveController.SaveFiles.Values)
-                        save.CleanUp(guild.Id);
-
-                    return Task.CompletedTask;
-                };
-                */
 
                 client.UserBanned += async delegate (SocketUser user, SocketGuild guild)
                 {

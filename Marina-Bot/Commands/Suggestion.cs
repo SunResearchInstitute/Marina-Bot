@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Marina.Save;
 using Marina.Utils;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Marina.Commands

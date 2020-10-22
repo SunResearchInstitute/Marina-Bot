@@ -10,7 +10,6 @@ namespace Marina.Save
     {
         public static DictionarySaveFile<ulong, ulong> LogSave => Program.SaveController.GetSave<DictionarySaveFile<ulong, ulong>>("Logs");
         public static ListSaveFile<ulong> BlacklistSave => Program.SaveController.GetSave<ListSaveFile<ulong>>("Blacklist");
-
         public static DictionarySaveFile<ulong, List<ulong>> LockdownSave => Program.SaveController.GetSave<DictionarySaveFile<ulong, List<ulong>>>("Lockdowns");
 
         public static void RegisterSaves(SaveController controller)
