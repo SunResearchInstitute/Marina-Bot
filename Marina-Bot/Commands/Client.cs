@@ -58,7 +58,7 @@ namespace Marina.Commands
         }
 
         [Command("BanUser")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task AddUserToBlacklist(IUser user)
         {
             if (!SaveHandler.BlacklistSave.Contains(user.Id))
@@ -73,7 +73,7 @@ namespace Marina.Commands
         }
 
         [Command("UnbanUser")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task RemoveUserFromBlacklist(IUser user)
         {
             if (SaveHandler.BlacklistSave.Remove(user.Id))
@@ -84,7 +84,7 @@ namespace Marina.Commands
 
 
         [Command("Announce")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task Announce(params string[] announcement)
         {
             foreach (SocketGuild guild in Context.Client.Guilds)
@@ -102,7 +102,7 @@ namespace Marina.Commands
 
         [Command("Shutdown")]
         [Alias("Quit", "Shutoff", "Stop")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task Shutdown()
         {
             await ReplyAsync("Shutting down!");
@@ -148,7 +148,7 @@ namespace Marina.Commands
         }
 
         [Command("Servers")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task GetServers()
         {
             EmbedBuilder builder = new EmbedBuilder();
@@ -191,7 +191,7 @@ namespace Marina.Commands
         }
 
         [Command("Save")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task ForceSave()
         {
             SaveHandler.SaveAll();
@@ -210,7 +210,7 @@ namespace Marina.Commands
             await ReplyAsync("You can find my voting, source, and invite links here: https://link.sunthecourier.net/marina-bot");
 
         [Command("SetMode")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task SetPriorityMode(ProcessPriorityClass mode)
         {
             using Process p = Process.GetCurrentProcess();
@@ -219,7 +219,7 @@ namespace Marina.Commands
         }
 
         [Command("Mode")]
-        [RequireOwner]
+        [RequireTeamOwnerAttributeManual]
         public async Task GetPriorityMode()
         {
             using Process p = Process.GetCurrentProcess();

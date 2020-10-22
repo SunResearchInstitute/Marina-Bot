@@ -25,7 +25,7 @@ namespace Marina.Commands
                 foreach (CommandInfo cmd in Program.Commands.Commands)
                 {
                     if (cmd.Attributes.Any(a => a is HideCommandAttribute) ||
-                        cmd.Preconditions.Any(p => p is RequireOwnerAttribute))
+                        cmd.Preconditions.Any(p => p is RequireTeamOwnerAttributeManual))
                         continue;
 
                     string str = "";
