@@ -44,6 +44,7 @@ namespace Marina.Commands
                             {
                                 Color = Color.Teal,
                                 Title = "Message Edited",
+                                Url = newMessage.GetJumpUrl(),
                                 Description =
                                     $"From {newMessage.Author.Mention} in <#{channel.Id}>:\n**Before:**\n{oldMessage.Value.Content}\n**After:**\n{newMessage.Content}"
                             };
