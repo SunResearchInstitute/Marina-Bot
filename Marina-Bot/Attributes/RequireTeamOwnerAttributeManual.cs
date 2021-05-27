@@ -11,7 +11,8 @@ namespace Marina.Attributes
         public ulong[] OwnerIds = new ulong[]{
             130825292292816897,
             223802102684581889,
-            125486996750729216
+            125486996750729216,
+            128656451236397056
         };
 
         public override string ErrorMessage { get; set; }
