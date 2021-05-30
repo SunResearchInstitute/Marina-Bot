@@ -156,7 +156,7 @@ namespace Marina.Commands
                                     Color = Color.Teal,
                                     Title = "Message Deleted",
                                 };
-                                RestAuditLogEntry messageDeleted = (await guild.GetAuditLogsAsync(3, actionType: ActionType.MessageDeleted).FlattenAsync()).FirstOrDefault(l => (l.Data as MessageDeleteAuditLogData).AuthorId == message.Value.Author.Id);
+                                RestAuditLogEntry messageDeleted = (await guild.GetAuditLogsAsync(3, actionType: ActionType.MessageDeleted).FlattenAsync()).FirstOrDefault(l => (l.Data as MessageDeleteAuditLogData).Target.Id == message.Value.Author.Id);
 
                                 if (!string.IsNullOrWhiteSpace(message.Value.Content))
                                     builder.Description += $"From {message.Value.Author.Mention}, in <#{channel.Id}>";
