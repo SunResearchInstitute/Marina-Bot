@@ -9,8 +9,8 @@ namespace Marina.Commands
     public class Suggestion : ModuleBase<SocketCommandContext>
     {
         //IDs to my discord and desired suggestions output
-        private const ulong GuildId = 506248420525342769;
-        private const ulong ChannelId = 670888046480195585;
+        private const ulong GuildId = 746651400779464784;
+        private const ulong ChannelId = 847526476248776725;
 
         [Command("Suggest")]
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
