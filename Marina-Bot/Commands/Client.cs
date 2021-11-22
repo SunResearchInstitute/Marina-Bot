@@ -207,7 +207,7 @@ namespace Marina.Commands
         [Command("Info"), Alias("Invite", "Source", "Vote")]
         [Summary("Bot information!")]
         public async Task GetInfo() =>
-            await ReplyAsync("You can find my voting, source, and invite links here: https://link.sunthecourier.net/marina-bot");
+            await ReplyAsync("You can find my voting, source, and invite links here: https://top.gg/bot/580901187931603004");
 
         [Command("SetMode")]
         [RequireTeamOwnerAttributeManual]

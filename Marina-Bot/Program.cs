@@ -34,7 +34,7 @@ namespace Marina
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 //Caching for Moderation
-                MessageCacheSize = 250,
+                MessageCacheSize = 150,
                 LogLevel = LogSeverity.Error
             });
 

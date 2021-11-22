@@ -5,17 +5,19 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Marina</RootNamespace>
     <AssemblyName>Marina-Bot</AssemblyName>
-    <Authors>SunTheCourier</Authors>
+    <Authors>gabeh</Authors>
     <Product>Marina-Bot</Product>
     <Company />
     <Description></Description>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <PackageId />
-    <RepositoryUrl>https://github.com/SunTheCourier/Marina-Bot</RepositoryUrl>
+    <RepositoryUrl>https://github.com/SunResearchInstitute/Marina-Bot</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Copyright>©SunTheCourier</Copyright>
+    <Copyright>©gabeh</Copyright>
     <Nullable>enable</Nullable>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
