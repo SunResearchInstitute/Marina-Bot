@@ -2,6 +2,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using LibSave;
+using LibSave.Types;
 using Marina.Save;
 using Marina.Utils;
 using System;
@@ -20,7 +21,6 @@ namespace Marina
         public static CommandService Commands { get; private set; }
 
         public static event EventHandler<DiscordSocketClient> Initialize;
-        public static SaveController SaveController { get; private set; }
 
         private static void Main()
         {
@@ -44,8 +44,8 @@ namespace Marina
                 DefaultRunMode = RunMode.Async,
                 LogLevel = LogSeverity.Error
             });
-
-            Dictionary<string, string> config = Misc.LoadConfig();
+            SaveHandler.RegisterSaves();
+            DictionarySaveFile<string, string> config = SaveHandler.Config;
             try
             {
                 await _client.LoginAsync(TokenType.Bot, config["token"]);
@@ -66,8 +66,7 @@ namespace Marina
             };
             Initialize?.Invoke(null, _client);
             _client.MessageReceived += MessageReceived;
-            SaveController = new SaveController("Save");
-            SaveHandler.RegisterSaves(SaveController);
+
 
             await Console.WriteLog("Initialized!");
         }

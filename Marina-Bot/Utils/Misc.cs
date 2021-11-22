@@ -25,23 +25,5 @@ namespace Marina.Utils
             obj.Stop();
             obj.Start();
         }
-
-        public static Dictionary<string, string> LoadConfig()
-        {
-            FileInfo configFile = new FileInfo("Config.txt");
-            if (configFile.Exists)
-            {
-                return File.ReadAllLines(configFile.FullName).Select(line => line.Split('='))
-                    .ToDictionary(configItems => configItems[0].ToLower(), configItems => configItems[1]);
-            }
-
-            File.WriteAllLines(configFile.FullName, new[]
-            {
-                "Token={token}"
-            });
-            Error.SendApplicationError(
-                $"Config does not exist, it has been created for you at {configFile.FullName}!", 1);
-            return null!;
-        }
     }
 }
