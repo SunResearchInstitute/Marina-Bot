@@ -8,10 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// ReSharper disable UseDeconstruction
-
-// ReSharper disable RedundantAssignment
-
 namespace Marina.Commands
 {
     public class Help : ModuleBase<SocketCommandContext>

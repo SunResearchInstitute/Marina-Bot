@@ -6,7 +6,6 @@ using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,29 +19,19 @@ namespace Marina.Commands
         {
             Program.Initialize += delegate (object? sender, DiscordSocketClient client)
             {
-                async Task UpdatePresence(SocketGuild arg)
-                {
-                    if (client.Guilds.Count > 1)
-                        await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help");
-                    else
-                        await client.SetGameAsync($"on {client.Guilds.Count} server | m.help");
-                }
 
                 client.Connected += async delegate
                 {
-                    if (client.Guilds.Count > 1)
-                        await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help");
-                    else
-                        await client.SetGameAsync($"on {client.Guilds.Count} server | m.help");
+                    await UpdatePresence(client);
                 };
 
-                client.LeftGuild += UpdatePresence;
-                client.JoinedGuild += UpdatePresence;
+                client.LeftGuild += arg => UpdatePresence(client);
+                client.JoinedGuild += arg => UpdatePresence(client);
                 //Clean Up
                 client.LeftGuild += async delegate (SocketGuild guild)
                 {
                     SaveHandler.LogSave.Remove(guild.Id);
-                    foreach(ulong val in SaveHandler.LockdownSave[guild.Id])
+                    foreach (ulong val in SaveHandler.LockdownSave[guild.Id])
                     {
                         SocketTextChannel channel = guild.GetTextChannel(val);
                         OverwritePermissions? permissions = channel.GetPermissionOverwrite(guild.EveryoneRole);
@@ -55,6 +44,24 @@ namespace Marina.Commands
                     }
                 };
             };
+        }
+
+        private static async Task UpdatePresence(DiscordSocketClient client)
+        {
+            if (string.IsNullOrEmpty(SaveHandler.Config.Data.TwitchName))
+            {
+                if (client.Guilds.Count > 1)
+                    await client.SetGameAsync($"{client.Guilds.Count} servers | m.help", type: ActivityType.Watching);
+                else
+                    await client.SetGameAsync($"{client.Guilds.Count} server | m.help", type: ActivityType.Watching);
+            }
+            else
+            {
+                if (client.Guilds.Count > 1)
+                    await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}");
+                else
+                    await client.SetGameAsync($"on {client.Guilds.Count} server | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}");
+            }
         }
 
         [Command("BanUser")]

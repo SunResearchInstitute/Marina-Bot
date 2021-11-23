@@ -9,8 +9,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Error = Marina.Utils.Error;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Local
-
 namespace Marina.Commands
 {
     public class Github : ModuleBase<SocketCommandContext>
@@ -22,9 +20,9 @@ namespace Marina.Commands
         {
             GitHubClient client = new GitHubClient(new ProductHeaderValue("Marina-Bot"));
 
-            Dictionary<string, string> config = Misc.LoadConfig();
-            if (config.ContainsKey("gitkey"))
-                client.Credentials = new Credentials(config["gitkey"]);
+            string key = Save.SaveHandler.Config.Data.GitKey;
+            if (string.IsNullOrEmpty("key"))
+                client.Credentials = new Credentials(key);
 
             Parser parser = new Parser(settings =>
             {

@@ -1,12 +1,10 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using LibSave;
-using LibSave.Types;
 using Marina.Save;
+using Marina.Save.Types;
 using Marina.Utils;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,10 +43,10 @@ namespace Marina
                 LogLevel = LogSeverity.Error
             });
             SaveHandler.RegisterSaves();
-            DictionarySaveFile<string, string> config = SaveHandler.Config;
+            ConfigFile config = SaveHandler.Config;
             try
             {
-                await _client.LoginAsync(TokenType.Bot, config["token"]);
+                await _client.LoginAsync(TokenType.Bot, config.Data.Token);
                 await _client.StartAsync();
             }
             catch (Exception e)

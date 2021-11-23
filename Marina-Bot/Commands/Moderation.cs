@@ -8,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-// ReSharper disable PossibleInvalidOperationException
-
 namespace Marina.Commands
 {
     public class Moderation : ModuleBase<SocketCommandContext>

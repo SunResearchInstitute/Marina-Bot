@@ -9,13 +9,18 @@ namespace Marina.Commands
     public class Suggestion : ModuleBase<SocketCommandContext>
     {
         //IDs to my discord and desired suggestions output
-        private const ulong GuildId = 746651400779464784;
-        private const ulong ChannelId = 847526476248776725;
+        private readonly ulong GuildId = SaveHandler.Config.Data.GuildId;
+        private readonly ulong ChannelId = SaveHandler.Config.Data.ChannelId;
 
         [Command("Suggest")]
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
         public async Task AddSuggestion([Name("Suggestion")] params string[] suggestion)
         {
+            if (SaveHandler.Config.Data.GuildId == 0L || SaveHandler.Config.Data.ChannelId == 0L)
+            {
+                await Error.SendDiscordError(Context, value: "This command has not been set up!");
+                return;
+            }
             if (SaveHandler.BlacklistSave.Contains(Context.User.Id))
             {
                 await Error.SendDiscordError(Context, value: "You are banned from using this command");
