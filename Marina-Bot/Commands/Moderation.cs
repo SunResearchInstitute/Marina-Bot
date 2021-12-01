@@ -52,7 +52,7 @@ namespace Marina.Commands
             }
 
             int rmCnt = 0;
-            foreach (IMessage msg in await Context.Channel.GetMessagesAsync(count).FlattenAsync())
+            foreach (IMessage msg in await Context.Channel.GetMessagesAsync(count + 1).FlattenAsync())
             {
                 try
                 {
