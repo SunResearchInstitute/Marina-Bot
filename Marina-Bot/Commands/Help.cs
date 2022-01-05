@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.Net;
 using Marina.Attributes;
 using Marina.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,14 @@ namespace Marina.Commands
 {
     public class Help : ModuleBase<SocketCommandContext>
     {
-        private static readonly SortedDictionary<string, string> Commands = new SortedDictionary<string, string>();
+        private static readonly SortedDictionary<string, string> Commands = new();
 
         static Help()
         {
-            Program.Initialize += delegate
+            Program.Initialize += delegate(object? sender, ServiceProvider services)
             {
-                foreach (CommandInfo cmd in Program.Commands.Commands)
+                var commands = services.GetService<CommandService>();
+                foreach (CommandInfo cmd in commands.Commands)
                 {
                     if (cmd.Attributes.Any(a => a is HideCommandAttribute) ||
                         cmd.Preconditions.Any(p => p is RequireTeamOwnerAttributeManual))

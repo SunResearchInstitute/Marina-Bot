@@ -11,17 +11,19 @@ namespace Marina.Save.Types
     {
         public Config()
         {
-            Token = "INSERT TOKEN HERE";
+            BotToken = "INSERT TOKEN HERE";
             TwitchName = "";
-            ChannelId = 0L;
-            GuildId = 0L;
+            Suggestions_ChannelId = 0L;
+            Suggestions_GuildId = 0L;
             GitKey = "";
+            Debug_GuildId = 0L;
         }
 
-        public string Token { get; set; }
+        public string BotToken { get; set; }
         public string TwitchName { get; set; }
-        public ulong ChannelId { get; set; }
-        public ulong GuildId { get; set; }
+        public ulong Suggestions_ChannelId { get; set; }
+        public ulong Suggestions_GuildId { get; set; }
         public string GitKey { get; set; }
+        public ulong Debug_GuildId { get; set; }
     }
 }

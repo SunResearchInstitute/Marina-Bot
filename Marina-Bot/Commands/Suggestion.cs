@@ -9,14 +9,14 @@ namespace Marina.Commands
     public class Suggestion : ModuleBase<SocketCommandContext>
     {
         //IDs to my discord and desired suggestions output
-        private readonly ulong GuildId = SaveHandler.Config.Data.GuildId;
-        private readonly ulong ChannelId = SaveHandler.Config.Data.ChannelId;
+        private readonly ulong GuildId = SaveHandler.Config.Data.Suggestions_GuildId;
+        private readonly ulong ChannelId = SaveHandler.Config.Data.Suggestions_ChannelId;
 
         [Command("Suggest")]
         [Summary("Send a suggestion for a feature! Please use this command responsibly")]
         public async Task AddSuggestion([Name("Suggestion")] params string[] suggestion)
         {
-            if (SaveHandler.Config.Data.GuildId == 0L || SaveHandler.Config.Data.ChannelId == 0L)
+            if (SaveHandler.Config.Data.Suggestions_GuildId == 0L || SaveHandler.Config.Data.Suggestions_ChannelId == 0L)
             {
                 await Error.SendDiscordError(Context, value: "This command has not been set up!");
                 return;

@@ -5,6 +5,7 @@ using Marina.Attributes;
 using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -17,9 +18,9 @@ namespace Marina.Commands
     {
         static Client()
         {
-            Program.Initialize += delegate (object? sender, DiscordSocketClient client)
+            Program.Initialize += delegate (object? sender, ServiceProvider service)
             {
-
+                var client = service.GetService<DiscordSocketClient>();
                 client.Connected += async delegate
                 {
                     await UpdatePresence(client);

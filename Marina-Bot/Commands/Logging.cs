@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Marina.Attributes;
 using Marina.Save;
 using Marina.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,8 +16,9 @@ namespace Marina.Commands
     {
         static Logging()
         {
-            Program.Initialize += delegate (object? sender, DiscordSocketClient client)
+            Program.Initialize += delegate (object? sender, ServiceProvider services)
             {
+                var client = services.GetService<DiscordSocketClient>();
                 client.ChannelDestroyed += delegate (SocketChannel channel)
                 {
                     //Only currently needed for Logs at the moment
@@ -73,20 +75,20 @@ namespace Marina.Commands
                     }
                 };
 
-                client.UserLeft += async delegate (SocketGuildUser user)
+                client.UserLeft += async delegate (SocketGuild guild, SocketUser user)
                 {
-                    if (SaveHandler.LogSave.ContainsKey(user.Guild.Id))
+                    if (SaveHandler.LogSave.ContainsKey(guild.Id))
                     {
-                        SocketTextChannel logChannel = user.Guild.GetTextChannel(SaveHandler.LogSave[user.Guild.Id]);
-                        RestAuditLogEntry lastKick = (await user.Guild.GetAuditLogsAsync(3, actionType: ActionType.Kick).FlattenAsync()).FirstOrDefault(l => (l.Data as KickAuditLogData).Target == user);
-                        EmbedBuilder builder = new EmbedBuilder
+                        SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
+                        RestAuditLogEntry lastKick = (await guild.GetAuditLogsAsync(3, actionType: ActionType.Kick).FlattenAsync()).FirstOrDefault(l => (l.Data as KickAuditLogData).Target == user);
+                        EmbedBuilder builder = new()
                         {
                             Color = Color.Teal
                         };
 
                         if (lastKick != null)
                         {
-                            string msg = $"You were kicked from {user.Guild.Name}";
+                            string msg = $"You were kicked from {guild.Name}";
                             if (lastKick.Reason != null) msg += $"\nReason: {lastKick.Reason}";
                             try
                             {
@@ -138,12 +140,12 @@ namespace Marina.Commands
                     }
                 };
                 client.MessageDeleted +=
-                    async delegate (Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
+                    async delegate (Cacheable<IMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel)
                     {
                         if (!message.HasValue || message.Value.Author.IsBot)
                             return;
 
-                        SocketGuild guild = ((SocketGuildChannel)channel).Guild;
+                        SocketGuild guild = ((SocketGuildChannel)channel.Value).Guild;
                         if (SaveHandler.LogSave.ContainsKey(guild.Id))
                         {
                             SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
@@ -197,18 +199,18 @@ namespace Marina.Commands
                         }
                     };
 
-                client.GuildMemberUpdated += async delegate (SocketGuildUser before, SocketGuildUser after)
+                client.GuildMemberUpdated += async delegate (Cacheable< SocketGuildUser, ulong> before, SocketGuildUser after)
                 {
-                    if (before.IsBot) return;
+                    if (before.Value.IsBot) return;
 
                     if (SaveHandler.LogSave.ContainsKey(after.Guild.Id))
                     {
                         SocketTextChannel logChannel = after.Guild.GetTextChannel(SaveHandler.LogSave[after.Guild.Id]);
                         if (logChannel != null)
                         {
-                            if (before.Nickname != after.Nickname)
+                            if (before.Value.Nickname != after.Nickname)
                             {
-                                EmbedBuilder builder = new EmbedBuilder
+                                EmbedBuilder builder = new()
                                 {
                                     Color = Color.Teal
                                 };
@@ -216,9 +218,9 @@ namespace Marina.Commands
                                 if (string.IsNullOrWhiteSpace(after.Nickname))
                                 {
                                     builder.Title = "Nickname Removal";
-                                    builder.Description = $"{after.Mention}:\n`{before.Nickname}` -> `None`";
+                                    builder.Description = $"{after.Mention}:\n`{before.Value.Nickname}` -> `None`";
                                 }
-                                else if (string.IsNullOrWhiteSpace(before.Nickname))
+                                else if (string.IsNullOrWhiteSpace(before.Value.Nickname))
                                 {
                                     builder.Title = "Nickname Changed";
                                     builder.Description = $"{after.Mention}:\n`None` -> `{after.Nickname}`";
@@ -227,7 +229,7 @@ namespace Marina.Commands
                                 {
                                     builder.Title = "Nickname Changed";
                                     builder.Description =
-                                        $"{after.Mention}:\n`{before.Nickname}` -> `{after.Nickname}`";
+                                        $"{after.Mention}:\n`{before.Value.Nickname}` -> `{after.Nickname}`";
                                 }
 
                                 await logChannel.SendMessageAsync(embed: builder.Build());
