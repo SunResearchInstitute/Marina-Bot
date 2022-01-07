@@ -45,10 +45,18 @@ namespace Marina
             }
             client.Ready += async () =>
             {
-                if (IsDebug())
-                    await interactions.RegisterCommandsToGuildAsync(config.Data.Debug_GuildId, true);
-                else
-                    await interactions.RegisterCommandsGloballyAsync(true);
+                try
+                {
+                    if (IsDebug())
+                        await interactions.RegisterCommandsToGuildAsync(config.Data.Debug_GuildId, true);
+                    else
+                        await interactions.RegisterCommandsGloballyAsync(true);
+                }
+                catch (Exception e)
+                {
+                    Error.SendApplicationError(e.Message, 1);
+                    return;
+                }
 
                 Initialize?.Invoke(null, services);
 

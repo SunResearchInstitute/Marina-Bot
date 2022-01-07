@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Marina.Attributes;
+using Marina.Commands.Attributes;
 using System.Threading.Tasks;
 
 namespace Marina.Commands

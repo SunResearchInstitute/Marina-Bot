@@ -1,11 +1,10 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Marina.Attributes;
+using Marina.Commands.Attributes;
 using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -16,55 +15,6 @@ namespace Marina.Commands
 {
     public class Client : ModuleBase<SocketCommandContext>
     {
-        static Client()
-        {
-            Program.Initialize += delegate (object? sender, ServiceProvider service)
-            {
-                var client = service.GetService<DiscordSocketClient>();
-                client.Connected += async delegate
-                {
-                    await UpdatePresence(client);
-                };
-
-                client.LeftGuild += arg => UpdatePresence(client);
-                client.JoinedGuild += arg => UpdatePresence(client);
-                //Clean Up
-                client.LeftGuild += async delegate (SocketGuild guild)
-                {
-                    SaveHandler.LogSave.Remove(guild.Id);
-                    foreach (ulong val in SaveHandler.LockdownSave[guild.Id])
-                    {
-                        SocketTextChannel channel = guild.GetTextChannel(val);
-                        OverwritePermissions? permissions = channel.GetPermissionOverwrite(guild.EveryoneRole);
-
-                        if (permissions.HasValue && permissions.Value.SendMessages == PermValue.Deny)
-                        {
-                            await channel.AddPermissionOverwriteAsync(guild.EveryoneRole,
-                                permissions.Value.Modify(sendMessages: PermValue.Inherit));
-                        }
-                    }
-                };
-            };
-        }
-
-        private static async Task UpdatePresence(DiscordSocketClient client)
-        {
-            if (string.IsNullOrEmpty(SaveHandler.Config.Data.TwitchName))
-            {
-                if (client.Guilds.Count > 1)
-                    await client.SetGameAsync($"{client.Guilds.Count} servers | m.help", type: ActivityType.Watching);
-                else
-                    await client.SetGameAsync($"{client.Guilds.Count} server | m.help", type: ActivityType.Watching);
-            }
-            else
-            {
-                if (client.Guilds.Count > 1)
-                    await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}");
-                else
-                    await client.SetGameAsync($"on {client.Guilds.Count} server | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}");
-            }
-        }
-
         [Command("BanUser")]
         [RequireTeamOwnerAttributeManual]
         public async Task AddUserToBlacklist(IUser user)

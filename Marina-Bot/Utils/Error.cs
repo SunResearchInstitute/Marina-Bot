@@ -10,14 +10,14 @@ namespace Marina.Utils
         public static async Task SendDiscordError(IInteractionContext context, string key = "An error has occured.",
             string value = "View the help menu for help.", Exception e = null)
         {
-            EmbedBuilder builder = new EmbedBuilder
+            EmbedBuilder builder = new()
             {
                 Title = "Error",
                 Color = Color.Red
             };
             builder.AddField(key, value);
             builder.WithCurrentTimestamp();
-            await context.Channel.SendMessageAsync(embed: builder.Build());
+            await context.Interaction.RespondAsync(embed: builder.Build());
             if (e != null)
             {
                 builder.Title = string.Empty;
@@ -33,7 +33,7 @@ namespace Marina.Utils
         public static async Task SendDiscordError(ICommandContext context, string key = "An error has occured.",
             string value = "View the help menu for help.", Exception e = null)
         {
-            EmbedBuilder builder = new EmbedBuilder
+            EmbedBuilder builder = new()
             {
                 Title = "Error",
                 Color = Color.Red

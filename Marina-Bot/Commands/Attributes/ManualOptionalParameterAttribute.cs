@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Marina.Attributes
+namespace Marina.Commands.Attributes
 {
     public class ManualOptionalParameterAttribute : Attribute
     {

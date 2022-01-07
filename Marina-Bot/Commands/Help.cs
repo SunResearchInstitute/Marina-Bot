@@ -1,7 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.Net;
-using Marina.Attributes;
+using Marina.Commands.Attributes;
 using Marina.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Marina.Commands
+namespace Marina.Commands.Commands
 {
     public class Help : ModuleBase<SocketCommandContext>
     {

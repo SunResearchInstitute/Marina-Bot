@@ -5,6 +5,7 @@ using Marina.Utils;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Marina.Commands.Animals.Cat
@@ -15,13 +16,13 @@ namespace Marina.Commands.Animals.Cat
         [Summary("Gets a random cat picture.")]
         public async Task UploadCat()
         {
-            using WebClient wc = new WebClient();
+            using HttpClient client = new HttpClient();
             CatData jsonData;
             try
             {
                 jsonData = JsonConvert
                     .DeserializeObject<CatData[]>(
-                        wc.DownloadString("https://api.thecatapi.com/v1/images/search?format=json")).First();
+                        await client.GetStringAsync("https://api.thecatapi.com/v1/images/search?format=json")).First();
             }
             catch (WebException e)
             {
@@ -29,9 +30,7 @@ namespace Marina.Commands.Animals.Cat
                 return;
             }
 
-            wc.Dispose();
-
-            EmbedBuilder builder = new EmbedBuilder
+            EmbedBuilder builder = new()
             {
                 Color = Color.Teal,
                 ImageUrl = jsonData.Url.OriginalString
