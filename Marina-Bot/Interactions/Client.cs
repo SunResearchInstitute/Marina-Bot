@@ -1,7 +1,6 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Marina.Commands.Attributes;
 using Marina.Properties;
 using Marina.Save;
 using Marina.Utils;
@@ -11,11 +10,11 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Console = Marina.Utils.Console;
+using RequireOwnerAttribute = Marina.Interactions.Attributes.RequireOwnerAttribute;
 
 namespace Marina.Interactions
 {
     [Group("client", "Client specific commands")]
-    [RequireTeamOwnerAttributeManual]
     public class Client : InteractionModuleBase<SocketInteractionContext>
     {
         static Client()
@@ -67,30 +66,32 @@ namespace Marina.Interactions
             }
         }
 
+        [RequireOwner]
         [SlashCommand("banuser", "Ban a user from using some of the commands!")]
         public async Task AddUserToBlacklist(IUser user)
         {
             if (!SaveHandler.BlacklistSave.Contains(user.Id))
             {
                 SaveHandler.BlacklistSave.Add(user.Id);
-                await RespondAsync("User added to blacklist!");
+                await RespondAsync("User added to blacklist!", ephemeral: true);
             }
             else
             {
-                await RespondAsync("User already in blacklist!");
+                await RespondAsync("User already in blacklist!", ephemeral: true);
             }
         }
 
+        [RequireOwner]
         [SlashCommand("unbanuser", "Unbans a user from using commands!")]
         public async Task RemoveUserFromBlacklist(IUser user)
         {
             if (SaveHandler.BlacklistSave.Remove(user.Id))
-                await RespondAsync("User removed from blacklist");
+                await RespondAsync("User removed from blacklist", ephemeral: true);
             else
-                await RespondAsync("User not added to blacklist!");
+                await RespondAsync("User not added to blacklist!", ephemeral: true);
         }
 
-
+        [RequireOwner]
         [SlashCommand("announce", "Send server owners important messages!!")]
         public async Task Announce(string announcement)
         {
@@ -104,19 +105,21 @@ namespace Marina.Interactions
                     // ignored
                 }
 
-            await RespondAsync("Announcement sent to all Guild Owners! :ok_hand:");
+            await RespondAsync("Announcement sent to all Guild Owners! :ok_hand:", ephemeral: true);
         }
 
+        [RequireOwner]
         [SlashCommand("stop", "Shut down Marina remotely!")]
         public async Task Shutdown()
         {
-            await RespondAsync("Shutting down!");
+            await RespondAsync("Shutting down!", ephemeral: true);
             await Context.Client.StopAsync();
             SaveHandler.SaveAll(false);
             await Console.WriteLog("***********************Shutdown via Command!***********************");
             Environment.Exit(0);
         }
 
+        [RequireOwner]
         [SlashCommand("say", "Say something lole")]
         [RequireUserPermission(ChannelPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
@@ -126,7 +129,7 @@ namespace Marina.Interactions
             await RespondAsync(":thumbsup:", ephemeral: true);
         }
 
-
+        [RequireOwner]
         [SlashCommand("csay", "Say something in a specific channel!")]
         [RequireUserPermission(ChannelPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
@@ -136,8 +139,8 @@ namespace Marina.Interactions
             await RespondAsync(":thumbsup:", ephemeral: true);
         }
 
+        [RequireOwner]
         [SlashCommand("servers", "See what servers the bot is in!")]
-        [RequireTeamOwnerAttributeManual]
         public async Task GetServers()
         {
             EmbedBuilder builder = new();
@@ -175,39 +178,42 @@ namespace Marina.Interactions
             else
             {
                 builder.WithCurrentTimestamp();
-                await RespondAsync(embed: builder.Build());
+                await RespondAsync(embed: builder.Build(), ephemeral: true);
             }
         }
 
+        [RequireOwner]
         [SlashCommand("save", "flush all save data to files!")]
         public async Task ForceSave()
         {
             SaveHandler.SaveAll();
-            await RespondAsync("Saved all data!");
+            await RespondAsync("Saved all data!", ephemeral: true);
         }
 
+        [RequireOwner]
         [SlashCommand("version", "Revision Number")]
-        [DefaultPermission(true)]
         public async Task GetVersion() =>
-            await RespondAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}");
+            await RespondAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}", ephemeral: true);
 
+        [RequireOwner]
         [SlashCommand("info", "Bot information!", true)]
-        [DefaultPermission(true)]
         public async Task GetInfo() => await RespondAsync("You can find my voting, source, and invite links here: https://top.gg/bot/580901187931603004");
 
+        [RequireOwner]
         [SlashCommand("setpmode", "set the bot's priority!")]
         public async Task SetPriorityMode(ProcessPriorityClass mode)
         {
             using Process p = Process.GetCurrentProcess();
             p.PriorityClass = mode;
-            await RespondAsync($"Set priority to `{p.PriorityClass}`");
+            await RespondAsync($"Set priority to `{p.PriorityClass}`", ephemeral: true);
         }
 
+        [RequireOwner]
         [SlashCommand("pmode", "Get the priority that has been set!")]
         public async Task GetPriorityMode()
         {
             using Process p = Process.GetCurrentProcess();
-            await RespondAsync($"Priority is set to `{p.PriorityClass}`");
+            await RespondAsync($"Priority is set to `{p.PriorityClass}`", ephemeral: true);
         }
     }
 }

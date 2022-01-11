@@ -8,7 +8,7 @@ namespace Marina.Utils
     public static class Error
     {
         public static async Task SendDiscordError(IInteractionContext context, string key = "An error has occured.",
-            string value = "View the help menu for help.", Exception e = null)
+            string value = "View the help menu for help.", Exception e = null, bool followUp = false)
         {
             EmbedBuilder builder = new()
             {
@@ -17,7 +17,10 @@ namespace Marina.Utils
             };
             builder.AddField(key, value);
             builder.WithCurrentTimestamp();
-            await context.Interaction.RespondAsync(embed: builder.Build());
+            if (!followUp)
+                await context.Interaction.RespondAsync(embed: builder.Build());
+            else
+                await context.Interaction.FollowupAsync(embed: builder.Build());
             if (e != null)
             {
                 builder.Title = string.Empty;

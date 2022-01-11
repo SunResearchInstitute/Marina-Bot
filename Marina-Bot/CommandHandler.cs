@@ -92,7 +92,7 @@ namespace Marina
                 await Utils.Console.WriteLog($"{context.User} ({context.User.Id}) executed command: {context.Message}");
         }
 
-        private async Task ComponentCommandExecuted(ComponentCommandInfo arg1, Discord.IInteractionContext arg2, IResult arg3)
+        private async Task ComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
             if (!arg3.IsSuccess)
             {
@@ -100,7 +100,7 @@ namespace Marina
             }
         }
 
-        private async Task ContextCommandExecuted(ContextCommandInfo arg1, Discord.IInteractionContext arg2, IResult arg3)
+        private async Task ContextCommandExecuted(ContextCommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
             if (!arg3.IsSuccess)
             {
@@ -108,7 +108,7 @@ namespace Marina
             }
         }
 
-        private async Task SlashCommandExecuted(SlashCommandInfo arg1, Discord.IInteractionContext arg2, IResult arg3)
+        private async Task SlashCommandExecuted(SlashCommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
             if (!arg3.IsSuccess)
             {

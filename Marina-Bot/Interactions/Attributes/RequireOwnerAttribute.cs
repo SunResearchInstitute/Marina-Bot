@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Marina.Interactions.Attributes
 {
-    class RequireTeamOwnerAttributeManual : PreconditionAttribute
+    class RequireOwnerAttribute : PreconditionAttribute
     {
         public override async Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {

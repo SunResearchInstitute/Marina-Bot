@@ -1,6 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
-using Discord.Net;
+using Discord.Interactions;
 using Marina.Utils;
 using Newtonsoft.Json;
 using System.Linq;
@@ -8,12 +7,11 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Marina.Commands.Animals.Cat
+namespace Marina.Interactions.Animals.Cat
 {
-    public class CatUpload : ModuleBase<SocketCommandContext>
+    public class CatUpload : InteractionModuleBase<SocketInteractionContext>
     {
-        [Command("Cat")]
-        [Summary("Gets a random cat picture.")]
+        [SlashCommand("cat", "Gets a random cat picture.")]
         public async Task UploadCat()
         {
             using HttpClient client = new();
@@ -40,7 +38,7 @@ namespace Marina.Commands.Animals.Cat
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");
 
-            await ReplyAsync(embed: builder.Build());
+            await RespondAsync(embed: builder.Build());
         }
     }
 }

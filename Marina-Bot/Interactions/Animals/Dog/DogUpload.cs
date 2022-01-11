@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Discord.Net;
 using Marina.Utils;
 using Newtonsoft.Json;
@@ -8,14 +8,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Marina.Commands.Animals.Dog
+namespace Marina.Interactions.Animals.Dog
 {
-    public class DogUpload : ModuleBase<SocketCommandContext>
+    public class DogUpload : InteractionModuleBase<SocketInteractionContext>
     {
-        [Command("Dog")]
-        [Summary("Gets a random dog picture.")]
+        [SlashCommand("dog", "Gets a random dog picture.")]
         public async Task UploadDog()
         {
+            //This just downloads the json which should be fine
             DogData jsonData;
             using HttpClient client = new();
             try
@@ -39,8 +39,7 @@ namespace Marina.Commands.Animals.Dog
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://dog.ceo/dog-api/");
 
-            await ReplyAsync(embed: builder.Build());
-
+            await RespondAsync(embed: builder.Build());
         }
     }
 }

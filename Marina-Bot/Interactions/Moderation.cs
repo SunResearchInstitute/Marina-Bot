@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace Marina.Interactions
 {
-    [Group("moderation", "moderation commands")]
     public class Moderation : InteractionModuleBase<SocketInteractionContext>
     {
         [RequireUserPermission(GuildPermission.BanMembers)]

@@ -15,7 +15,6 @@ namespace Marina.Save
         public static ListSaveFile<ulong> BlacklistSave => SaveController.GetSave<ListSaveFile<ulong>>("Blacklist");
         public static DictionarySaveFile<ulong, List<ulong>> LockdownSave => SaveController.GetSave<DictionarySaveFile<ulong, List<ulong>>>("Lockdowns");
         public static ConfigFile Config => SaveController.GetSave<ConfigFile>("Config");
-        public static ListSaveFile<ulong> Owners => SaveController.GetSave<ListSaveFile<ulong>>("Owners");
 
         public static void RegisterSaves()
         {
@@ -24,12 +23,6 @@ namespace Marina.Save
             SaveController.RegisterDictionarySave<ulong, List<ulong>>("Lockdowns");
             FileInfo f = SaveController.GetSavePath("Config");
             SaveController.RegisterCustomSave("Config", new ConfigFile(f));
-            SaveController.RegisterListSave("Owners", new List<ulong>() {
-            130825292292816897,
-            223802102684581889,
-            125486996750729216,
-            128656451236397056
-            });
             if (!f.Exists)
             {
                 Error.SendApplicationError($"Config does not exist, it has been created for you at {f.FullName}!", 1);

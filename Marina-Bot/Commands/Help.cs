@@ -70,7 +70,7 @@ namespace Marina.Commands.Commands
         [Command("Help")]
         public async Task GetHelp([Name("Command")] string command = null)
         {
-            EmbedBuilder builder = new EmbedBuilder
+            EmbedBuilder builder = new()
             {
                 Color = Color.Teal,
                 Title = "Help Menu"

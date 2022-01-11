@@ -16,6 +16,7 @@ namespace Marina.Interactions
             {
                 using Ping pinger = new();
                 PingReply reply = pinger.Send(ip);
+                await DeferAsync();
                 if (reply.Status == IPStatus.Success)
                 {
                     EmbedBuilder builder = new()
@@ -25,11 +26,11 @@ namespace Marina.Interactions
                     builder.WithCurrentTimestamp();
                     string s = reply.Address.ToString() != ip ? $"{reply.Address} ({ip})" : $"{reply.Address}";
                     builder.AddField(s, $"RTT: {reply.RoundtripTime}ms");
-                    await RespondAsync(embed: builder.Build());
+                    await FollowupAsync(embed: builder.Build());
                 }
                 else
                 {
-                    await Error.SendDiscordError(Context, value: $"Ping failed!\nStatus: {reply.Status}");
+                    await Error.SendDiscordError(Context, value: $"Ping failed!\nStatus: {reply.Status}", followUp: true);
                 }
             }
             catch
