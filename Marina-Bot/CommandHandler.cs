@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Marina.Utils;
@@ -38,6 +39,28 @@ namespace Marina
             _interactions.Log += async delegate (LogMessage log)
             {
                 await Utils.Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
+            };
+
+            _client.MessageReceived += async delegate (SocketMessage msg)
+            {
+                if (msg is SocketUserMessage message)
+                {
+                    SocketCommandContext context = new(_client, message);
+                    int prefixPos = 0;
+
+                    if (!string.IsNullOrWhiteSpace(context.Message.Content) && !context.User.IsBot && message.HasStringPrefix("m.", ref prefixPos))
+                    {
+                        EmbedBuilder builder = new()
+                        {
+                            Title = "Error",
+                            Color = Color.Red
+                        };
+                        builder.AddField("An error has occured.", "Text commands are no longer supported. Please use slash commands!");
+                        builder.WithCurrentTimestamp();
+
+                        await context.Channel.SendMessageAsync(embed: builder.Build());
+                    }
+                }
             };
         }
 
