@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace Marina.Utils
@@ -10,7 +8,7 @@ namespace Marina.Utils
     {
         public static string[] ConvertToDiscordSendable(string s, int size = 2048)
         {
-            List<string> readable = new List<string>();
+            List<string> readable = new();
             for (int i = 0; i < s.Length; i += size)
             {
                 int length = Math.Min(s.Length - i, size);

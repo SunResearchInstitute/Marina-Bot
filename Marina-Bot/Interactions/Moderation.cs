@@ -1,44 +1,39 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
-using Marina.Attributes;
+using Marina.Interactions.Attributes;
 using Marina.Save;
 using Marina.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Marina.Commands
+namespace Marina.Interactions
 {
-    public class Moderation : ModuleBase<SocketCommandContext>
+    public class Moderation : InteractionModuleBase<SocketInteractionContext>
     {
         [RequireUserPermission(GuildPermission.BanMembers)]
         [RequireBotPermission(GuildPermission.BanMembers)]
-        [Command("Ban")]
-        public async Task BanUser([Name("User")][RequireHierarchy] SocketGuildUser user,
-            [Name("Reason")] params string[] reason)
+        [SlashCommand("ban", "Ban someone lole")]
+        public async Task BanUser([RequireHierarchy] SocketGuildUser user, string reason = null, int pruneDays = 0)
         {
-            string reasonJoined = (reason != null ? string.Join(' ', reason) : null)!;
-            await user.BanAsync(reason: reasonJoined);
-            await ReplyAsync($"{user} is now b& :thumbsup:");
-            //Bans will automatically logged
+            await user.BanAsync(pruneDays, reason);
+            await RespondAsync($"{user} is now b& :thumbsup:");
         }
 
         [RequireUserPermission(GuildPermission.KickMembers)]
         [RequireBotPermission(GuildPermission.KickMembers)]
-        [Command("Kick")]
-        public async Task KickUser([Name("User")][RequireHierarchy] SocketGuildUser user,
-            [Name("Reason")] params string[] reason)
+        [SlashCommand("kick", "kick someone lole")]
+        public async Task KickUser([RequireHierarchy] SocketGuildUser user, string reason = null)
         {
-            string joined = (reason != null ? string.Join(' ', reason) : null)!;
-            await user.KickAsync(joined);
-            await ReplyAsync($"kicked {user} :boot:");
+            await user.KickAsync(reason);
+            await RespondAsync($"kicked {user} :boot:");
         }
 
-        [Command("Purge")]
-        [RequireBotPermission(ChannelPermission.ManageMessages)]
-        [RequireUserPermission(ChannelPermission.ManageMessages)]
-        public async Task Purge([Name("Count")] int count = 50)
+        [RequireBotPermission(GuildPermission.ManageMessages)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [SlashCommand("purge", "purge messages from the current channel")]
+        public async Task Purge(int count = 50)
         {
             if (count <= 0)
             {
@@ -72,22 +67,13 @@ namespace Marina.Commands
                 await Error.SendDiscordError(Context, value: "Could not remove any messages");
                 return;
             }
-            IUserMessage resultMsg = await ReplyAsync($"Removed {rmCnt - 1} messages");
-            await Task.Delay(TimeSpan.FromSeconds(3));
-            try
-            {
-                await resultMsg.DeleteAsync();
-            }
-            catch
-            {
-                // ignored
-            }
+            await RespondAsync($"Removed {rmCnt - 1} messages", ephemeral: true);
         }
 
-        [Command("Lock")]
-        [Summary("Denies the Everyone role from sending messages")]
-        [RequireUserPermission(GuildPermission.ManageChannels)]
-        [RequireBotPermission(ChannelPermission.ManageChannels)]
+        
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireBotPermission(GuildPermission.Administrator)]
+        [SlashCommand("lock", "Denies the Everyone role from sending messages")]
         public async Task Lockdown()
         {
             if (!SaveHandler.LockdownSave.ContainsKey(Context.Guild.Id))
@@ -122,14 +108,12 @@ namespace Marina.Commands
 
             SaveHandler.LockdownSave[Context.Guild.Id].Add(Context.Channel.Id);
 
-            await ReplyAsync("Channel is now locked down!");
+            await RespondAsync("Channel is now locked down!");
         }
 
-        [Command("Unlock")]
-        [Summary(
-            "Unlocks a channels that was previously locked in which did not allow for the Everyone role to send messages in.")]
-        [RequireUserPermission(GuildPermission.ManageChannels)]
-        [RequireBotPermission(ChannelPermission.ManageChannels)]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireBotPermission(GuildPermission.Administrator)]
+        [SlashCommand("unlock", "Unlocks a channels that was previously locked .")]
         public async Task Unlock()
         {
             if (!SaveHandler.LockdownSave.ContainsKey(Context.Guild.Id) ||
@@ -150,7 +134,7 @@ namespace Marina.Commands
 
             SaveHandler.LockdownSave[Context.Guild.Id].Remove(Context.Channel.Id);
 
-            await ReplyAsync("Channel is unlocked!");
+            await RespondAsync("Channel is unlocked!");
         }
     }
 }

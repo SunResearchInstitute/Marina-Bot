@@ -1,15 +1,13 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Marina.Utils;
 using System.Threading.Tasks;
 
-namespace Marina.Commands
+namespace Marina.Interactions
 {
-    public class Guild : ModuleBase<SocketCommandContext>
+    public class Guild : InteractionModuleBase<SocketInteractionContext>
     {
-        [Command("ServerIcon")]
-        [Alias("Server")]
-        [Summary("Gets a image of the server icon.")]
+        [SlashCommand("servericon", "Gets a image of the server icon.")]
         public async Task GetServerIcon()
         {
             if (Context.Guild == null)
@@ -18,7 +16,7 @@ namespace Marina.Commands
                 return;
             }
 
-            EmbedBuilder builder = new EmbedBuilder
+            EmbedBuilder builder = new()
             {
                 Title = $"Server Icon",
                 Color = Color.Teal,
@@ -26,7 +24,7 @@ namespace Marina.Commands
             };
             builder.WithCurrentTimestamp();
 
-            await ReplyAsync(embed: builder.Build());
+            await RespondAsync(embed: builder.Build());
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
 using System;
 using System.Threading.Tasks;
 
@@ -7,17 +6,19 @@ namespace Marina.Utils
 {
     public static class Error
     {
-        public static async Task SendDiscordError(SocketCommandContext context, string key = "An error has occured.",
-            string value = "View the help menu for help.", Exception e = null)
+        public static async Task SendDiscordError(IInteractionContext context, string key = "An error has occured.", string value = "View the help menu for help.", Exception e = null, bool followUp = false, bool ephemeral = false)
         {
-            EmbedBuilder builder = new EmbedBuilder
+            EmbedBuilder builder = new()
             {
                 Title = "Error",
                 Color = Color.Red
             };
             builder.AddField(key, value);
             builder.WithCurrentTimestamp();
-            await context.Channel.SendMessageAsync(embed: builder.Build());
+            if (!followUp)
+                await context.Interaction.RespondAsync(embed: builder.Build(), ephemeral: ephemeral);
+            else
+                await context.Interaction.FollowupAsync(embed: builder.Build(), ephemeral: ephemeral);
             if (e != null)
             {
                 builder.Title = string.Empty;

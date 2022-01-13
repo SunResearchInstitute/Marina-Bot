@@ -1,27 +1,25 @@
 ﻿using Discord;
-using Discord.Commands;
-using Discord.Net;
+using Discord.Interactions;
 using Marina.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Marina.Commands.Animals.Dog
+namespace Marina.Interactions.Dog
 {
-    public class DogUpload : ModuleBase<SocketCommandContext>
+    public class Dog : InteractionModuleBase<SocketInteractionContext>
     {
-        [Command("Dog")]
-        [Summary("Gets a random dog picture.")]
+        [SlashCommand("dog", "Gets a random dog picture.")]
         public async Task UploadDog()
         {
-            //This just downloads the json which should be fine
             DogData jsonData;
-            using WebClient wc = new WebClient();
+            using HttpClient client = new();
             try
             {
                 jsonData = JsonConvert.DeserializeObject<DogData>(
-                    wc.DownloadString("https://dog.ceo/api/breeds/image/random"));
+                    await client.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
             }
             catch (WebException e)
             {
@@ -29,24 +27,24 @@ namespace Marina.Commands.Animals.Dog
                 return;
             }
 
-            wc.Dispose();
             if (jsonData.Status != "success")
                 await Error.SendDiscordError(Context, value: "API Failed!", e: new Exception("Dog API Failed!"));
-            EmbedBuilder builder = new EmbedBuilder
+            EmbedBuilder builder = new()
             {
                 Color = Color.Teal,
                 ImageUrl = jsonData.ImageUrl.OriginalString
             };
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://dog.ceo/dog-api/");
-            try
-            {
-                await Context.User.SendMessageAsync(embed: builder.Build());
-            }
-            catch (HttpException)
-            {
-                await ReplyAsync("Unable to send DM!");
-            }
+
+            await RespondAsync(embed: builder.Build());
         }
+    }
+
+    public partial class DogData
+    {
+        [JsonProperty("message")] public Uri ImageUrl { get; set; }
+
+        [JsonProperty("status")] public string Status { get; set; }
     }
 }
