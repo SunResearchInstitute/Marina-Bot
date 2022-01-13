@@ -1,5 +1,4 @@
 using Discord;
-using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Marina.Save;
@@ -29,7 +28,6 @@ namespace Marina
             
             var client = services.GetRequiredService<DiscordSocketClient>();
             var interactions = services.GetRequiredService<InteractionService>();
-            var commands = services.GetRequiredService<CommandService>();
             SaveHandler.RegisterSaves();
             ConfigFile config = SaveHandler.Config;
 
@@ -47,10 +45,10 @@ namespace Marina
             {
                 try
                 {
-                    if (IsDebug())
-                        await interactions.RegisterCommandsToGuildAsync(config.Data.Debug_GuildId, true);
-                    else
+                    if (!IsDebug())
                         await interactions.RegisterCommandsGloballyAsync(true);
+                    else
+                        await interactions.RegisterCommandsToGuildAsync(config.Data.Debug_GuildId, true);
                 }
                 catch (Exception e)
                 {
@@ -79,14 +77,10 @@ namespace Marina
                     LogLevel = LogSeverity.Error
                 }))
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
-                .AddSingleton(x => new CommandService(new CommandServiceConfig
-                {
-                    CaseSensitiveCommands = false,
-                    LogLevel = LogSeverity.Error
-                }))
                 .AddSingleton<CommandHandler>()
                 .BuildServiceProvider();
         }
+
         static bool IsDebug()
         {
 #if DEBUG

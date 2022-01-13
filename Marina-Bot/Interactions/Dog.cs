@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.Net;
 using Marina.Utils;
 using Newtonsoft.Json;
 using System;
@@ -8,9 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Marina.Interactions.Animals.Dog
+namespace Marina.Interactions.Dog
 {
-    public class DogUpload : InteractionModuleBase<SocketInteractionContext>
+    public class Dog : InteractionModuleBase<SocketInteractionContext>
     {
         [SlashCommand("dog", "Gets a random dog picture.")]
         public async Task UploadDog()
@@ -41,5 +40,12 @@ namespace Marina.Interactions.Animals.Dog
 
             await RespondAsync(embed: builder.Build());
         }
+    }
+
+    public partial class DogData
+    {
+        [JsonProperty("message")] public Uri ImageUrl { get; set; }
+
+        [JsonProperty("status")] public string Status { get; set; }
     }
 }

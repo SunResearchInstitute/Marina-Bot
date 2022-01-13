@@ -1,19 +1,18 @@
 ﻿using Discord;
-using Discord.Commands;
-using Discord.Net;
+using Discord.Interactions;
 using Marina.Utils;
 using Newtonsoft.Json;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Marina.Commands.Animals.Cat
+namespace Marina.Animals.Cat
 {
-    public class CatUpload : ModuleBase<SocketCommandContext>
+    public class Cat : InteractionModuleBase<SocketInteractionContext>
     {
-        [Command("Cat")]
-        [Summary("Gets a random cat picture.")]
+        [SlashCommand("cat", "Gets a random cat picture.")]
         public async Task UploadCat()
         {
             using HttpClient client = new();
@@ -40,7 +39,37 @@ namespace Marina.Commands.Animals.Cat
             builder.WithCurrentTimestamp();
             builder.WithFooter("Taken from https://thecatapi.com/");
 
-            await ReplyAsync(embed: builder.Build());
+            await RespondAsync(embed: builder.Build());
         }
+    }
+
+    public partial class CatData
+    {
+        [JsonProperty("breeds")]
+        public object[] Breeds { get; set; }
+
+        [JsonProperty("categories", NullValueHandling = NullValueHandling.Ignore)]
+        public Category[] Categories { get; set; }
+
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("url")]
+        public Uri Url { get; set; }
+
+        [JsonProperty("width")]
+        public long Width { get; set; }
+
+        [JsonProperty("height")]
+        public long Height { get; set; }
+    }
+
+    public partial class Category
+    {
+        [JsonProperty("id")]
+        public long Id { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Marina.Utils;
@@ -13,83 +12,33 @@ namespace Marina
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
-        private readonly InteractionService _interacts;
-        public readonly CommandService _commands;
+        private readonly InteractionService _interactions;
         private readonly IServiceProvider _services;
 
-        public CommandHandler(DiscordSocketClient client, InteractionService interacts, CommandService commands, IServiceProvider services)
+        public CommandHandler(DiscordSocketClient client, InteractionService interacts, IServiceProvider services)
         {
             _client = client;
-            _interacts = interacts;
-            _commands = commands;
+            _interactions = interacts;
             _services = services;
         }
 
         public async Task InitializeAsync()
         {
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
-            await _interacts.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            await _interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
             // Process the InteractionCreated payloads to execute Interactions commands
             _client.InteractionCreated += HandleInteraction;
 
             // Process the command execution results 
-            _interacts.SlashCommandExecuted += SlashCommandExecuted;
-            _interacts.ContextCommandExecuted += ContextCommandExecuted;
-            _interacts.ComponentCommandExecuted += ComponentCommandExecuted;
+            _interactions.SlashCommandExecuted += SlashCommandExecuted;
+            _interactions.ContextCommandExecuted += ContextCommandExecuted;
+            _interactions.ComponentCommandExecuted += ComponentCommandExecuted;
 
-            _interacts.Log += async delegate (LogMessage log)
+            _interactions.Log += async delegate (LogMessage log)
             {
-                if (log.Exception != null && log.Exception is CommandException exception && log.Exception.InnerException != null)
-                    await Error.SendDiscordError((SocketCommandContext)exception.Context, value: "A Fatal error has occured. This has been reported.", e: log.Exception.InnerException);
-                else
-                    await Utils.Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
+                await Utils.Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
             };
-            _commands.Log += async delegate (LogMessage log)
-            {
-                if (log.Exception != null && log.Exception is CommandException exception && log.Exception.InnerException != null)
-                    await Error.SendDiscordError((SocketCommandContext)exception.Context, value: "A Fatal error has occured. This has been reported.", e: log.Exception.InnerException);
-                else
-                    await Utils.Console.WriteLog($"[{DateTime.Now}]: {log.ToString()}\n");
-            };
-
-            _client.MessageReceived += MessageReceived;
-        }
-
-        private async Task MessageReceived(SocketMessage arg)
-        {
-            //Welcomes are considered a message and are null
-            if (arg is not SocketUserMessage message)
-                return;
-
-            SocketCommandContext context = new(_client, message);
-            int prefixPos = 0;
-
-            if (string.IsNullOrWhiteSpace(context.Message.Content) || context.User.IsBot)
-                return;
-
-            if (context.Guild != null)
-            {
-                if (IsDebug())
-                {
-                    if (!message.HasStringPrefix("d.", ref prefixPos))
-                        return;
-                }
-                else
-                {
-                    if (!message.HasStringPrefix("m.", ref prefixPos))
-                        return;
-                }
-            }
-
-
-            await context.Channel.TriggerTypingAsync();
-            Discord.Commands.IResult result = await _commands.ExecuteAsync(context, prefixPos, null);
-            if (!result.IsSuccess)
-                await Error.SendDiscordError(context, result.ErrorReason);
-            else
-                await Utils.Console.WriteLog($"{context.User} ({context.User.Id}) executed command: {context.Message}");
         }
 
         private async Task ComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
@@ -122,7 +71,7 @@ namespace Marina
             {
                 // Create an execution context that matches the generic type parameter of your InteractionModuleBase<T> modules
                 var ctx = new SocketInteractionContext(_client, arg);
-                await _interacts.ExecuteCommandAsync(ctx, _services);
+                await _interactions.ExecuteCommandAsync(ctx, _services);
             }
             catch (Exception ex)
             {
@@ -133,15 +82,6 @@ namespace Marina
                 if (arg.Type == InteractionType.ApplicationCommand)
                     await arg.GetOriginalResponseAsync().ContinueWith(async (msg) => await msg.Result.DeleteAsync());
             }
-        }
-
-        static bool IsDebug()
-        {
-#if DEBUG
-            return true;
-#else
-                return false;
-#endif
         }
     }
 }
