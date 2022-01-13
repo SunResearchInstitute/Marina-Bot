@@ -14,7 +14,6 @@ namespace Marina.Interactions.Dog
         [SlashCommand("dog", "Gets a random dog picture.")]
         public async Task UploadDog()
         {
-            //This just downloads the json which should be fine
             DogData jsonData;
             using HttpClient client = new();
             try
