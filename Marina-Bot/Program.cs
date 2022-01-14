@@ -25,7 +25,7 @@ namespace Marina
         private static async Task MainAsync()
         {
             using var services = ConfigureServices();
-            
+
             var client = services.GetRequiredService<DiscordSocketClient>();
             var interactions = services.GetRequiredService<InteractionService>();
             SaveHandler.RegisterSaves();
@@ -46,9 +46,15 @@ namespace Marina
                 try
                 {
                     if (!IsDebug())
+                    {
                         await interactions.RegisterCommandsGloballyAsync(true);
+                        await Console.WriteLog("Registering commands globally");
+                    }
                     else
+                    {
                         await interactions.RegisterCommandsToGuildAsync(config.Data.Debug_GuildId, true);
+                        await Console.WriteLog($"Registering commands to guild {config.Data.Debug_GuildId}");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -86,7 +92,7 @@ namespace Marina
 #if DEBUG
             return true;
 #else
-                return false;
+            return false;
 #endif
         }
     }
