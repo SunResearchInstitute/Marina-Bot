@@ -190,12 +190,10 @@ namespace Marina.Interactions
             await RespondAsync("Saved all data!", ephemeral: true);
         }
 
-        [RequireOwner]
         [SlashCommand("version", "Revision Number")]
         public async Task GetVersion() =>
             await RespondAsync($"Git Commit: {Encoding.UTF8.GetString(Resources.CurrentCommit)}", ephemeral: true);
 
-        [RequireOwner]
         [SlashCommand("info", "Bot information!", true)]
         public async Task GetInfo() => await RespondAsync("You can find my voting, source, and invite links here: https://top.gg/bot/580901187931603004");
 
