@@ -42,7 +42,7 @@ namespace Marina.Interactions
                         SocketTextChannel logChannel = guild.GetTextChannel(SaveHandler.LogSave[guild.Id]);
                         if (oldMessage.Value.Content != newMessage.Content)
                         {
-                            EmbedBuilder builder = new EmbedBuilder
+                            EmbedBuilder builder = new()
                             {
                                 Color = Color.Teal,
                                 Title = "Message Edited",

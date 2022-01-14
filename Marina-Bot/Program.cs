@@ -14,7 +14,6 @@ namespace Marina
 {
     internal static class Program
     {
-        //API Stuff
         public static event EventHandler<ServiceProvider> Initialize;
 
         private static void Main()

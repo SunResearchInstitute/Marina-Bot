@@ -19,14 +19,10 @@ namespace Marina.Interactions
     {
         static Client()
         {
-            Program.Initialize += delegate (object? sender, ServiceProvider service)
+            Program.Initialize += async delegate (object? sender, ServiceProvider service)
             {
                 var client = service.GetService<DiscordSocketClient>();
-                client.Connected += async delegate
-                {
-                    await UpdatePresence(client);
-                };
-
+                await UpdatePresence(client);
                 client.LeftGuild += arg => UpdatePresence(client);
                 client.JoinedGuild += arg => UpdatePresence(client);
                 //Clean Up
@@ -60,9 +56,9 @@ namespace Marina.Interactions
             else
             {
                 if (client.Guilds.Count > 1)
-                    await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}");
+                    await client.SetGameAsync($"on {client.Guilds.Count} servers | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}", ActivityType.Streaming);
                 else
-                    await client.SetGameAsync($"on {client.Guilds.Count} server | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}");
+                    await client.SetGameAsync($"on {client.Guilds.Count} server | m.help", $"https://twitch.tv/{SaveHandler.Config.Data.TwitchName}", ActivityType.Streaming);
             }
         }
 
