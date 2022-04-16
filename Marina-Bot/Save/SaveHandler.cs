@@ -14,10 +14,12 @@ namespace Marina.Save
         public static DictionarySaveFile<ulong, ulong> LogSave => SaveController.GetSave<DictionarySaveFile<ulong, ulong>>("Logs");
         public static ListSaveFile<ulong> BlacklistSave => SaveController.GetSave<ListSaveFile<ulong>>("Blacklist");
         public static DictionarySaveFile<ulong, List<ulong>> LockdownSave => SaveController.GetSave<DictionarySaveFile<ulong, List<ulong>>>("Lockdowns");
+        public static ListSaveFile<string> ClipsShipped => SaveController.GetSave<ListSaveFile<string>>("Clips");
         public static ConfigFile Config => SaveController.GetSave<ConfigFile>("Config");
 
         public static void RegisterSaves()
         {
+            SaveController.RegisterListSave<string>("Clips");
             SaveController.RegisterDictionarySave<ulong, ulong>("Logs");
             SaveController.RegisterListSave<ulong>("Blacklist");
             SaveController.RegisterDictionarySave<ulong, List<ulong>>("Lockdowns");
@@ -29,7 +31,7 @@ namespace Marina.Save
             }
         }
 
-        private static readonly Timer Timer = new Timer(1.8e+6)
+        private static readonly Timer Timer = new(1.8e+6)
         {
             AutoReset = true,
             Enabled = true
